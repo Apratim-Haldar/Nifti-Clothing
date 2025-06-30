@@ -1,0 +1,201 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import type { Category, AdminTabProps } from '../../types/admin';
+
+const CategoriesTab: React.FC<AdminTabProps> = ({ setMessage, setError }) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [newCategory, setNewCategory] = useState<string>('');
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async (): Promise<void> => {
+    try {
+      setLoading(true);
+      const response = await axios.get<Category[]>(`${import.meta.env.VITE_API_BASE_URL}/categories`);
+      setCategories(response.data);
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+      setMessage('Failed to fetch categories', true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddCategory = async (): Promise<void> => {
+    if (!newCategory.trim()) {
+      setMessage('Category name is required', true);
+      return;
+    }
+
+    try {
+      const response = await axios.post<Category>(
+        `${import.meta.env.VITE_API_BASE_URL}/categories`,
+        { name: newCategory.trim() },
+        { withCredentials: true }
+      );
+      setCategories([...categories, response.data]);
+      setNewCategory('');
+      setMessage('Category added successfully!');
+    } catch (err: any) {
+      console.error('Error adding category:', err);
+      setMessage(err.response?.data?.message || 'Failed to add category', true);
+    }
+  };
+
+  const handleUpdateCategory = async (): Promise<void> => {
+    if (!editingCategory || !editingCategory.name.trim()) {
+      setMessage('Category name is required', true);
+      return;
+    }
+
+    try {
+      const response = await axios.put<Category>(
+        `${import.meta.env.VITE_API_BASE_URL}/categories/${editingCategory._id}`,
+        { name: editingCategory.name.trim() },
+        { withCredentials: true }
+      );
+      setCategories(categories.map(cat => 
+        cat._id === editingCategory._id ? response.data : cat
+      ));
+      setEditingCategory(null);
+      setMessage('Category updated successfully!');
+    } catch (err: any) {
+      console.error('Error updating category:', err);
+      setMessage(err.response?.data?.message || 'Failed to update category', true);
+    }
+  };
+
+  const handleDeleteCategory = async (id: string): Promise<void> => {
+    if (!window.confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/categories/${id}`, {
+        withCredentials: true
+      });
+      setCategories(categories.filter(c => c._id !== id));
+      setMessage('Category deleted successfully!');
+    } catch (err: any) {
+      console.error('Error deleting category:', err);
+      setMessage(err.response?.data?.message || 'Failed to delete category', true);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent, action: () => void): void => {
+    if (e.key === 'Enter') {
+      action();
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+        <span className="ml-3 text-gray-600">Loading categories...</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Manage Categories</h2>
+        
+        {/* Add Category Form */}
+        <div className="bg-gray-50 p-4 rounded-lg mb-6">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              placeholder="Enter new category name"
+              value={newCategory}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewCategory(e.target.value)}
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              onKeyPress={(e) => handleKeyPress(e, handleAddCategory)}
+            />
+            <button
+              onClick={handleAddCategory}
+              className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Add Category
+            </button>
+          </div>
+        </div>
+
+        {/* Categories List */}
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+          {categories.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              <div className="text-4xl mb-2">📂</div>
+              <p>No categories found. Add your first category!</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-200">
+              {categories.map((category) => (
+                <div key={category._id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                  {editingCategory?._id === category._id ? (
+                    <div className="flex items-center gap-3 flex-1">
+                      <span className="text-2xl">📂</span>
+                      <input
+                        type="text"
+                        value={editingCategory.name}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingCategory({
+                          ...editingCategory,
+                          name: e.target.value
+                        })}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
+                        onKeyPress={(e) => handleKeyPress(e, handleUpdateCategory)}
+                        autoFocus
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleUpdateCategory}
+                          className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditingCategory(null)}
+                          className="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center">
+                        <span className="text-2xl mr-3">📂</span>
+                        <span className="font-medium text-gray-900">{category.name}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setEditingCategory(category)}
+                          className="px-3 py-1 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCategory(category._id)}
+                          className="px-3 py-1 text-red-600 hover:text-red-800 text-sm font-medium transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CategoriesTab;
