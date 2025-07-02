@@ -5,6 +5,7 @@ import ProductsTab from '../components/admin/ProductsTab';
 import ReviewsTab from '../components/admin/ReviewsTab';
 import OverviewTab from '../components/admin/OverviewTab';
 import AdvertisementTab from '../components/admin/AdvertisementTab';
+import OrdersTab from '../components/admin/OrdersTab';
 
 // Define interfaces
 interface User {
@@ -13,7 +14,7 @@ interface User {
   isAdmin?: boolean;
 }
 
-type TabType = 'overview' | 'categories' | 'products' | 'reviews' | 'advertisements';
+type TabType = 'overview' | 'orders' | 'categories' | 'products' | 'reviews' | 'advertisements';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -41,6 +42,7 @@ const AdminDashboard: React.FC = () => {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'orders', label: 'Orders', icon: '📦' },
     { id: 'categories', label: 'Categories', icon: '📁' },
     { id: 'products', label: 'Products', icon: '👕' },
     { id: 'reviews', label: 'Reviews', icon: '⭐' },
@@ -51,6 +53,8 @@ const AdminDashboard: React.FC = () => {
     switch (activeTab) {
       case 'overview':
         return <OverviewTab setMessage={setMessage} setError={setError} />;
+      case 'orders':
+        return <OrdersTab />;
       case 'categories':
         return <CategoriesTab  />;
       case 'products':

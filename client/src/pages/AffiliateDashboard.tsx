@@ -126,7 +126,7 @@ const AffiliateDashboard = () => {
                     />
                   </svg>
                 </div>
-                <img src="/logo.png" alt="Nifti" className="absolute top-0 right-0 w-6 h-6 opacity-20" />
+                
               </div>
               <h3 className="text-2xl font-light text-slate-900 mb-6 tracking-wide">Your Referral Code</h3>
               <div className="bg-gradient-to-r from-teal-50 to-teal-100 border-2 border-teal-200 p-6 mb-6 rounded-2xl">
@@ -148,7 +148,6 @@ const AffiliateDashboard = () => {
                     />
                   </svg>
                 </div>
-                <img src="/logo.png" alt="Nifti" className="absolute top-0 right-0 w-6 h-6 opacity-20" />
               </div>
               <h3 className="text-2xl font-light text-slate-900 mb-6 tracking-wide">Total Referrals</h3>
               <div className="text-6xl font-extralight text-slate-900 mb-6 group-hover:text-teal-600 transition-colors duration-300">

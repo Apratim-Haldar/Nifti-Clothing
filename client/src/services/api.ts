@@ -42,4 +42,36 @@ export const clearCartAPI = async () => {
   return res.data;
 };
 
+// Order API functions
+export const createOrder = async (orderData: any) => {
+  const res = await API.post('/orders', orderData);
+  return res.data;
+};
+
+export const fetchMyOrders = async () => {
+  const res = await API.get('/orders/my-orders');
+  return res.data;
+};
+
+export const cancelOrder = async (orderId: string) => {
+  const res = await API.patch(`/orders/${orderId}/cancel`);
+  return res.data;
+};
+
+// Admin Order API functions
+export const fetchAllOrders = async () => {
+  const res = await API.get('/orders/admin/all');
+  return res.data;
+};
+
+export const updateOrderStatus = async (orderId: string, status: string, paymentStatus?: string) => {
+  const res = await API.patch(`/orders/${orderId}/status`, { status, paymentStatus });
+  return res.data;
+};
+
+export const addOrderNote = async (orderId: string, notes: string) => {
+  const res = await API.patch(`/orders/${orderId}/notes`, { notes });
+  return res.data;
+};
+
 export default API;

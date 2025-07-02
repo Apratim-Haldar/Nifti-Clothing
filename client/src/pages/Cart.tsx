@@ -127,10 +127,10 @@ const Cart = () => {
                     <span>Shipping</span>
                     <span>Free</span>
                   </div>
-                  <div className="flex justify-between text-slate-600 text-lg">
+                  {/* <div className="flex justify-between text-slate-600 text-lg">
                     <span>Tax</span>
                     <span>Calculated at checkout</span>
-                  </div>
+                  </div> */}
                   <div className="pt-6 border-t border-slate-200">
                     <div className="flex justify-between text-2xl font-medium text-slate-900">
                       <span>Total</span>

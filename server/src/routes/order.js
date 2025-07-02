@@ -99,6 +99,35 @@ router.get('/my-orders', verifyToken, async (req, res) => {
   }
 });
 
+// Cancel order (customer)
+router.patch('/:orderId/cancel', verifyToken, async (req, res) => {
+  try {
+    const order = await Order.findOne({ 
+      _id: req.params.orderId, 
+      userId: req.userId 
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    if (['shipped', 'delivered', 'cancelled'].includes(order.status)) {
+      return res.status(400).json({ 
+        message: 'Cannot cancel order in current status' 
+      });
+    }
+
+    order.status = 'cancelled';
+    order.updatedAt = new Date();
+    await order.save();
+
+    res.json({ message: 'Order cancelled successfully', order });
+  } catch (err) {
+    console.error('Error cancelling order:', err);
+    res.status(500).json({ message: 'Failed to cancel order' });
+  }
+});
+
 // Get all orders (admin only)
 router.get('/admin/all', verifyToken, async (req, res) => {
   try {
@@ -143,6 +172,35 @@ router.patch('/:orderId/status', verifyToken, async (req, res) => {
   } catch (err) {
     console.error('Error updating order:', err);
     res.status(500).json({ message: 'Failed to update order' });
+  }
+});
+
+// Add/update order notes (admin only)
+router.patch('/:orderId/notes', verifyToken, async (req, res) => {
+  try {
+    if (!req.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    const { notes } = req.body;
+    
+    const order = await Order.findByIdAndUpdate(
+      req.params.orderId,
+      { 
+        notes,
+        updatedAt: new Date()
+      },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.json({ message: 'Order notes updated successfully', order });
+  } catch (err) {
+    console.error('Error updating order notes:', err);
+    res.status(500).json({ message: 'Failed to update order notes' });
   }
 });
 
