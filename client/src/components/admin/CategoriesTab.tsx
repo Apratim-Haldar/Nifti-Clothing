@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import type { Category, AdminTabProps } from '../../types/admin';
+import { useToast } from '../../context/ToastContext';
+import type { Category } from '../../types/admin';
 
-const CategoriesTab: React.FC<AdminTabProps> = ({ setMessage }) => {
+const CategoriesTab: React.FC = () => {
+  const { showToast } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState<string>('');
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -16,10 +18,22 @@ const CategoriesTab: React.FC<AdminTabProps> = ({ setMessage }) => {
     try {
       setLoading(true);
       const response = await axios.get<Category[]>(`${import.meta.env.VITE_API_BASE_URL}/categories`);
-      setCategories(response.data);
+      
+      // Filter out null/undefined categories and ensure proper structure
+      const validCategories = (response.data || []).filter(
+        (category): category is Category => 
+          category !== null && 
+          category !== undefined && 
+          typeof category === 'object' &&
+          '_id' in category &&
+          'name' in category &&
+          typeof category.name === 'string'
+      );
+      
+      setCategories(validCategories);
     } catch (err) {
       console.error('Error fetching categories:', err);
-      setMessage('Failed to fetch categories', true);
+      showToast('Failed to fetch categories', 'error');
     } finally {
       setLoading(false);
     }
@@ -27,7 +41,7 @@ const CategoriesTab: React.FC<AdminTabProps> = ({ setMessage }) => {
 
   const handleAddCategory = async (): Promise<void> => {
     if (!newCategory.trim()) {
-      setMessage('Category name is required', true);
+      showToast('Category name is required', 'error');
       return;
     }
 
@@ -37,18 +51,24 @@ const CategoriesTab: React.FC<AdminTabProps> = ({ setMessage }) => {
         { name: newCategory.trim() },
         { withCredentials: true }
       );
-      setCategories([...categories, response.data]);
-      setNewCategory('');
-      setMessage('Category added successfully!');
+      
+      // Validate the response
+      if (response.data && response.data._id && response.data.name) {
+        setCategories(prevCategories => [...prevCategories, response.data]);
+        setNewCategory('');
+        showToast('Category added successfully!', 'success');
+      } else {
+        throw new Error('Invalid response from server');
+      }
     } catch (err: any) {
       console.error('Error adding category:', err);
-      setMessage(err.response?.data?.message || 'Failed to add category', true);
+      showToast(err.response?.data?.message || 'Failed to add category', 'error');
     }
   };
 
   const handleUpdateCategory = async (): Promise<void> => {
     if (!editingCategory || !editingCategory.name.trim()) {
-      setMessage('Category name is required', true);
+      showToast('Category name is required', 'error');
       return;
     }
 
@@ -58,14 +78,22 @@ const CategoriesTab: React.FC<AdminTabProps> = ({ setMessage }) => {
         { name: editingCategory.name.trim() },
         { withCredentials: true }
       );
-      setCategories(categories.map(cat => 
-        cat._id === editingCategory._id ? response.data : cat
-      ));
-      setEditingCategory(null);
-      setMessage('Category updated successfully!');
+      
+      // Validate the response
+      if (response.data && response.data._id && response.data.name) {
+        setCategories(prevCategories => 
+          prevCategories.map(cat => 
+            cat._id === editingCategory._id ? response.data : cat
+          )
+        );
+        setEditingCategory(null);
+        showToast('Category updated successfully!', 'success');
+      } else {
+        throw new Error('Invalid response from server');
+      }
     } catch (err: any) {
       console.error('Error updating category:', err);
-      setMessage(err.response?.data?.message || 'Failed to update category', true);
+      showToast(err.response?.data?.message || 'Failed to update category', 'error');
     }
   };
 
@@ -78,11 +106,12 @@ const CategoriesTab: React.FC<AdminTabProps> = ({ setMessage }) => {
       await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/categories/${id}`, {
         withCredentials: true
       });
-      setCategories(categories.filter(c => c._id !== id));
-      setMessage('Category deleted successfully!');
+      
+      setCategories(prevCategories => prevCategories.filter(c => c._id !== id));
+      showToast('Category deleted successfully!', 'success');
     } catch (err: any) {
       console.error('Error deleting category:', err);
-      setMessage(err.response?.data?.message || 'Failed to delete category', true);
+      showToast(err.response?.data?.message || 'Failed to delete category', 'error');
     }
   };
 
@@ -135,14 +164,16 @@ const CategoriesTab: React.FC<AdminTabProps> = ({ setMessage }) => {
             </div>
           ) : (
             <div className="divide-y divide-gray-200">
-              {categories.map((category) => (
+              {categories
+                .filter(category => category && category._id && category.name) // Additional safety filter
+                .map((category) => (
                 <div key={category._id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
                   {editingCategory?._id === category._id ? (
                     <div className="flex items-center gap-3 flex-1">
                       <span className="text-2xl">📂</span>
                       <input
                         type="text"
-                        value={editingCategory.name}
+                        value={editingCategory.name || ''}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingCategory({
                           ...editingCategory,
                           name: e.target.value
@@ -170,7 +201,7 @@ const CategoriesTab: React.FC<AdminTabProps> = ({ setMessage }) => {
                     <>
                       <div className="flex items-center">
                         <span className="text-2xl mr-3">📂</span>
-                        <span className="font-medium text-gray-900">{category.name}</span>
+                        <span className="font-medium text-gray-900">{category.name || 'Unnamed Category'}</span>
                       </div>
                       <div className="flex gap-2">
                         <button
