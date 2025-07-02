@@ -31,6 +31,29 @@ router.post('/upload/product-image', verifyToken, verifyAdmin, (req, res) => {
   });
 });
 
+// Upload hero image
+router.post('/upload/hero-image', verifyToken, verifyAdmin, (req, res) => {
+  uploadHero.single('image')(req, res, (err) => {
+    if (err) {
+      return handleS3Error(err, req, res);
+    }
+    
+    if (!req.file) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'No file uploaded' 
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Hero image uploaded successfully',
+      imageUrl: req.file.location,
+      filename: req.file.key
+    });
+  });
+});
+
 // Upload single color image
 router.post('/upload/color-image', verifyToken, verifyAdmin, (req, res) => {
   uploadProduct.single('image')(req, res, (err) => {

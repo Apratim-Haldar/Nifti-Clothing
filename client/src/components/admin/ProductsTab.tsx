@@ -19,6 +19,9 @@ interface Product {
   inStock: boolean;
   stockStatus: string;
   isLowStock: boolean;
+  isHero: boolean;
+  heroImage?: string;
+  heroTagline?: string;
 }
 
 interface Category {
@@ -38,6 +41,9 @@ interface FormData {
   categories: string[];
   imageUrl: string;
   defaultColor: string;
+  isHero: boolean;
+  heroImage: string;
+  heroTagline: string;
 }
 
 interface ColorImageState {
@@ -73,7 +79,10 @@ const ProductsTab: React.FC = () => {
     gender: 'Unisex',
     categories: [],
     imageUrl: '',
-    defaultColor: ''
+    defaultColor: '',
+    isHero: false,
+    heroImage: '',
+    heroTagline: ''
   });
 
   useEffect(() => {
@@ -111,6 +120,27 @@ const ProductsTab: React.FC = () => {
 
     const response = await axios.post(
       `${import.meta.env.VITE_API_BASE_URL}/admin/products/upload/product-image`,
+      formData,
+      { 
+        withCredentials: true,
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }
+    );
+
+    if (response.data.success) {
+      return response.data.imageUrl;
+    } else {
+      throw new Error(response.data.message || 'Upload failed');
+    }
+  };
+
+  // Upload hero image to S3
+  const uploadHeroImage = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/admin/products/upload/hero-image`,
       formData,
       { 
         withCredentials: true,
@@ -182,6 +212,28 @@ const ProductsTab: React.FC = () => {
     }
   };
 
+  const handleHeroImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      // Delete old hero image if updating
+      if (formData.heroImage && editingProduct) {
+        await deleteImage(formData.heroImage);
+      }
+
+      const imageUrl = await uploadHeroImage(file);
+      setFormData(prev => ({ ...prev, heroImage: imageUrl }));
+      addToast('Hero image uploaded successfully!', 'success');
+    } catch (error: any) {
+      console.error('Error uploading hero image:', error);
+      addToast(error.response?.data?.message || 'Error uploading hero image', 'error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleColorImageUpload = async (color: string, file: File) => {
     if (!file) return;
 
@@ -231,6 +283,12 @@ const ProductsTab: React.FC = () => {
       return;
     }
 
+    // Validate hero section requirements
+    if (formData.isHero && !formData.heroTagline.trim()) {
+      addToast('Hero tagline is required for hero products', 'error');
+      return;
+    }
+
     setSaving(true);
     try {
       // Prepare color images data
@@ -257,6 +315,7 @@ const ProductsTab: React.FC = () => {
         // Send old data for cleanup
         ...(editingProduct && {
           oldImageUrl: editingProduct.imageUrl,
+          oldHeroImage: editingProduct.heroImage,
           oldColorImages: editingProduct.colorImages
         })
       };
@@ -305,7 +364,10 @@ const ProductsTab: React.FC = () => {
       gender: product.gender,
       categories: product.categories,
       imageUrl: product.imageUrl,
-      defaultColor: product.defaultColor || ''
+      defaultColor: product.defaultColor || '',
+      isHero: product.isHero || false,
+      heroImage: product.heroImage || '',
+      heroTagline: product.heroTagline || ''
     });
 
     // Set existing color images
@@ -361,7 +423,10 @@ const ProductsTab: React.FC = () => {
       gender: 'Unisex',
       categories: [],
       imageUrl: '',
-      defaultColor: ''
+      defaultColor: '',
+      isHero: false,
+      heroImage: '',
+      heroTagline: ''
     });
     setEditingProduct(null);
     setColorImages({});
@@ -499,6 +564,11 @@ const ProductsTab: React.FC = () => {
                 alt={product.title}
                 className="w-full h-48 object-cover"
               />
+              {product.isHero && (
+                <div className="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 rounded text-xs font-medium">
+                  HERO
+                </div>
+              )}
               {product.colors.length > 0 && (
                 <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
                   {product.colors.length} color{product.colors.length > 1 ? 's' : ''}
@@ -604,8 +674,8 @@ const ProductsTab: React.FC = () => {
 
       {/* Add/Edit Product Modal */}
       {showModal && (
-        <div className="fixed inset-0 backdrop-blur-xl bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white border-black border-2 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">
@@ -717,6 +787,58 @@ const ProductsTab: React.FC = () => {
                         alt="Preview"
                         className="w-32 h-32 object-cover rounded-lg border"
                       />
+                    </div>
+                  )}
+                </div>
+
+                {/* Hero Section */}
+                <div className="border border-yellow-200 bg-yellow-50 p-4 rounded-lg">
+                  <div className="flex items-center mb-3">
+                    <input
+                      type="checkbox"
+                      id="isHero"
+                      checked={formData.isHero}
+                      onChange={(e) => setFormData(prev => ({ ...prev, isHero: e.target.checked }))}
+                      className="mr-2"
+                    />
+                    <label htmlFor="isHero" className="text-sm font-medium text-yellow-800">
+                      ⭐ Feature as Hero Product
+                    </label>
+                  </div>
+                  
+                  {formData.isHero && (
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium mb-1 text-yellow-800">Hero Tagline *</label>
+                        <input
+                          type="text"
+                          value={formData.heroTagline}
+                          onChange={(e) => setFormData(prev => ({ ...prev, heroTagline: e.target.value }))}
+                          className="w-full px-3 py-2 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                          placeholder="Enter catchy tagline for hero section"
+                          required={formData.isHero}
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-1 text-yellow-800">Hero Banner Image</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleHeroImageUpload}
+                          className="w-full px-3 py-2 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                        />
+                        <p className="text-xs text-yellow-700 mt-1">Optional: Upload a different image for hero banner (will use main product image if not provided)</p>
+                        {formData.heroImage && (
+                          <div className="mt-2">
+                            <img
+                              src={formData.heroImage}
+                              alt="Hero Preview"
+                              className="w-32 h-20 object-cover rounded-lg border border-yellow-300"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

@@ -6,11 +6,12 @@ interface User {
   name: string;
   email: string;
   affiliateCode?: string;
-  isAdmin?: boolean; // Add this missing property
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
+  loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (userData: any) => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -19,6 +20,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  loading: true,
   login: async () => {},
   register: async () => {},
   checkAuth: async () => {},
@@ -27,6 +29,7 @@ const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const login = async (email: string, password: string) => {
     const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, 
@@ -52,6 +55,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(data.user);
     } catch {
       setUser(null);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,7 +72,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, register, checkAuth, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, checkAuth, logout }}>
       {children}
     </AuthContext.Provider>
   );

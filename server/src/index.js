@@ -13,6 +13,7 @@ const notificationRoutes = require('./routes/notification');
 const paymentRoutes = require('./routes/payment');
 const adminProductRoutes = require('./routes/adminProducts');
 const reviewRoutes = require('./routes/reviews');
+const advertisementRoutes = require('./routes/advertisements');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
@@ -42,8 +43,8 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/admin/products', adminProductRoutes);
+app.use('/api/admin/advertisements', advertisementRoutes);
 app.use('/api/reviews', reviewRoutes);
-
 
 // Stripe webhook requires raw body
 app.post('/api/payment/webhook', bodyParser.raw({ type: 'application/json' }), paymentRoutes);

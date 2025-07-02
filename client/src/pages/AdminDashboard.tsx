@@ -4,6 +4,7 @@ import CategoriesTab from '../components/admin/CategoriesTab';
 import ProductsTab from '../components/admin/ProductsTab';
 import ReviewsTab from '../components/admin/ReviewsTab';
 import OverviewTab from '../components/admin/OverviewTab';
+import AdvertisementTab from '../components/admin/AdvertisementTab';
 
 // Define interfaces
 interface User {
@@ -12,7 +13,7 @@ interface User {
   isAdmin?: boolean;
 }
 
-type TabType = 'overview' | 'categories' | 'products' | 'reviews';
+type TabType = 'overview' | 'categories' | 'products' | 'reviews' | 'advertisements';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -43,6 +44,7 @@ const AdminDashboard: React.FC = () => {
     { id: 'categories', label: 'Categories', icon: '📁' },
     { id: 'products', label: 'Products', icon: '👕' },
     { id: 'reviews', label: 'Reviews', icon: '⭐' },
+    { id: 'advertisements', label: 'Advertisements', icon: '📢' },
   ];
 
   const renderActiveTab = () => {
@@ -55,6 +57,8 @@ const AdminDashboard: React.FC = () => {
         return <ProductsTab setMessage={setMessage} setError={setError} />;
       case 'reviews':
         return <ReviewsTab setMessage={setMessage} setError={setError} />;
+      case 'advertisements':
+        return <AdvertisementTab setMessage={setMessage} setError={setError} />;
       default:
         return <OverviewTab setMessage={setMessage} setError={setError} />;
     }

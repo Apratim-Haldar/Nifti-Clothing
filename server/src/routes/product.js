@@ -4,12 +4,69 @@ const Product = require('../models/Product');
 const Category = require('../models/Category');
 const { verifyToken, verifyAdmin } = require('../middleware/authMiddleware');
 const { uploadProduct, deleteFromS3, handleS3Error } = require('../middleware/s3Upload');
+const mongoose = require('mongoose');
+
+// Get filter options for products (colors, sizes, etc.)
+router.get('/filters/options', async (req, res) => {
+  try {
+    // Get all unique colors from products
+    const colorData = await Product.aggregate([
+      { $unwind: '$colors' },
+      { $group: { _id: '$colors' } },
+      { $sort: { _id: 1 } },
+      { $project: { _id: 0, color: '$_id' } }
+    ]);
+    
+    // Get all unique sizes from products
+    const sizeData = await Product.aggregate([
+      { $unwind: '$sizes' },
+      { $group: { _id: '$sizes' } },
+      { $sort: { _id: 1 } },
+      { $project: { _id: 0, size: '$_id' } }
+    ]);
+
+    // Get all unique genders
+    const genderData = await Product.aggregate([
+      { $group: { _id: '$gender' } },
+      { $sort: { _id: 1 } },
+      { $project: { _id: 0, gender: '$_id' } }
+    ]);
+
+    // Get price range
+    const priceRange = await Product.aggregate([
+      {
+        $group: {
+          _id: null,
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' }
+        }
+      }
+    ]);
+
+    const colors = colorData.map(item => item.color);
+    const sizes = sizeData.map(item => item.size);
+    const genders = genderData.map(item => item.gender).filter(Boolean);
+    const price = priceRange.length > 0 ? priceRange[0] : { minPrice: 0, maxPrice: 0 };
+
+    res.json({
+      colors,
+      sizes,
+      genders,
+      priceRange: price
+    });
+  } catch (err) {
+    console.error('Error fetching filter options:', err);
+    res.status(500).json({ message: 'Failed to fetch filter options' });
+  }
+});
 
 // Get all products with enhanced filtering
 router.get('/', async (req, res) => {
   try {
-    const { search, category, size, color, gender, inStock } = req.query;
+    const { search, category, size, color, gender, inStock, isHero } = req.query;
     let filter = {};
+
+    console.log('Product filter params:', req.query);
 
     // Search functionality
     if (search) {
@@ -19,9 +76,18 @@ router.get('/', async (req, res) => {
       ];
     }
 
-    // Category filter
+    // Category filter - Handle both ObjectId and string
     if (category) {
-      filter.categories = category;
+      // Check if category is a valid ObjectId
+      if (mongoose.Types.ObjectId.isValid(category)) {
+        filter.categories = new mongoose.Types.ObjectId(category);
+      } else {
+        // If not ObjectId, search by category name
+        const categoryDoc = await Category.findOne({ name: { $regex: category, $options: 'i' } });
+        if (categoryDoc) {
+          filter.categories = categoryDoc._id;
+        }
+      }
     }
 
     // Size filter
@@ -29,9 +95,9 @@ router.get('/', async (req, res) => {
       filter.sizes = size;
     }
 
-    // Color filter
+    // Color filter - improved to handle exact matches and partial matches
     if (color) {
-      filter.colors = { $regex: new RegExp(color, 'i') };
+      filter.colors = { $in: [new RegExp(color, 'i')] };
     }
 
     // Gender filter
@@ -46,9 +112,18 @@ router.get('/', async (req, res) => {
       filter.stock = 0;
     }
 
+    // Hero filter
+    if (isHero === 'true') {
+      filter.isHero = true;
+    }
+
+    console.log('Applied filter:', JSON.stringify(filter, null, 2));
+
     const products = await Product.find(filter)
       .populate('categories', 'name')
       .sort({ createdAt: -1 });
+
+    console.log(`Found ${products.length} products with filter`);
 
     res.json(products);
   } catch (err) {

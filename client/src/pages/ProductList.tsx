@@ -2,6 +2,7 @@
 
 import React from "react"
 import { useState, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 import axios from "axios"
 import ProductCard from "../components/ProductCard"
 
@@ -36,9 +37,12 @@ interface FetchParams {
 }
 
 const ProductList = () => {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [availableColors, setAvailableColors] = useState<string[]>([])
+  const [availableSizes, setAvailableSizes] = useState<string[]>([])
+  const [availableGenders, setAvailableGenders] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
 
   const [search, setSearch] = useState<string>("")
@@ -47,6 +51,25 @@ const ProductList = () => {
   const [selectedColor, setSelectedColor] = useState<string>("")
   const [selectedGender, setSelectedGender] = useState<string>("")
   const [showInStockOnly, setShowInStockOnly] = useState<boolean>(false)
+
+  // Initialize filters from URL parameters
+  useEffect(() => {
+    const urlSearch = searchParams.get('search') || ''
+    const urlCategory = searchParams.get('category') || ''
+    const urlSize = searchParams.get('size') || ''
+    const urlColor = searchParams.get('color') || ''
+    const urlGender = searchParams.get('gender') || ''
+    const urlInStock = searchParams.get('inStock') === 'true'
+
+    console.log('URL params:', { urlSearch, urlCategory, urlSize, urlColor, urlGender, urlInStock });
+
+    setSearch(urlSearch)
+    setSelectedCategory(urlCategory)
+    setSelectedSize(urlSize)
+    setSelectedColor(urlColor)
+    setSelectedGender(urlGender)
+    setShowInStockOnly(urlInStock)
+  }, [searchParams])
 
   const fetchProducts = async () => {
     setLoading(true)
@@ -58,11 +81,14 @@ const ProductList = () => {
     if (selectedGender) params.gender = selectedGender
     if (showInStockOnly) params.inStock = "true"
 
+    console.log('Fetching products with params:', params);
+
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/products`,
         { params }
       )
+      console.log(`Fetched ${res.data.length} products`);
       setProducts(res.data)
     } catch (error) {
       console.error("Error fetching products:", error)
@@ -90,10 +116,25 @@ const ProductList = () => {
     ])
       .then(([categoriesRes, filtersRes]) => {
         setCategories(categoriesRes.data)
-        setAvailableColors(filtersRes.data.colors)
+        setAvailableColors(filtersRes.data.colors || [])
+        setAvailableSizes(filtersRes.data.sizes || [])
+        setAvailableGenders(filtersRes.data.genders || [])
       })
-      .catch((err) => console.error(err))
+      .catch((err) => console.error('Error fetching filter options:', err))
   }, [])
+
+  // Update URL when filters change
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (search) params.set('search', search)
+    if (selectedCategory) params.set('category', selectedCategory)
+    if (selectedSize) params.set('size', selectedSize)
+    if (selectedColor) params.set('color', selectedColor)
+    if (selectedGender) params.set('gender', selectedGender)
+    if (showInStockOnly) params.set('inStock', 'true')
+    
+    setSearchParams(params)
+  }, [search, selectedCategory, selectedSize, selectedColor, selectedGender, showInStockOnly, setSearchParams])
 
   const clearFilters = () => {
     setSearch("")
@@ -147,9 +188,11 @@ const ProductList = () => {
                 className="border-2 border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:border-slate-900 transition-all duration-300"
               >
                 <option value="">All Genders</option>
-                <option value="Men">Men</option>
-                <option value="Women">Women</option>
-                <option value="Unisex">Unisex</option>
+                {availableGenders.map((gender) => (
+                  <option key={gender} value={gender}>
+                    {gender}
+                  </option>
+                ))}
               </select>
 
               {/* Category Filter */}
@@ -177,7 +220,7 @@ const ProductList = () => {
                 className="border-2 border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:border-slate-900 transition-all duration-300"
               >
                 <option value="">All Sizes</option>
-                {["XS", "S", "M", "L", "XL", "XXL"].map((size) => (
+                {availableSizes.map((size) => (
                   <option key={size} value={size}>
                     {size}
                   </option>
@@ -219,7 +262,7 @@ const ProductList = () => {
                 onClick={clearFilters}
                 className="border-2 border-slate-200 px-4 py-3 text-slate-600 hover:border-slate-900 hover:text-slate-900 transition-all duration-300"
               >
-                Clear Filters
+                Clear All
               </button>
             </div>
           </div>

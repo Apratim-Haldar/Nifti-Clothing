@@ -11,13 +11,13 @@ const ProductSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   sizes: [{ type: String, required: true }],
   colors: [{ type: String }],
-  colorImages: [ColorImageSchema], // Images for each color
-  defaultColor: { type: String }, // Default color to display
-  imageUrl: { type: String, required: true }, // Main/fallback image
+  colorImages: [ColorImageSchema],
+  defaultColor: { type: String },
+  imageUrl: { type: String, required: true },
   inStock: { type: Boolean, default: true },
-  stock: { type: Number, required: true, default: 0, min: 0 }, // Stock tracking
-  lowStockThreshold: { type: Number, default: 10 }, // Low stock warning threshold
-  gender: { type: String, required: true, enum: ['Men', 'Women', 'Unisex'] }, // Gender categorization
+  stock: { type: Number, required: true, default: 0, min: 0 },
+  lowStockThreshold: { type: Number, default: 10 },
+  gender: { type: String, required: true, enum: ['Men', 'Women', 'Unisex'] },
   categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
   isHero: { type: Boolean, default: false },
   heroImage: { type: String },
