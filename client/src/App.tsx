@@ -1,5 +1,5 @@
 // client/src/App.tsx
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { GuestOnlyRoute, ProtectedRoute } from './components/RouteGuard';
@@ -42,6 +42,7 @@ function App() {
           
           {/* Public routes */}
           <Route path="/products" element={<ProductList />} />
+          <Route path="/shop" element={<ProductList />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           
           {/* Protected routes (require authentication) */}
@@ -77,6 +78,9 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          
+          {/* Catch-all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
       <Footer />
