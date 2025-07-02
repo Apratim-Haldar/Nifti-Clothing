@@ -52,7 +52,7 @@ const AdminDashboard: React.FC = () => {
       case 'overview':
         return <OverviewTab setMessage={setMessage} setError={setError} />;
       case 'categories':
-        return <CategoriesTab setMessage={setMessage} setError={setError} />;
+        return <CategoriesTab  />;
       case 'products':
         return <ProductsTab />;
       case 'reviews':
