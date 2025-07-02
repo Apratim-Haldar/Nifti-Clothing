@@ -1,3 +1,5 @@
+"use client"
+
 import type React from "react"
 import { useCart } from "../context/CartContext"
 import { useAuth } from "../context/AuthContext"
@@ -22,47 +24,57 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
   onClose,
   onConfirm,
   loading,
-  orderDetails
+  orderDetails,
 }) => {
   if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-semibold text-gray-900">Confirm Your Order</h2>
-          <p className="text-gray-600 mt-2">Please review your order details before confirming</p>
+      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="p-8 border-b border-gray-200">
+          <h2 className="text-3xl font-light text-gray-900">Confirm Your Order</h2>
+          <p className="text-gray-600 mt-3 text-lg">Please review your order details before confirming</p>
         </div>
-        
-        <div className="p-6 space-y-6">
+
+        <div className="p-8 space-y-8">
           {/* Customer Information */}
           <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-3">Customer Information</h3>
-            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-              <p><span className="font-medium">Name:</span> {orderDetails.customerInfo.name}</p>
-              <p><span className="font-medium">Email:</span> {orderDetails.customerInfo.email}</p>
-              <p><span className="font-medium">Phone:</span> {orderDetails.customerInfo.phone}</p>
-              <p><span className="font-medium">Address:</span> {orderDetails.customerInfo.address}</p>
+            <h3 className="text-xl font-medium text-gray-900 mb-4">Customer Information</h3>
+            <div className="bg-gray-50 p-6 rounded-xl space-y-3">
+              <p className="text-lg">
+                <span className="font-medium">Name:</span> {orderDetails.customerInfo.name}
+              </p>
+              <p className="text-lg">
+                <span className="font-medium">Email:</span> {orderDetails.customerInfo.email}
+              </p>
+              <p className="text-lg">
+                <span className="font-medium">Phone:</span> {orderDetails.customerInfo.phone}
+              </p>
+              <p className="text-lg">
+                <span className="font-medium">Address:</span> {orderDetails.customerInfo.address}
+              </p>
             </div>
           </div>
 
           {/* Order Items */}
           <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-3">Order Items</h3>
-            <div className="space-y-3">
+            <h3 className="text-xl font-medium text-gray-900 mb-4">Order Items</h3>
+            <div className="space-y-4">
               {orderDetails.items.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                <div key={idx} className="flex items-center gap-6 p-4 bg-gray-50 rounded-xl">
                   <img
                     src={item.imageUrl || "/placeholder.svg"}
                     alt={item.title}
-                    className="w-16 h-16 object-cover rounded"
+                    className="w-20 h-20 object-cover rounded-lg"
                   />
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{item.title}</h4>
-                    <p className="text-sm text-gray-600">Size: {item.size} | Qty: {item.quantity}</p>
+                    <h4 className="font-medium text-gray-900 text-lg">{item.title}</h4>
+                    <p className="text-gray-600">
+                      Size: {item.size} | Qty: {item.quantity}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-gray-900">₹{item.price * item.quantity}</p>
+                    <p className="font-medium text-gray-900 text-lg">₹{item.price * item.quantity}</p>
                   </div>
                 </div>
               ))}
@@ -70,43 +82,48 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
           </div>
 
           {/* Order Total */}
-          <div className="border-t border-gray-200 pt-4">
-            <div className="flex justify-between text-xl font-semibold text-gray-900">
+          <div className="border-t border-gray-200 pt-6">
+            <div className="flex justify-between text-2xl font-semibold text-gray-900">
               <span>Total Amount:</span>
               <span>₹{orderDetails.total}</span>
             </div>
           </div>
 
           {/* Payment Notice */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
             <div className="flex items-start">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                <svg className="h-6 w-6 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800">Payment Information</h3>
-                <p className="mt-1 text-sm text-blue-700">
-                  Your order will be confirmed via email. Our team will contact you for payment arrangements and delivery details.
+              <div className="ml-4">
+                <h3 className="font-medium text-blue-800">Payment Information</h3>
+                <p className="mt-2 text-blue-700">
+                  Your order will be confirmed via email. Our team will contact you for payment arrangements and
+                  delivery details.
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="p-6 border-t border-gray-200 flex gap-3 justify-end">
+        <div className="p-8 border-t border-gray-200 flex gap-4 justify-end">
           <button
             onClick={onClose}
             disabled={loading}
-            className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="px-8 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 disabled:opacity-50 font-medium"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-8 py-3 bg-black text-white rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
             {loading ? "Confirming..." : "Confirm Order"}
           </button>
@@ -120,11 +137,11 @@ const Checkout = () => {
   const { cart, clearCart } = useCart()
   const { user } = useAuth()
   const { showToast } = useToast()
-  const [form, setForm] = useState({ 
-    name: user?.name || "", 
-    email: user?.email || "", 
-    phone: "", 
-    address: "" 
+  const [form, setForm] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: "",
+    address: "",
   })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -138,7 +155,7 @@ const Checkout = () => {
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     // Validate form
     if (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !form.address.trim()) {
       showToast("Please fill in all required fields", "error")
@@ -162,11 +179,11 @@ const Checkout = () => {
         user: form,
         items: cart,
         totalAmount: total,
-        status: 'pending'
+        status: "pending",
       }
 
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders`, orderData, {
-        withCredentials: true
+        withCredentials: true,
       })
 
       setSuccess(true)
@@ -182,20 +199,20 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-6">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-extralight mb-6 text-slate-900 tracking-tight">Checkout</h1>
-            <div className="w-16 h-px bg-slate-900 mx-auto"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+      <section className="py-20">
+        <div className="max-w-5xl mx-auto px-6">
+          {/* Enhanced Header */}
+          <div className="text-center mb-20">
+            <h1 className="text-5xl md:text-6xl font-extralight mb-8 text-slate-900 tracking-tight">Checkout</h1>
+            <div className="w-20 h-1 bg-slate-900 mx-auto"></div>
           </div>
 
           {success ? (
-            <div className="bg-white p-12 text-center shadow-sm rounded-lg">
-              <div className="mb-8">
+            <div className="bg-white p-16 text-center shadow-2xl rounded-2xl border border-slate-100">
+              <div className="mb-10">
                 <svg
-                  className="w-20 h-20 text-green-500 mx-auto mb-6"
+                  className="w-24 h-24 text-green-500 mx-auto mb-8"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -208,33 +225,33 @@ const Checkout = () => {
                   />
                 </svg>
               </div>
-              <h2 className="text-3xl font-light text-slate-900 mb-4">Order Confirmed!</h2>
-              <p className="text-slate-600 font-light text-lg mb-8">
-                Thank you for your order! You will receive a confirmation email shortly with all the details. 
-                Our team will contact you soon for payment and delivery arrangements.
+              <h2 className="text-4xl font-light text-slate-900 mb-6">Order Confirmed!</h2>
+              <p className="text-slate-600 font-light text-xl mb-10">
+                Thank you for your order! You will receive a confirmation email shortly with all the details. Our team
+                will contact you soon for payment and delivery arrangements.
               </p>
               <button
-                onClick={() => window.location.href = '/products'}
-                className="bg-slate-900 text-white px-8 py-3 font-medium tracking-wide uppercase hover:bg-slate-800 transition-all duration-300"
+                onClick={() => (window.location.href = "/products")}
+                className="bg-slate-900 text-white px-10 py-4 font-medium tracking-wider uppercase hover:bg-slate-800 transition-all duration-500 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 Continue Shopping
               </button>
             </div>
           ) : (
-            <div className="grid lg:grid-cols-2 gap-12">
+            <div className="grid lg:grid-cols-2 gap-16">
               {/* Order Form */}
-              <div className="bg-white p-8 shadow-sm rounded-lg">
-                <h2 className="text-2xl font-light mb-8 text-slate-900">Shipping Information</h2>
-                <form onSubmit={handleFormSubmit} className="space-y-6">
+              <div className="bg-white p-10 shadow-2xl rounded-2xl border border-slate-100">
+                <h2 className="text-3xl font-light mb-10 text-slate-900">Shipping Information</h2>
+                <form onSubmit={handleFormSubmit} className="space-y-8">
                   <div>
-                    <label className="block text-sm font-medium text-slate-900 mb-2 tracking-wide uppercase">
+                    <label className="block text-sm font-medium text-slate-900 mb-3 tracking-wider uppercase">
                       Full Name *
                     </label>
                     <input
                       type="text"
                       name="name"
                       placeholder="Enter your full name"
-                      className="w-full border-2 border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-all duration-300 rounded"
+                      className="w-full border-2 border-slate-200 px-5 py-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-all duration-300 rounded-xl text-lg"
                       value={form.name}
                       onChange={handleChange}
                       required
@@ -242,14 +259,14 @@ const Checkout = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-900 mb-2 tracking-wide uppercase">
+                    <label className="block text-sm font-medium text-slate-900 mb-3 tracking-wider uppercase">
                       Email Address *
                     </label>
                     <input
                       type="email"
                       name="email"
                       placeholder="Enter your email"
-                      className="w-full border-2 border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-all duration-300 rounded"
+                      className="w-full border-2 border-slate-200 px-5 py-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-all duration-300 rounded-xl text-lg"
                       value={form.email}
                       onChange={handleChange}
                       required
@@ -257,14 +274,14 @@ const Checkout = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-900 mb-2 tracking-wide uppercase">
+                    <label className="block text-sm font-medium text-slate-900 mb-3 tracking-wider uppercase">
                       Phone Number *
                     </label>
                     <input
                       type="tel"
                       name="phone"
                       placeholder="Enter your phone number"
-                      className="w-full border-2 border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-all duration-300 rounded"
+                      className="w-full border-2 border-slate-200 px-5 py-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-all duration-300 rounded-xl text-lg"
                       value={form.phone}
                       onChange={handleChange}
                       required
@@ -272,13 +289,13 @@ const Checkout = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-900 mb-2 tracking-wide uppercase">
+                    <label className="block text-sm font-medium text-slate-900 mb-3 tracking-wider uppercase">
                       Shipping Address *
                     </label>
                     <textarea
                       name="address"
                       placeholder="Enter your complete address"
-                      className="w-full border-2 border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-all duration-300 rounded"
+                      className="w-full border-2 border-slate-200 px-5 py-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-all duration-300 rounded-xl text-lg"
                       rows={4}
                       value={form.address}
                       onChange={handleChange}
@@ -288,7 +305,7 @@ const Checkout = () => {
 
                   <button
                     type="submit"
-                    className="w-full bg-slate-900 text-white py-4 text-lg font-medium tracking-wide uppercase hover:bg-slate-800 transition-all duration-300 rounded"
+                    className="w-full bg-slate-900 text-white py-5 text-xl font-medium tracking-wider uppercase hover:bg-slate-800 transition-all duration-500 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                   >
                     Review Order
                   </button>
@@ -296,52 +313,56 @@ const Checkout = () => {
               </div>
 
               {/* Order Summary */}
-              <div className="bg-white p-8 shadow-sm h-fit rounded-lg">
-                <h2 className="text-2xl font-light mb-8 text-slate-900">Order Summary</h2>
+              <div className="bg-white p-10 shadow-2xl h-fit rounded-2xl border border-slate-100">
+                <h2 className="text-3xl font-light mb-10 text-slate-900">Order Summary</h2>
 
-                <div className="space-y-6 mb-8">
+                <div className="space-y-8 mb-10">
                   {cart.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-4 pb-6 border-b border-slate-200 last:border-b-0">
+                    <div key={idx} className="flex items-center gap-6 pb-8 border-b border-slate-200 last:border-b-0">
                       <img
                         src={item.imageUrl || "/placeholder.svg"}
                         alt={item.title}
-                        className="w-16 h-16 object-cover rounded"
+                        className="w-20 h-20 object-cover rounded-xl"
                       />
                       <div className="flex-1">
-                        <h4 className="font-medium text-slate-900 mb-1">{item.title}</h4>
-                        <p className="text-sm text-slate-600">Size: {item.size}</p>
-                        <p className="text-sm text-slate-600">Qty: {item.quantity}</p>
+                        <h4 className="font-medium text-slate-900 mb-2 text-lg">{item.title}</h4>
+                        <p className="text-slate-600">Size: {item.size}</p>
+                        <p className="text-slate-600">Qty: {item.quantity}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium text-slate-900">₹{item.price * item.quantity}</p>
+                        <p className="font-medium text-slate-900 text-lg">₹{item.price * item.quantity}</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="space-y-3 mb-8 pt-6 border-t border-slate-200">
-                  <div className="flex justify-between text-slate-600">
+                <div className="space-y-4 mb-10 pt-8 border-t border-slate-200">
+                  <div className="flex justify-between text-slate-600 text-lg">
                     <span>Subtotal</span>
                     <span>₹{total}</span>
                   </div>
-                  <div className="flex justify-between text-slate-600">
+                  <div className="flex justify-between text-slate-600 text-lg">
                     <span>Shipping</span>
                     <span>Free</span>
                   </div>
-                  <div className="flex justify-between text-xl font-medium text-slate-900 pt-3 border-t border-slate-200">
+                  <div className="flex justify-between text-2xl font-medium text-slate-900 pt-4 border-t border-slate-200">
                     <span>Total</span>
                     <span>₹{total}</span>
                   </div>
                 </div>
 
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
                   <div className="flex items-start">
-                    <svg className="h-5 w-5 text-amber-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    <svg className="h-6 w-6 text-amber-400 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
                     </svg>
-                    <div className="ml-3">
-                      <h3 className="text-sm font-medium text-amber-800">Payment Notice</h3>
-                      <p className="mt-1 text-sm text-amber-700">
+                    <div className="ml-4">
+                      <h3 className="font-medium text-amber-800">Payment Notice</h3>
+                      <p className="mt-2 text-amber-700">
                         No payment required now. We'll contact you for payment arrangements after order confirmation.
                       </p>
                     </div>
@@ -360,7 +381,7 @@ const Checkout = () => {
             orderDetails={{
               items: cart,
               total: total,
-              customerInfo: form
+              customerInfo: form,
             }}
           />
         </div>

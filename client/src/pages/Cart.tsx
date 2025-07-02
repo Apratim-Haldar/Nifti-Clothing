@@ -1,3 +1,5 @@
+"use client"
+
 import { useCart } from "../context/CartContext"
 import { Link } from "react-router-dom"
 
@@ -6,20 +8,20 @@ const Cart = () => {
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <section className="py-16">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+      <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-extralight mb-6 text-slate-900 tracking-tight">Shopping Cart</h1>
-            <div className="w-16 h-px bg-slate-900 mx-auto"></div>
+          {/* Enhanced Header */}
+          <div className="text-center mb-20">
+            <h1 className="text-5xl md:text-6xl font-extralight mb-8 text-slate-900 tracking-tight">Shopping Cart</h1>
+            <div className="w-20 h-1 bg-slate-900 mx-auto"></div>
           </div>
 
           {cart.length === 0 ? (
-            <div className="bg-white p-16 text-center shadow-sm">
-              <div className="mb-8">
+            <div className="bg-white p-20 text-center shadow-xl rounded-2xl border border-slate-100">
+              <div className="mb-10">
                 <svg
-                  className="w-24 h-24 text-slate-300 mx-auto mb-6"
+                  className="w-32 h-32 text-slate-300 mx-auto mb-8"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -32,51 +34,51 @@ const Cart = () => {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-light text-slate-900 mb-4">Your cart is empty</h2>
-              <p className="text-slate-600 font-light mb-8">
+              <h2 className="text-3xl font-light text-slate-900 mb-6">Your cart is empty</h2>
+              <p className="text-slate-600 font-light mb-10 text-lg">
                 Discover our premium collection and find your perfect style
               </p>
               <Link
                 to="/products"
-                className="inline-block bg-slate-900 text-white px-8 py-3 font-medium tracking-wide uppercase hover:bg-slate-800 transition-colors"
+                className="inline-block bg-slate-900 text-white px-10 py-4 font-medium tracking-wider uppercase hover:bg-slate-800 transition-all duration-500 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 Shop Now
               </Link>
             </div>
           ) : (
-            <div className="grid lg:grid-cols-3 gap-12">
+            <div className="grid lg:grid-cols-3 gap-16">
               {/* Cart Items */}
-              <div className="lg:col-span-2 space-y-6">
+              <div className="lg:col-span-2 space-y-8">
                 {cart.map((item, idx) => (
-                  <div key={idx} className="bg-white p-6 shadow-sm">
-                    <div className="flex items-center gap-6">
+                  <div key={idx} className="bg-white p-8 shadow-xl rounded-2xl border border-slate-100">
+                    <div className="flex items-center gap-8">
                       <img
                         src={item.imageUrl || "/placeholder.svg"}
                         alt={item.title}
-                        className="w-24 h-24 object-cover"
+                        className="w-32 h-32 object-cover rounded-xl"
                       />
 
                       <div className="flex-1">
-                        <h3 className="text-xl font-light text-slate-900 mb-2">{item.title}</h3>
-                        <p className="text-slate-600 font-light mb-2">Size: {item.size}</p>
-                        <p className="text-lg font-medium text-slate-900">₹{item.price}</p>
+                        <h3 className="text-2xl font-light text-slate-900 mb-3">{item.title}</h3>
+                        <p className="text-slate-600 font-light mb-3 text-lg">Size: {item.size}</p>
+                        <p className="text-xl font-medium text-slate-900">₹{item.price}</p>
                       </div>
 
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-6">
                         {/* Quantity Controls */}
-                        <div className="flex items-center border-2 border-slate-200">
+                        <div className="flex items-center border-2 border-slate-200 rounded-xl">
                           <button
                             onClick={() => decreaseQty(item.productId, item.size)}
-                            className="w-10 h-10 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors"
+                            className="w-12 h-12 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors rounded-l-xl"
                           >
                             −
                           </button>
-                          <span className="w-12 h-10 flex items-center justify-center text-slate-900 font-medium">
+                          <span className="w-16 h-12 flex items-center justify-center text-slate-900 font-medium bg-slate-50 border-x border-slate-200">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() => increaseQty(item.productId, item.size)}
-                            className="w-10 h-10 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors"
+                            className="w-12 h-12 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors rounded-r-xl"
                           >
                             +
                           </button>
@@ -85,9 +87,9 @@ const Cart = () => {
                         {/* Remove Button */}
                         <button
                           onClick={() => removeFromCart(item.productId, item.size)}
-                          className="text-red-600 hover:text-red-800 font-light transition-colors"
+                          className="text-red-600 hover:text-red-800 font-light transition-colors p-2"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -102,10 +104,10 @@ const Cart = () => {
                 ))}
 
                 {/* Clear Cart */}
-                <div className="text-center pt-6">
+                <div className="text-center pt-8">
                   <button
                     onClick={clearCart}
-                    className="text-slate-600 hover:text-slate-900 font-light transition-colors"
+                    className="text-slate-600 hover:text-slate-900 font-light transition-colors text-lg"
                   >
                     Clear entire cart
                   </button>
@@ -113,24 +115,24 @@ const Cart = () => {
               </div>
 
               {/* Order Summary */}
-              <div className="bg-white p-8 shadow-sm h-fit">
-                <h2 className="text-2xl font-light mb-8 text-slate-900">Order Summary</h2>
+              <div className="bg-white p-10 shadow-xl h-fit rounded-2xl border border-slate-100">
+                <h2 className="text-3xl font-light mb-10 text-slate-900">Order Summary</h2>
 
-                <div className="space-y-4 mb-8">
-                  <div className="flex justify-between text-slate-600">
+                <div className="space-y-6 mb-10">
+                  <div className="flex justify-between text-slate-600 text-lg">
                     <span>Subtotal ({cart.length} items)</span>
                     <span>₹{total}</span>
                   </div>
-                  <div className="flex justify-between text-slate-600">
+                  <div className="flex justify-between text-slate-600 text-lg">
                     <span>Shipping</span>
                     <span>Free</span>
                   </div>
-                  <div className="flex justify-between text-slate-600">
+                  <div className="flex justify-between text-slate-600 text-lg">
                     <span>Tax</span>
                     <span>Calculated at checkout</span>
                   </div>
-                  <div className="pt-4 border-t border-slate-200">
-                    <div className="flex justify-between text-xl font-medium text-slate-900">
+                  <div className="pt-6 border-t border-slate-200">
+                    <div className="flex justify-between text-2xl font-medium text-slate-900">
                       <span>Total</span>
                       <span>₹{total}</span>
                     </div>
@@ -139,14 +141,14 @@ const Cart = () => {
 
                 <Link
                   to="/checkout"
-                  className="block w-full bg-slate-900 text-white py-4 text-center text-lg font-medium tracking-wide uppercase hover:bg-slate-800 transition-colors mb-4"
+                  className="block w-full bg-slate-900 text-white py-5 text-center text-lg font-medium tracking-wider uppercase hover:bg-slate-800 transition-all duration-500 mb-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   Proceed to Checkout
                 </Link>
 
                 <Link
                   to="/products"
-                  className="block w-full border-2 border-slate-900 text-slate-900 py-4 text-center font-medium tracking-wide uppercase hover:bg-slate-900 hover:text-white transition-all duration-300"
+                  className="block w-full border-2 border-slate-900 text-slate-900 py-5 text-center font-medium tracking-wider uppercase hover:bg-slate-900 hover:text-white transition-all duration-500 rounded-xl"
                 >
                   Continue Shopping
                 </Link>

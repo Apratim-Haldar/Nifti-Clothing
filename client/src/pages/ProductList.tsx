@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import type React from "react"
 import { useState, useEffect } from "react"
 import { useSearchParams } from "react-router-dom"
 import axios from "axios"
@@ -54,14 +54,12 @@ const ProductList = () => {
 
   // Initialize filters from URL parameters
   useEffect(() => {
-    const urlSearch = searchParams.get('search') || ''
-    const urlCategory = searchParams.get('category') || ''
-    const urlSize = searchParams.get('size') || ''
-    const urlColor = searchParams.get('color') || ''
-    const urlGender = searchParams.get('gender') || ''
-    const urlInStock = searchParams.get('inStock') === 'true'
-
-    console.log('URL params:', { urlSearch, urlCategory, urlSize, urlColor, urlGender, urlInStock });
+    const urlSearch = searchParams.get("search") || ""
+    const urlCategory = searchParams.get("category") || ""
+    const urlSize = searchParams.get("size") || ""
+    const urlColor = searchParams.get("color") || ""
+    const urlGender = searchParams.get("gender") || ""
+    const urlInStock = searchParams.get("inStock") === "true"
 
     setSearch(urlSearch)
     setSelectedCategory(urlCategory)
@@ -81,14 +79,8 @@ const ProductList = () => {
     if (selectedGender) params.gender = selectedGender
     if (showInStockOnly) params.inStock = "true"
 
-    console.log('Fetching products with params:', params);
-
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/products`,
-        { params }
-      )
-      console.log(`Fetched ${res.data.length} products`);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products`, { params })
       setProducts(res.data)
     } catch (error) {
       console.error("Error fetching products:", error)
@@ -99,14 +91,7 @@ const ProductList = () => {
 
   useEffect(() => {
     fetchProducts()
-  }, [
-    search,
-    selectedCategory,
-    selectedSize,
-    selectedColor,
-    selectedGender,
-    showInStockOnly,
-  ])
+  }, [search, selectedCategory, selectedSize, selectedColor, selectedGender, showInStockOnly])
 
   useEffect(() => {
     // Fetch categories and filter options
@@ -120,19 +105,19 @@ const ProductList = () => {
         setAvailableSizes(filtersRes.data.sizes || [])
         setAvailableGenders(filtersRes.data.genders || [])
       })
-      .catch((err) => console.error('Error fetching filter options:', err))
+      .catch((err) => console.error("Error fetching filter options:", err))
   }, [])
 
   // Update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams()
-    if (search) params.set('search', search)
-    if (selectedCategory) params.set('category', selectedCategory)
-    if (selectedSize) params.set('size', selectedSize)
-    if (selectedColor) params.set('color', selectedColor)
-    if (selectedGender) params.set('gender', selectedGender)
-    if (showInStockOnly) params.set('inStock', 'true')
-    
+    if (search) params.set("search", search)
+    if (selectedCategory) params.set("category", selectedCategory)
+    if (selectedSize) params.set("size", selectedSize)
+    if (selectedColor) params.set("color", selectedColor)
+    if (selectedGender) params.set("gender", selectedGender)
+    if (showInStockOnly) params.set("inStock", "true")
+
     setSearchParams(params)
   }, [search, selectedCategory, selectedSize, selectedColor, selectedGender, showInStockOnly, setSearchParams])
 
@@ -146,186 +131,231 @@ const ProductList = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <section className="bg-slate-50 py-20">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-slate-50">
+      {/* Geometric Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-gradient-to-br from-teal-500/5 to-teal-600/5 transform rotate-45 rounded-3xl"></div>
+        <div className="absolute top-40 right-20 w-48 h-48 bg-gradient-to-br from-teal-400/5 to-teal-500/5 transform -rotate-12 rounded-3xl"></div>
+        <div className="absolute bottom-40 left-1/4 w-32 h-32 bg-gradient-to-br from-teal-600/5 to-teal-700/5 transform rotate-12 rounded-3xl"></div>
+      </div>
+
+      {/* Enhanced Header */}
+      <section className="relative py-24">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-5xl md:text-6xl font-extralight mb-6 text-slate-900 tracking-tight">
-            Our Collection
-          </h1>
-          <div className="w-24 h-px bg-slate-900 mx-auto mb-8"></div>
-          <p className="text-xl text-slate-600 font-light max-w-2xl mx-auto">
-            Discover premium pieces crafted for the modern individual
+          <div className="flex items-center justify-center mb-8">
+            <div className="w-16 h-px bg-teal-500"></div>
+            <img src="/logo.png" alt="Nifti" className="w-12 h-12 mx-6" />
+            <div className="w-16 h-px bg-teal-500"></div>
+          </div>
+          <h1 className="text-6xl md:text-7xl font-extralight mb-8 text-slate-900 tracking-tight">Our Collection</h1>
+          <p className="text-2xl text-slate-600 font-light max-w-3xl mx-auto">
+            Discover premium pieces crafted for the modern individual who values sophistication and style
           </p>
         </div>
       </section>
 
-      {/* Filters */}
-      <section className="py-12 border-b border-slate-200">
+      {/* Creative Filters Section */}
+      <section className="relative py-16 border-y border-teal-100/50">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col gap-6">
-            {/* Search Bar */}
-            <div className="w-full">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={search}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setSearch(e.target.value)
-                }
-                className="w-full border-2 border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-all duration-300"
-              />
-            </div>
-
-            {/* Filter Row */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {/* Gender Filter */}
-              <select
-                value={selectedGender}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  setSelectedGender(e.target.value)
-                }
-                className="border-2 border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:border-slate-900 transition-all duration-300"
-              >
-                <option value="">All Genders</option>
-                {availableGenders.map((gender) => (
-                  <option key={gender} value={gender}>
-                    {gender}
-                  </option>
-                ))}
-              </select>
-
-              {/* Category Filter */}
-              <select
-                value={selectedCategory}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  setSelectedCategory(e.target.value)
-                }
-                className="border-2 border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:border-slate-900 transition-all duration-300"
-              >
-                <option value="">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-
-              {/* Size Filter */}
-              <select
-                value={selectedSize}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  setSelectedSize(e.target.value)
-                }
-                className="border-2 border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:border-slate-900 transition-all duration-300"
-              >
-                <option value="">All Sizes</option>
-                {availableSizes.map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
-
-              {/* Color Filter */}
-              <select
-                value={selectedColor}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  setSelectedColor(e.target.value)
-                }
-                className="border-2 border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:border-slate-900 transition-all duration-300"
-              >
-                <option value="">All Colors</option>
-                {availableColors.map((color) => (
-                  <option key={color} value={color}>
-                    {color}
-                  </option>
-                ))}
-              </select>
-
-              {/* Stock Filter */}
-              <div className="flex items-center space-x-2 px-4 py-3">
+          <div className="bg-white/80 backdrop-blur-xl border border-teal-100 rounded-3xl p-8 shadow-2xl">
+            <div className="flex flex-col gap-8">
+              {/* Search Bar */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+                  <svg className="h-6 w-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
                 <input
-                  type="checkbox"
-                  id="inStock"
-                  checked={showInStockOnly}
-                  onChange={(e) => setShowInStockOnly(e.target.checked)}
-                  className="w-4 h-4 text-slate-600 border-slate-300 rounded focus:ring-slate-500"
+                  type="text"
+                  placeholder="Search for your perfect style..."
+                  value={search}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+                  className="w-full border-2 border-teal-200 pl-14 pr-6 py-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-500 transition-all duration-300 rounded-2xl text-lg bg-white/50 backdrop-blur-sm"
                 />
-                <label htmlFor="inStock" className="text-sm text-slate-900">
-                  In Stock Only
-                </label>
               </div>
 
-              {/* Clear Filters */}
-              <button
-                onClick={clearFilters}
-                className="border-2 border-slate-200 px-4 py-3 text-slate-600 hover:border-slate-900 hover:text-slate-900 transition-all duration-300"
-              >
-                Clear All
-              </button>
+              {/* Filter Pills */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {/* Gender Filter */}
+                <div className="relative">
+                  <select
+                    value={selectedGender}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedGender(e.target.value)}
+                    className="w-full border-2 border-teal-200 px-4 py-3 text-slate-900 focus:outline-none focus:border-teal-500 transition-all duration-300 rounded-xl bg-white/50 backdrop-blur-sm appearance-none cursor-pointer"
+                  >
+                    <option value="">All Genders</option>
+                    {availableGenders.map((gender) => (
+                      <option key={gender} value={gender}>
+                        {gender}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="h-5 w-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Category Filter */}
+                <div className="relative">
+                  <select
+                    value={selectedCategory}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedCategory(e.target.value)}
+                    className="w-full border-2 border-teal-200 px-4 py-3 text-slate-900 focus:outline-none focus:border-teal-500 transition-all duration-300 rounded-xl bg-white/50 backdrop-blur-sm appearance-none cursor-pointer"
+                  >
+                    <option value="">All Categories</option>
+                    {categories.map((cat) => (
+                      <option key={cat._id} value={cat._id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="h-5 w-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Size Filter */}
+                <div className="relative">
+                  <select
+                    value={selectedSize}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedSize(e.target.value)}
+                    className="w-full border-2 border-teal-200 px-4 py-3 text-slate-900 focus:outline-none focus:border-teal-500 transition-all duration-300 rounded-xl bg-white/50 backdrop-blur-sm appearance-none cursor-pointer"
+                  >
+                    <option value="">All Sizes</option>
+                    {availableSizes.map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="h-5 w-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Color Filter */}
+                <div className="relative">
+                  <select
+                    value={selectedColor}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedColor(e.target.value)}
+                    className="w-full border-2 border-teal-200 px-4 py-3 text-slate-900 focus:outline-none focus:border-teal-500 transition-all duration-300 rounded-xl bg-white/50 backdrop-blur-sm appearance-none cursor-pointer"
+                  >
+                    <option value="">All Colors</option>
+                    {availableColors.map((color) => (
+                      <option key={color} value={color}>
+                        {color}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="h-5 w-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Stock Filter */}
+                <div className="flex items-center justify-center px-4 py-3 border-2 border-teal-200 rounded-xl bg-white/50 backdrop-blur-sm">
+                  <input
+                    type="checkbox"
+                    id="inStock"
+                    checked={showInStockOnly}
+                    onChange={(e) => setShowInStockOnly(e.target.checked)}
+                    className="w-5 h-5 text-teal-600 border-teal-300 rounded focus:ring-teal-500 mr-3"
+                  />
+                  <label htmlFor="inStock" className="text-sm text-slate-900 font-medium cursor-pointer">
+                    In Stock Only
+                  </label>
+                </div>
+
+                {/* Clear Filters */}
+                <button
+                  onClick={clearFilters}
+                  className="border-2 border-slate-300 px-4 py-3 text-slate-600 hover:border-teal-500 hover:text-teal-600 transition-all duration-300 rounded-xl font-medium bg-white/50 backdrop-blur-sm hover:bg-teal-50"
+                >
+                  Clear All
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Products Grid */}
-      <section className="py-16">
+      <section className="relative py-20">
         <div className="max-w-7xl mx-auto px-6">
           {loading ? (
-            <div className="flex items-center justify-center py-20">
+            <div className="flex items-center justify-center py-24">
               <div className="text-center">
-                <div className="w-16 h-16 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-slate-600 font-light">Loading products...</p>
+                <div className="relative mb-8">
+                  <div className="w-20 h-20 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto"></div>
+                  <img
+                    src="/logo.png"
+                    alt="Loading"
+                    className="absolute inset-0 w-12 h-12 m-auto animate-pulse"
+                  />
+                </div>
+                <p className="text-slate-600 font-light text-lg">Discovering amazing products...</p>
               </div>
             </div>
           ) : products.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="mb-8">
-                <svg
-                  className="w-24 h-24 text-slate-300 mx-auto mb-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            <div className="text-center py-24">
+              <div className="bg-white/80 backdrop-blur-xl border border-teal-100 rounded-3xl p-16 shadow-2xl max-w-2xl mx-auto">
+                <div className="mb-10">
+                  <svg
+                    className="w-32 h-32 text-slate-300 mx-auto mb-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1}
+                      d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8l-4 4m0 0l-4-4m4 4V3"
+                    />
+                  </svg>
+                  <img src="/logo.png" alt="Nifti" className="w-12 h-12 mx-auto mb-6 opacity-50" />
+                </div>
+                <h3 className="text-3xl font-light text-slate-900 mb-6">No products found</h3>
+                <p className="text-slate-600 font-light text-lg mb-8">
+                  Try adjusting your search or filter criteria to discover more amazing pieces
+                </p>
+                <button
+                  onClick={clearFilters}
+                  className="bg-gradient-to-r from-teal-500 to-teal-600 text-white px-8 py-3 rounded-xl hover:from-teal-600 hover:to-teal-700 transition-all duration-300 font-medium transform hover:scale-105"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1}
-                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8l-4 4m0 0l-4-4m4 4V3"
-                  />
-                </svg>
+                  Clear All Filters
+                </button>
               </div>
-              <h3 className="text-2xl font-light text-slate-900 mb-4">
-                No products found
-              </h3>
-              <p className="text-slate-600 font-light">
-                Try adjusting your search or filter criteria
-              </p>
-              <button
-                onClick={clearFilters}
-                className="mt-4 bg-slate-900 text-white px-6 py-2 rounded hover:bg-slate-800 transition-colors"
-              >
-                Clear All Filters
-              </button>
             </div>
           ) : (
             <>
               {/* Results Header */}
-              <div className="mb-6 flex justify-between items-center">
-                <p className="text-slate-600">
-                  Showing {products.length}{" "}
-                  {products.length === 1 ? "product" : "products"}
-                </p>
-                {(search ||
-                  selectedCategory ||
-                  selectedSize ||
-                  selectedColor ||
-                  selectedGender ||
-                  showInStockOnly) && (
+              <div className="mb-8 flex justify-between items-center bg-white/80 backdrop-blur-xl border border-teal-100 rounded-2xl p-6 shadow-lg">
+                <div className="flex items-center space-x-4">
+                  <img src="/logo.png" alt="Nifti" className="w-6 h-6" />
+                  <p className="text-slate-600 text-lg">
+                    Showing <span className="font-medium text-teal-600">{products.length}</span>{" "}
+                    {products.length === 1 ? "product" : "products"}
+                  </p>
+                </div>
+                {(search || selectedCategory || selectedSize || selectedColor || selectedGender || showInStockOnly) && (
                   <button
                     onClick={clearFilters}
-                    className="text-slate-600 hover:text-slate-900 text-sm underline"
+                    className="text-slate-600 hover:text-teal-600 underline font-medium transition-colors"
                   >
                     Clear all filters
                   </button>
