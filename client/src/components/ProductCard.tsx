@@ -18,7 +18,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addToCart, isLoading } = useCart()
+  const { addToCart, loading } = useCart()
   const [qty, setQty] = useState(1)
   const [selectedSize, setSelectedSize] = useState("M")
   const [isAdding, setIsAdding] = useState(false)
@@ -96,7 +96,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               <div className="flex items-center border border-white/50 rounded">
                 <button
                   onClick={decrementQty}
-                  disabled={isAdding || isLoading}
+                  disabled={isAdding || loading}
                   className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/20 disabled:opacity-50 transition-colors"
                 >
                   −
@@ -106,7 +106,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 </span>
                 <button
                   onClick={incrementQty}
-                  disabled={isAdding || isLoading}
+                  disabled={isAdding || loading}
                   className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/20 disabled:opacity-50 transition-colors"
                 >
                   +
@@ -117,7 +117,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             {/* Add to Cart Button */}
             <button
               onClick={handleQuickAdd}
-              disabled={isAdding || isLoading}
+              disabled={isAdding || loading}
               className="w-full py-2 bg-white text-black text-sm font-medium uppercase tracking-wide hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center"
             >
               {isAdding ? (

@@ -51,7 +51,7 @@ interface NewReview {
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-  const { addToCart, isLoading: cartLoading } = useCart();
+  const { addToCart, loading: cartLoading } = useCart();
   const { addToast } = useToast();
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedSize, setSelectedSize] = useState<string>("");

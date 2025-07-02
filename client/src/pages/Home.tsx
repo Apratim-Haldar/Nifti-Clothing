@@ -130,7 +130,7 @@ const Home: React.FC = () => {
           <div className="text-center">
             <div className="relative mb-8">
               <div className="w-16 h-16 border-3 border-slate-200 border-t-slate-800 rounded-full animate-spin mx-auto"></div>
-              <div className="absolute inset-0 w-12 h-12 border-3 border-transparent border-t-slate-600 rounded-full animate-spin mx-auto mt-2 ml-2 animate-pulse"></div>
+              <div className="absolute inset-0 w-12 h-12 border-3 border-transparent border-t-slate-600 rounded-full animate-spin mx-auto mt-2 ml-2 "></div>
             </div>
             <h2 className="text-3xl font-light text-slate-800 mb-3 tracking-wide animate-pulse">NIFTI CLOTHING</h2>
             <p className="text-slate-600 font-light tracking-wide animate-pulse">Curating your perfect style...</p>

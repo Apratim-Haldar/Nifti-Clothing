@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import type { Category, AdminTabProps } from '../../types/admin';
 
-const CategoriesTab: React.FC<AdminTabProps> = ({ setMessage, setError }) => {
+const CategoriesTab: React.FC<AdminTabProps> = ({ setMessage }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState<string>('');
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);

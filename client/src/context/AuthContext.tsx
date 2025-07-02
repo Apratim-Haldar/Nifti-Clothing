@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 interface User {
+  _id: string;
   name: string;
   email: string;
   affiliateCode?: string;

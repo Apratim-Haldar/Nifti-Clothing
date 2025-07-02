@@ -335,8 +335,9 @@ const ProductsTab: React.FC = () => {
         );
       }
 
+      // Use the response to show more specific success message
       addToast(
-        editingProduct ? 'Product updated successfully!' : 'Product created successfully!',
+        response.data.message || (editingProduct ? 'Product updated successfully!' : 'Product created successfully!'),
         'success'
       );
       
