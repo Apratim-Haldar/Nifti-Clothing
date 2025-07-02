@@ -33,9 +33,51 @@ console.log('- AWS_REGION:', process.env.AWS_REGION ? 'Set ✅' : 'Not set ❌')
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+// Determine if we're in production
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Configure CORS for production and development
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, etc.)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      process.env.CLIENT_URL,
+      process.env.CLIENT_URL_2,
+      process.env.PRODUCTION_CLIENT_URL,
+      // Add your production domain here
+      'https://your-production-domain.com',
+      'https://your-production-domain.vercel.app',
+      'https://your-production-domain.netlify.app'
+    ].filter(Boolean); // Remove undefined values
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['Set-Cookie']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
+
+// Add security headers for production
+if (isProduction) {
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Origin', req.headers.origin);
+    next();
+  });
+}
+
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
@@ -48,19 +90,28 @@ app.use('/api/admin/advertisements', advertisementRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/cart', cartRoutes);
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 // Stripe webhook requires raw body
 app.post('/api/payment/webhook', bodyParser.raw({ type: 'application/json' }), paymentRoutes);
 
-mongoose
-  .connect(process.env.MONGODB_URI, { dbName: 'clothing-store' })
-  .then(() => {
-    console.log('✅ MongoDB connected');
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`);
-      console.log(`🌐 Client URL: ${process.env.CLIENT_URL}`);
-    });
-  })
-  .catch((err) => {
-    console.error('❌ MongoDB connection error:', err);
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('MongoDB connected successfully'))
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
     process.exit(1);
   });
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`CORS origins: ${JSON.stringify(corsOptions.origin)}`);
+});

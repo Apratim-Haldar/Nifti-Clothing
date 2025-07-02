@@ -6,6 +6,17 @@ const { v4: uuidv4 } = require('uuid');
 const { verifyToken } = require('../middleware/authMiddleware');
 const router = express.Router();
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Cookie configuration for production
+const getCookieOptions = () => ({
+  httpOnly: true,
+  secure: isProduction, // HTTPS only in production
+  sameSite: isProduction ? 'none' : 'lax', // 'none' for cross-site in production
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  domain: isProduction ? undefined : undefined // Let browser handle domain
+});
+
 // REGISTER
 router.post('/register', async (req, res) => {
   try {
@@ -32,10 +43,23 @@ router.post('/register', async (req, res) => {
     await newUser.save();
 
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.cookie('token', token, { httpOnly: true });
-    res.status(201).json({ msg: 'User registered', user: newUser });
+    
+    // Set cookie with production-safe options
+    res.cookie('token', token, getCookieOptions());
+    
+    // Return user without password
+    const userResponse = {
+      _id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      affiliateCode: newUser.affiliateCode,
+      isAdmin: newUser.isAdmin
+    };
+    
+    res.status(201).json({ msg: 'User registered', user: userResponse });
   } catch (err) {
-    res.status(500).json({ msg: 'Server error', error: err });
+    console.error('Registration error:', err);
+    res.status(500).json({ msg: 'Server error', error: err.message });
   }
 });
 
@@ -50,10 +74,23 @@ router.post('/login', async (req, res) => {
     if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.cookie('token', token, { httpOnly: true });
-    res.status(200).json({ msg: 'Login successful', user });
+    
+    // Set cookie with production-safe options
+    res.cookie('token', token, getCookieOptions());
+    
+    // Return user without password
+    const userResponse = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      affiliateCode: user.affiliateCode,
+      isAdmin: user.isAdmin
+    };
+    
+    res.status(200).json({ msg: 'Login successful', user: userResponse });
   } catch (err) {
-    res.status(500).json({ msg: 'Server error', error: err });
+    console.error('Login error:', err);
+    res.status(500).json({ msg: 'Server error', error: err.message });
   }
 });
 
@@ -62,19 +99,29 @@ router.get('/me', verifyToken, async (req, res) => {
     const user = await User.findById(req.userId).select('name email affiliateCode isAdmin');
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    res.json({ user });
-  } catch {
+    const userResponse = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      affiliateCode: user.affiliateCode,
+      isAdmin: user.isAdmin
+    };
+
+    res.json({ user: userResponse });
+  } catch (error) {
+    console.error('Auth check error:', error);
     res.status(500).json({ message: 'Failed to fetch user' });
   }
 });
 
 router.post('/logout', (req, res) => {
   try {
-    // Clear the token cookie
-    res.clearCookie('token');
+    // Clear the token cookie with same options used to set it
+    res.clearCookie('token', getCookieOptions());
     res.status(200).json({ msg: 'Logged out successfully' });
   } catch (err) {
-    res.status(500).json({ msg: 'Server error', error: err });
+    console.error('Logout error:', err);
+    res.status(500).json({ msg: 'Server error', error: err.message });
   }
 });
 
