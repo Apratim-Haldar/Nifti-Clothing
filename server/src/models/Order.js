@@ -1,45 +1,71 @@
 const mongoose = require('mongoose');
 
-const OrderItemSchema = new mongoose.Schema({
-  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-  title: { type: String, required: true },
-  price: { type: Number, required: true },
-  quantity: { type: Number, required: true, min: 1 },
-  size: { type: String, required: true },
-  color: { type: String },
-  imageUrl: { type: String }
-});
-
 const OrderSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  items: [OrderItemSchema],
-  totalAmount: { type: Number, required: true },
+  orderNumber: {
+    type: String,
+    unique: true,
+    default: function() {
+      // Generate a unique order number
+      return 'ORD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+    }
+  },
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: true 
+  },
+  user: {
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
+    address: { type: String, required: true }
+  },
+  items: [{
+    productId: { type: String, required: true },
+    title: { type: String, required: true },
+    imageUrl: { type: String },
+    price: { type: Number, required: true },
+    size: { type: String, required: true },
+    quantity: { type: Number, required: true, min: 1 }
+  }],
+  totalAmount: { 
+    type: Number, 
+    required: true, 
+    min: 0 
+  },
   status: { 
     type: String, 
-    enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
-    default: 'pending'
-  },
-  shippingAddress: {
-    name: { type: String, required: true },
-    address: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    pincode: { type: String, required: true },
-    phone: { type: String, required: true }
+    enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'], 
+    default: 'pending' 
   },
   paymentStatus: {
     type: String,
-    enum: ['pending', 'completed', 'failed', 'refunded'],
+    enum: ['pending', 'paid', 'failed', 'refunded'],
     default: 'pending'
   },
-  orderNumber: { type: String, unique: true, required: true }
-}, { timestamps: true });
+  paymentMethod: {
+    type: String,
+    enum: ['cash_on_delivery', 'bank_transfer', 'upi', 'card'],
+    default: 'cash_on_delivery'
+  },
+  notes: { type: String }
+}, { 
+  timestamps: true 
+});
 
-// Generate order number before saving
+// Pre-save hook to ensure unique order number
 OrderSchema.pre('save', async function(next) {
   if (!this.orderNumber) {
-    const count = await mongoose.model('Order').countDocuments();
-    this.orderNumber = `ORD${String(count + 1).padStart(6, '0')}`;
+    let orderNumber;
+    let exists = true;
+    
+    // Keep generating until we get a unique one
+    while (exists) {
+      orderNumber = 'ORD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+      exists = await mongoose.model('Order').findOne({ orderNumber });
+    }
+    
+    this.orderNumber = orderNumber;
   }
   next();
 });

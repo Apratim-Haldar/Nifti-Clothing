@@ -42,6 +42,7 @@ const allowedOrigins = [
   process.env.CLIENT_URL_2,
   process.env.PRODUCTION_CLIENT_URL,
   process.env.TEST_URL,
+  'https://www.nifti.in',
   // Add your actual production domains here
   'https://your-production-domain.com',
   'https://your-production-domain.vercel.app',

@@ -3,73 +3,112 @@ const router = express.Router();
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const { verifyToken } = require('../middleware/authMiddleware');
+const { sendOrderConfirmationEmail } = require('../utils/emailService');
 
-// Create new order
+// Create new order (without payment)
 router.post('/', verifyToken, async (req, res) => {
   try {
-    const { items, shippingAddress, totalAmount } = req.body;
+    const { user, items, totalAmount } = req.body;
 
-    // Validate stock availability for all items
-    for (const item of items) {
-      const product = await Product.findById(item.productId);
-      if (!product) {
-        return res.status(404).json({ 
-          message: `Product ${item.title} not found` 
-        });
-      }
+    console.log('Creating order with data:', { user, items: items?.length, totalAmount });
 
-      if (product.stock < item.quantity) {
-        return res.status(400).json({ 
-          message: `Insufficient stock for ${product.title}. Available: ${product.stock}, Requested: ${item.quantity}` 
-        });
-      }
+    // Validate that items exist and have required fields
+    if (!items || items.length === 0) {
+      return res.status(400).json({ 
+        message: 'Order must contain at least one item' 
+      });
     }
 
-    // Create order
-    const order = new Order({
+    // Validate user data
+    if (!user || !user.name || !user.email || !user.phone || !user.address) {
+      return res.status(400).json({ 
+        message: 'All user information (name, email, phone, address) is required' 
+      });
+    }
+
+    // Validate and clean items data
+    const cleanedItems = items.map(item => ({
+      productId: item.productId,
+      title: item.title,
+      imageUrl: item.imageUrl || '',
+      price: Number(item.price),
+      size: item.size,
+      quantity: Number(item.quantity)
+    }));
+
+    // Create order with explicit field mapping
+    const orderData = {
       userId: req.userId,
-      items,
-      totalAmount,
-      shippingAddress
-    });
+      user: {
+        name: user.name.trim(),
+        email: user.email.trim(),
+        phone: user.phone.trim(),
+        address: user.address.trim()
+      },
+      items: cleanedItems,
+      totalAmount: Number(totalAmount),
+      status: 'pending',
+      paymentStatus: 'pending'
+    };
 
-    await order.save();
+    console.log('Cleaned order data:', orderData);
 
-    // Reduce stock for each item
-    for (const item of items) {
-      await Product.findByIdAndUpdate(
-        item.productId,
-        { 
-          $inc: { stock: -item.quantity },
-          $set: { inStock: true } // Will be updated by post-save hook if needed
-        }
-      );
+    const order = new Order(orderData);
+    const savedOrder = await order.save();
 
-      // Update inStock status
-      const updatedProduct = await Product.findById(item.productId);
-      updatedProduct.inStock = updatedProduct.stock > 0;
-      await updatedProduct.save();
+    console.log('Order saved successfully:', savedOrder._id);
+
+    // Send confirmation emails (but don't fail if email fails)
+    try {
+      await sendOrderConfirmationEmail(savedOrder);
+    } catch (emailError) {
+      console.error('Email sending failed:', emailError);
+      // Don't fail the order if email fails
     }
 
-    await order.populate('items.productId', 'title imageUrl');
-    
     res.status(201).json({
-      message: 'Order created successfully',
-      order: order
+      message: 'Order placed successfully! You will receive a confirmation email shortly.',
+      order: {
+        _id: savedOrder._id,
+        orderNumber: savedOrder.orderNumber,
+        status: savedOrder.status,
+        totalAmount: savedOrder.totalAmount,
+        createdAt: savedOrder.createdAt
+      }
     });
+
   } catch (err) {
-    console.error('Error creating order:', err);
-    res.status(500).json({ message: 'Failed to create order' });
+    console.error('Order creation error:', err);
+    res.status(500).json({ 
+      message: 'Failed to create order',
+      error: err.message 
+    });
   }
 });
 
-// Get user orders
+// Get user's orders
 router.get('/my-orders', verifyToken, async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.userId })
-      .populate('items.productId', 'title imageUrl')
       .sort({ createdAt: -1 });
+    
+    res.json(orders);
+  } catch (err) {
+    console.error('Error fetching orders:', err);
+    res.status(500).json({ message: 'Failed to fetch orders' });
+  }
+});
 
+// Get all orders (admin only)
+router.get('/admin/all', verifyToken, async (req, res) => {
+  try {
+    if (!req.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    const orders = await Order.find()
+      .sort({ createdAt: -1 });
+    
     res.json(orders);
   } catch (err) {
     console.error('Error fetching orders:', err);
@@ -78,38 +117,32 @@ router.get('/my-orders', verifyToken, async (req, res) => {
 });
 
 // Update order status (admin only)
-router.patch('/:id/status', verifyToken, async (req, res) => {
+router.patch('/:orderId/status', verifyToken, async (req, res) => {
   try {
-    const { status } = req.body;
-    const order = await Order.findById(req.params.id);
+    if (!req.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    const { status, paymentStatus } = req.body;
+    
+    const order = await Order.findByIdAndUpdate(
+      req.params.orderId,
+      { 
+        status,
+        paymentStatus,
+        updatedAt: new Date()
+      },
+      { new: true }
+    );
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // If order is being cancelled, restore stock
-    if (status === 'cancelled' && order.status !== 'cancelled') {
-      for (const item of order.items) {
-        await Product.findByIdAndUpdate(
-          item.productId,
-          { 
-            $inc: { stock: item.quantity },
-            $set: { inStock: true }
-          }
-        );
-      }
-    }
-
-    order.status = status;
-    await order.save();
-
-    res.json({
-      message: 'Order status updated successfully',
-      order: order
-    });
+    res.json({ message: 'Order updated successfully', order });
   } catch (err) {
-    console.error('Error updating order status:', err);
-    res.status(500).json({ message: 'Failed to update order status' });
+    console.error('Error updating order:', err);
+    res.status(500).json({ message: 'Failed to update order' });
   }
 });
 
