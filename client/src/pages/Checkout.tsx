@@ -165,7 +165,7 @@ const Checkout = () => {
         status: 'pending'
       }
 
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders`, orderData, {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders`, orderData, {
         withCredentials: true
       })
 
