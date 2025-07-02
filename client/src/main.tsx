@@ -16,16 +16,16 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <Elements stripe={stripePromise}>
-        <CartProvider>
-          <ToastProvider>
-            <AuthProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <CartProvider>
               <App />
-            </AuthProvider>
-          </ToastProvider>
-        </CartProvider>
+            </CartProvider>
+          </AuthProvider>
+        </ToastProvider>
       </Elements>
     </BrowserRouter>
   </React.StrictMode>
 );
 
-// 
+//

@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       { withCredentials: true }
     );
     setUser(response.data.user);
+    // Cart will be synced automatically via useEffect in CartContext
   };
 
   const register = async (userData: any) => {
@@ -45,6 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       { withCredentials: true }
     );
     setUser(response.data.user);
+    // Cart will be synced automatically via useEffect in CartContext
   };
 
   const checkAuth = async () => {
@@ -65,6 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       withCredentials: true,
     });
     setUser(null);
+    // Cart will be cleared automatically via useEffect in CartContext
   };
 
   useEffect(() => {

@@ -16,6 +16,7 @@ const reviewRoutes = require('./routes/reviews');
 const advertisementRoutes = require('./routes/advertisements');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const cartRoutes = require('./routes/cart');
 
 // Configure dotenv to look for .env file in the server root directory
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
@@ -45,6 +46,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/admin/products', adminProductRoutes);
 app.use('/api/admin/advertisements', advertisementRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/cart', cartRoutes);
 
 // Stripe webhook requires raw body
 app.post('/api/payment/webhook', bodyParser.raw({ type: 'application/json' }), paymentRoutes);

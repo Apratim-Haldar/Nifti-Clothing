@@ -47,7 +47,7 @@ interface HeroItem {
 const Home: React.FC = () => {
   const [heroItems, setHeroItems] = useState<HeroItem[]>([])
   const [currentHeroIndex, setCurrentHeroIndex] = useState<number>(0)
-  const [loading, setLoading] = useState<boolean>(true)
+  const [loading, setLoading] = useState<boolean>(false)
   const [featuredCollection, setFeaturedCollection] = useState<Product[]>([])
 
   useEffect(() => {
