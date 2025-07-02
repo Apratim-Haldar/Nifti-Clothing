@@ -335,11 +335,11 @@ const AdvertisementTab: React.FC = () => {
       buttonText: ad.buttonText,
       buttonLink: ad.buttonLink,
       targetPage: ad.targetPage || 'custom',
-      shopFilters: ad.shopFilters || {
-        category: '',
-        gender: '',
-        priceRange: '',
-        sortBy: ''
+      shopFilters: {
+        category: ad.shopFilters?.category ?? '',
+        gender: ad.shopFilters?.gender ?? '',
+        priceRange: ad.shopFilters?.priceRange ?? '',
+        sortBy: ad.shopFilters?.sortBy ?? ''
       },
       isActive: ad.isActive,
       priority: ad.priority
@@ -401,7 +401,7 @@ const AdvertisementTab: React.FC = () => {
       if (ad.targetPage === 'shop' && ad.shopFilters) {
         const filters = [];
         if (ad.shopFilters.category) {
-          const cat = categories.find(c => c._id === ad.shopFilters.category);
+          const cat = categories.find(c => c._id === ad.shopFilters?.category);
           filters.push(`Category: ${cat?.name || ad.shopFilters.category}`);
         }
         if (ad.shopFilters.gender) filters.push(`Gender: ${ad.shopFilters.gender}`);

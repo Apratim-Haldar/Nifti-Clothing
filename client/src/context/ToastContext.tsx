@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-
+import { createContext, useContext, useState, useCallback} from 'react';
+import type { ReactNode } from 'react';
 export interface Toast {
   id: string;
   message: string;
@@ -10,6 +10,7 @@ export interface Toast {
 interface ToastContextType {
   toasts: Toast[];
   addToast: (message: string, type: Toast['type'], duration?: number) => void;
+  showToast: (message: string, type: Toast['type'], duration?: number) => void;
   removeToast: (id: string) => void;
 }
 
@@ -35,8 +36,11 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   }, []);
 
+  // Alias for addToast to maintain compatibility
+  const showToast = addToast;
+
   return (
-    <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
+    <ToastContext.Provider value={{ toasts, addToast, showToast, removeToast }}>
       {children}
     </ToastContext.Provider>
   );

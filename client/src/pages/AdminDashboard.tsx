@@ -54,11 +54,11 @@ const AdminDashboard: React.FC = () => {
       case 'categories':
         return <CategoriesTab setMessage={setMessage} setError={setError} />;
       case 'products':
-        return <ProductsTab setMessage={setMessage} setError={setError} />;
+        return <ProductsTab />;
       case 'reviews':
         return <ReviewsTab setMessage={setMessage} setError={setError} />;
       case 'advertisements':
-        return <AdvertisementTab setMessage={setMessage} setError={setError} />;
+        return <AdvertisementTab />;
       default:
         return <OverviewTab setMessage={setMessage} setError={setError} />;
     }
