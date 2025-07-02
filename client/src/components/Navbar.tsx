@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { useCart } from "../context/CartContext"
-import { ShoppingBag, User, Menu, X, Package } from "lucide-react"
+import { ShoppingBag, Menu, X, Package } from "lucide-react"
 import { useState } from "react"
 
 const Navbar = () => {

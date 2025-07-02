@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { fetchMyOrders, cancelOrder } from '../services/api';
-import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import './MyOrders.css';
 
@@ -37,7 +36,6 @@ const MyOrders: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all');
-  const { user } = useAuth();
   const { showToast } = useToast();
 
   useEffect(() => {
