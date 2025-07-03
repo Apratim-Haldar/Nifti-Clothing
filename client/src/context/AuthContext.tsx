@@ -6,6 +6,7 @@ interface User {
   _id: string;
   name: string;
   email: string;
+  phone?: string;
   affiliateCode?: string;
   isAdmin?: boolean;
 }
@@ -14,6 +15,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  setUser: (user: User) => void;
   register: (userData: any) => Promise<void>;
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
@@ -23,6 +25,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   login: async () => {},
+  setUser: () => {},
   register: async () => {},
   checkAuth: async () => {},
   logout: async () => {},
@@ -76,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, checkAuth, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, setUser, register, checkAuth, logout }}>
       {children}
     </AuthContext.Provider>
   );

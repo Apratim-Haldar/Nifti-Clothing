@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { useCart } from "../context/CartContext"
-import { ShoppingBag, Menu, X, Package } from "lucide-react"
+import { ShoppingBag, Menu, X, Package, User } from "lucide-react"
 import { useState } from "react"
 
 const Navbar = () => {
@@ -79,12 +79,25 @@ const Navbar = () => {
                   <Link
                     to="/orders"
                     className={`relative flex items-center space-x-2 text-lg font-medium transition-all duration-300 ${
-                      isActive("/my-orders") ? "text-slate-900" : "text-slate-700 hover:text-slate-900"
+                      isActive("/orders") ? "text-slate-900" : "text-slate-700 hover:text-slate-900"
                     }`}
                   >
                     <Package className="w-5 h-5" />
                     <span>My Orders</span>
-                    {isActive("/my-orders") && (
+                    {isActive("/orders") && (
+                      <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gradient-to-r from-slate-800 to-slate-900"></div>
+                    )}
+                  </Link>
+
+                  <Link
+                    to="/profile"
+                    className={`relative flex items-center space-x-2 text-lg font-medium transition-all duration-300 ${
+                      isActive("/profile") ? "text-slate-900" : "text-slate-700 hover:text-slate-900"
+                    }`}
+                  >
+                    <User className="w-5 h-5" />
+                    <span>Profile</span>
+                    {isActive("/profile") && (
                       <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gradient-to-r from-slate-800 to-slate-900"></div>
                     )}
                   </Link>
@@ -202,9 +215,9 @@ const Navbar = () => {
                 {user && (
                   <>
                     <Link
-                      to="/my-orders"
+                      to="/orders"
                       className={`flex items-center space-x-3 text-lg font-medium transition-all duration-300 ${
-                        isActive("/my-orders") ? "text-slate-900" : "text-slate-700 hover:text-slate-900"
+                        isActive("/orders") ? "text-slate-900" : "text-slate-700 hover:text-slate-900"
                       }`}
                       onClick={() => setIsMenuOpen(false)}
                     >
@@ -212,7 +225,21 @@ const Navbar = () => {
                         <Package className="w-5 h-5" />
                         <span>My Orders</span>
                       </div>
-                      {isActive("/my-orders") && <div className="w-2 h-2 bg-slate-900 rounded-full"></div>}
+                      {isActive("/orders") && <div className="w-2 h-2 bg-slate-900 rounded-full"></div>}
+                    </Link>
+
+                    <Link
+                      to="/profile"
+                      className={`flex items-center space-x-3 text-lg font-medium transition-all duration-300 ${
+                        isActive("/profile") ? "text-slate-900" : "text-slate-700 hover:text-slate-900"
+                      }`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <User className="w-5 h-5" />
+                        <span>Profile</span>
+                      </div>
+                      {isActive("/profile") && <div className="w-2 h-2 bg-slate-900 rounded-full"></div>}
                     </Link>
 
                     <Link
@@ -236,52 +263,50 @@ const Navbar = () => {
                     }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <span>Admin Dashboard</span>
+                    <span>Admin</span>
                     {isActive("/admin") && <div className="w-2 h-2 bg-slate-900 rounded-full"></div>}
                   </Link>
                 )}
 
-                <div className="pt-6 border-t border-slate-200">
-                  {user ? (
-                    <div className="flex flex-col space-y-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center">
-                          <span className="text-white font-medium text-sm">{user.name.charAt(0).toUpperCase()}</span>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium text-slate-900">Hi, {user.name.split(" ")[0]}</span>
-                          <span className="text-xs text-slate-500">Welcome back</span>
-                        </div>
+                {user ? (
+                  <div className="pt-6 border-t border-slate-200">
+                    <div className="flex items-center space-x-3 mb-6">
+                      <div className="w-10 h-10 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center">
+                        <span className="text-white font-medium text-sm">{user.name.charAt(0).toUpperCase()}</span>
                       </div>
-                      <button
-                        onClick={() => {
-                          logout()
-                          setIsMenuOpen(false)
-                        }}
-                        className="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-6 py-3 rounded-full text-sm font-medium hover:from-slate-900 hover:to-black transition-all duration-300 text-center shadow-lg"
-                      >
-                        Logout
-                      </button>
+                      <div>
+                        <p className="text-sm font-medium text-slate-900">Hi, {user.name.split(" ")[0]}</p>
+                        <p className="text-xs text-slate-500">Welcome back</p>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="flex flex-col space-y-4">
-                      <Link
-                        to="/login"
-                        className="text-slate-700 hover:text-slate-900 font-medium transition-colors duration-300 text-lg"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Login
-                      </Link>
-                      <Link
-                        to="/register"
-                        className="bg-gradient-to-r from-slate-700 to-slate-900 text-white px-6 py-3 rounded-full text-sm font-medium hover:from-slate-800 hover:to-black transition-all duration-300 text-center shadow-lg"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Join Nifti
-                      </Link>
-                    </div>
-                  )}
-                </div>
+                    <button
+                      onClick={() => {
+                        logout()
+                        setIsMenuOpen(false)
+                      }}
+                      className="w-full bg-gradient-to-r from-slate-800 to-slate-900 text-white py-3 rounded-xl font-medium hover:from-slate-900 hover:to-black transition-all duration-300"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <div className="pt-6 border-t border-slate-200 space-y-4">
+                    <Link
+                      to="/login"
+                      className="block text-center text-slate-700 hover:text-slate-900 font-medium transition-colors duration-300"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="block w-full bg-gradient-to-r from-slate-700 to-slate-900 text-white py-3 rounded-xl text-center font-medium hover:from-slate-800 hover:to-black transition-all duration-300"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Join Nifti
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           )}

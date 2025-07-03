@@ -52,6 +52,7 @@ router.post('/register', async (req, res) => {
       _id: newUser._id,
       name: newUser.name,
       email: newUser.email,
+      phone: newUser.phone,
       affiliateCode: newUser.affiliateCode,
       isAdmin: newUser.isAdmin
     };
@@ -83,6 +84,7 @@ router.post('/login', async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
       affiliateCode: user.affiliateCode,
       isAdmin: user.isAdmin
     };
@@ -94,15 +96,17 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// GET ME
 router.get('/me', verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('name email affiliateCode isAdmin');
+    const user = await User.findById(req.userId).select('name email phone affiliateCode isAdmin');
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     const userResponse = {
       _id: user._id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
       affiliateCode: user.affiliateCode,
       isAdmin: user.isAdmin
     };
@@ -114,6 +118,97 @@ router.get('/me', verifyToken, async (req, res) => {
   }
 });
 
+// NEW: UPDATE PROFILE
+router.put('/profile', verifyToken, async (req, res) => {
+  try {
+    const { name, email, phone } = req.body;
+
+    // Validate required fields
+    if (!name || !email) {
+      return res.status(400).json({ message: 'Name and email are required' });
+    }
+
+    // Check if email is already taken by another user
+    if (email) {
+      const existingUser = await User.findOne({ email, _id: { $ne: req.userId } });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Email is already taken by another user' });
+      }
+    }
+
+    // Update user
+    const updateData = {
+      name,
+      email,
+      ...(phone && { phone }) // Only include phone if provided
+    };
+
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('name email phone affiliateCode isAdmin');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const userResponse = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      affiliateCode: user.affiliateCode,
+      isAdmin: user.isAdmin
+    };
+
+    res.json({ message: 'Profile updated successfully', user: userResponse });
+  } catch (error) {
+    console.error('Profile update error:', error);
+    res.status(500).json({ message: 'Failed to update profile' });
+  }
+});
+
+// NEW: UPDATE PASSWORD
+router.put('/password', verifyToken, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    // Validate input
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Current password and new password are required' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters long' });
+    }
+
+    // Get user with password
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    // Update password
+    await User.findByIdAndUpdate(req.userId, { password: hashedPassword });
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Password update error:', error);
+    res.status(500).json({ message: 'Failed to update password' });
+  }
+});
+
+// LOGOUT
 router.post('/logout', (req, res) => {
   try {
     // Clear the token cookie with same options used to set it

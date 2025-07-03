@@ -13,6 +13,7 @@ import Checkout from './pages/Checkout';
 import MyOrders from './pages/MyOrders';
 import AffiliateDashboard from './pages/AffiliateDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import Profile from './pages/Profile';
 import "./App.css"; // Import your global styles
 import TermsConditions from './pages/TermsConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -82,6 +83,14 @@ function App() {
             } 
           />
           <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/affiliate" 
             element={
               <ProtectedRoute>
@@ -98,7 +107,7 @@ function App() {
             } 
           />
           
-          {/* Catch-all route */}
+          {/* Catch all route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
