@@ -20,6 +20,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import ShippingPolicy from './pages/ShippingPolicy';
 import CancellationRefunds from './pages/CancellationRefunds';
 import ContactUs from './pages/ContactUs';
+import ResetPassword from './pages/ResetPassword'; // Import the ResetPassword component
 
 function App() {
   return (
@@ -43,6 +44,14 @@ function App() {
             element={
               <GuestOnlyRoute>
                 <Register />
+              </GuestOnlyRoute>
+            } 
+          />
+          <Route 
+            path="/reset-password" 
+            element={
+              <GuestOnlyRoute>
+                <ResetPassword />
               </GuestOnlyRoute>
             } 
           />

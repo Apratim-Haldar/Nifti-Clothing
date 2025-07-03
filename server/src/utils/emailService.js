@@ -230,6 +230,157 @@ const sendOrderConfirmationEmail = async (orderData) => {
   }
 };
 
+// OTP Email Function
+const sendOTPEmail = async (email, name, otp) => {
+  try {
+    const transporter = await createTransporter();
+
+    const mailOptions = {
+      from: `"NIFTI CLOTHING" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Verify Your Email - Nifti Clothing',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Email Verification - Nifti</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: 'Arial', sans-serif; background-color: #f8fafc;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 300; letter-spacing: 2px;">NIFTI</h1>
+              <p style="color: #ffffff; margin: 10px 0 0 0; opacity: 0.9; font-size: 16px;">Premium Fashion, Verified Experience</p>
+            </div>
+            
+            <!-- Content -->
+            <div style="padding: 40px 30px;">
+              <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px; font-weight: 400;">Welcome to Nifti, ${name}!</h2>
+              
+              <p style="color: #6b7280; margin: 0 0 30px 0; font-size: 16px; line-height: 1.6;">
+                Thank you for choosing Nifti Clothing. To complete your registration and start exploring our premium collection, please verify your email address.
+              </p>
+              
+              <!-- OTP Box -->
+              <div style="background-color: #f8fafc; border: 2px solid #1e293b; border-radius: 12px; padding: 30px; text-align: center; margin: 30px 0;">
+                <p style="color: #1e293b; margin: 0 0 15px 0; font-size: 18px; font-weight: 500;">Your Verification Code</p>
+                <div style="background-color: #ffffff; border: 2px solid #1e293b; border-radius: 8px; padding: 20px; display: inline-block;">
+                  <span style="color: #1e293b; font-size: 36px; font-weight: 700; letter-spacing: 8px; font-family: 'Courier New', monospace;">${otp}</span>
+                </div>
+                <p style="color: #374151; margin: 15px 0 0 0; font-size: 14px;">This code expires in 10 minutes</p>
+              </div>
+              
+              <p style="color: #6b7280; margin: 20px 0; font-size: 14px; line-height: 1.6;">
+                If you didn't create an account with Nifti, please ignore this email or contact our support team.
+              </p>
+            </div>
+            
+            <!-- Footer -->
+            <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="color: #6b7280; margin: 0 0 15px 0; font-size: 14px;">
+                Need help? Contact us at 
+                <a href="mailto:nifti.user.in@gmail.com" style="color: #1e293b; text-decoration: none;">${process.env.EMAIL_USER}</a>
+              </p>
+              <p style="color: #9ca3af; margin: 0; font-size: 12px;">
+                © ${new Date().getFullYear()} Nifti Clothing. All rights reserved.
+              </p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('OTP email sent successfully:', result.messageId);
+    return result;
+
+  } catch (error) {
+    console.error('Error sending OTP email:', error);
+    throw error;
+  }
+};
+
+// Welcome Email Function
+const sendWelcomeEmail = async (user) => {
+  try {
+    const transporter = await createTransporter();
+
+    const mailOptions = {
+      from: `"NIFTI CLOTHING" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: 'Welcome to Nifti - Your Style Journey Begins!',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Welcome to Nifti</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: 'Arial', sans-serif; background-color: #f8fafc;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 300; letter-spacing: 2px;">NIFTI</h1>
+              <p style="color: #ffffff; margin: 10px 0 0 0; opacity: 0.9; font-size: 16px;">Welcome to Premium Fashion</p>
+            </div>
+            
+            <!-- Content -->
+            <div style="padding: 40px 30px;">
+              <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px; font-weight: 400;">Welcome to Nifti, ${user.name}! 🎉</h2>
+              
+              <p style="color: #6b7280; margin: 0 0 25px 0; font-size: 16px; line-height: 1.6;">
+                Congratulations! Your email has been verified and your Nifti account is now active. You're now part of an exclusive community that values premium fashion and sophisticated style.
+              </p>
+              
+              <!-- What's Next -->
+              <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 12px; padding: 25px; margin: 25px 0;">
+                <h3 style="color: #1e293b; margin: 0 0 20px 0; font-size: 18px;">What's Next?</h3>
+                <div style="color: #374151; font-size: 14px; line-height: 1.6;">
+                  <p style="margin: 0 0 12px 0;">✨ Explore our premium collection of carefully curated fashion pieces</p>
+                  <p style="margin: 0 0 12px 0;">🛒 Add your favorite items to your personalized cart</p>
+                  <p style="margin: 0 0 12px 0;">🎯 Join our referral program and earn rewards</p>
+                  <p style="margin: 0;">📱 Follow us on social media for style inspiration</p>
+                </div>
+              </div>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/products" 
+                   style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: #ffffff; text-decoration: none; padding: 15px 30px; border-radius: 8px; font-weight: 600; display: inline-block; letter-spacing: 1px;">
+                  START SHOPPING
+                </a>
+              </div>
+            </div>
+            
+            <!-- Footer -->
+            <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="color: #6b7280; margin: 0 0 15px 0; font-size: 14px;">
+                Questions? We're here to help! 
+                <a href="mailto:${process.env.EMAIL_USER}" style="color: #1e293b; text-decoration: none;">${process.env.EMAIL_USER}</a>
+              </p>
+              <p style="color: #9ca3af; margin: 0; font-size: 12px;">
+                © ${new Date().getFullYear()} Nifti Clothing. All rights reserved.
+              </p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Welcome email sent successfully:', result.messageId);
+    return result;
+
+  } catch (error) {
+    console.error('Error sending welcome email:', error);
+    throw error;
+  }
+};
+
 const sendEmail = async (to, subject, html) => {
   const transporter = await createTransporter();
   await transporter.sendMail({ 
@@ -240,4 +391,10 @@ const sendEmail = async (to, subject, html) => {
   });
 };
 
-module.exports = { sendEmail, sendOrderConfirmationEmail };
+// Export all functions including the new OTP functions
+module.exports = { 
+  sendEmail, 
+  sendOrderConfirmationEmail,
+  sendOTPEmail,
+  sendWelcomeEmail
+};
