@@ -28,7 +28,7 @@ const Header: React.FC = () => {
             <Link to="/" className="flex items-center space-x-4 group">
               <div className="relative">
                 <img
-                  src="logo.png"
+                  src="logo.jpg"
                   alt="Nifti Logo"
                   className="w-12 h-12 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
                 />

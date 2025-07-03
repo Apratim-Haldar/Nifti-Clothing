@@ -28,7 +28,7 @@ const Navbar = () => {
             <Link to="/" className="flex items-center space-x-4 group">
               <div className="relative">
                 <div className="w-12 h-12 bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
-                  <img src="logo.png" className="text-white font-bold text-xl"/>
+                  <img src="logo.jpg" className="text-white font-bold text-xl"/>
                 </div>
                 <div className="absolute inset-0 bg-slate-500/20 rounded-lg scale-0 group-hover:scale-150 transition-transform duration-500"></div>
               </div>

@@ -44,7 +44,7 @@ const AffiliateDashboard = () => {
         </div>
 
         <div className="relative max-w-md w-full text-center bg-white/80 backdrop-blur-xl border border-teal-100 rounded-3xl p-12 shadow-2xl">
-          <img src="logo.png" alt="Nifti" className="w-16 h-16 mx-auto mb-6" />
+          <img src="logo.jpg" alt="Nifti" className="w-16 h-16 mx-auto mb-6" />
           <h2 className="text-3xl font-light text-slate-900 mb-6">Access Restricted</h2>
           <p className="text-slate-600 font-light text-lg mb-8">Please log in to view your affiliate dashboard.</p>
           <a
@@ -64,7 +64,7 @@ const AffiliateDashboard = () => {
         <div className="text-center">
           <div className="relative mb-8">
             <div className="w-20 h-20 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto"></div>
-            <img src="/logo.png" alt="Loading" className="absolute inset-0 w-12 h-12 m-auto animate-pulse" />
+            <img src="/logo.jpg" alt="Loading" className="absolute inset-0 w-12 h-12 m-auto animate-pulse" />
           </div>
           <p className="text-slate-600 font-light text-lg">Loading affiliate stats...</p>
         </div>
@@ -76,7 +76,7 @@ const AffiliateDashboard = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-slate-50 flex items-center justify-center px-6">
         <div className="max-w-md w-full text-center bg-white/80 backdrop-blur-xl border border-teal-100 rounded-3xl p-12 shadow-2xl">
-          <img src="/logo.png" alt="Nifti" className="w-16 h-16 mx-auto mb-6 opacity-50" />
+          <img src="/logo.jpg" alt="Nifti" className="w-16 h-16 mx-auto mb-6 opacity-50" />
           <h2 className="text-3xl font-light text-slate-900 mb-6">No Data Available</h2>
           <p className="text-slate-600 font-light text-lg">Unable to load affiliate statistics.</p>
         </div>
@@ -100,7 +100,7 @@ const AffiliateDashboard = () => {
           <div className="text-center mb-20">
             <div className="flex items-center justify-center mb-8">
               <div className="w-16 h-px bg-teal-500"></div>
-              <img src="/logo.png" alt="Nifti" className="w-12 h-12 mx-6" />
+              <img src="/logo.jpg" alt="Nifti" className="w-12 h-12 mx-6" />
               <div className="w-16 h-px bg-teal-500"></div>
             </div>
             <h1 className="text-5xl md:text-6xl font-extralight mb-8 text-slate-900 tracking-tight">
@@ -160,7 +160,7 @@ const AffiliateDashboard = () => {
           {/* Enhanced Referral Link Section */}
           <div className="bg-white/80 backdrop-blur-xl border border-teal-100 p-10 shadow-2xl mb-16 rounded-3xl">
             <div className="flex items-center mb-8">
-              <img src="/logo.png" alt="Nifti" className="w-8 h-8 mr-4" />
+              <img src="/logo.jpg" alt="Nifti" className="w-8 h-8 mr-4" />
               <h3 className="text-3xl font-light text-slate-900">Your Referral Link</h3>
             </div>
             <div className="bg-gradient-to-r from-slate-50 to-slate-100 border-2 border-slate-200 p-6 mb-6 rounded-2xl">
@@ -215,7 +215,7 @@ const AffiliateDashboard = () => {
           <div className="bg-white/80 backdrop-blur-xl border border-teal-100 p-10 shadow-2xl rounded-3xl">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center">
-                <img src="/logo.png" alt="Nifti" className="w-8 h-8 mr-4" />
+                <img src="/logo.jpg" alt="Nifti" className="w-8 h-8 mr-4" />
                 <h3 className="text-3xl font-light text-slate-900">Referred Users</h3>
               </div>
               <div className="bg-gradient-to-r from-teal-500 to-teal-600 text-white px-6 py-2 rounded-full text-sm font-medium">
@@ -274,7 +274,7 @@ const AffiliateDashboard = () => {
                     />
                   </svg>
                   <img
-                    src="../public/logo.png"
+                    src="../public/logo.jpg"
                     alt="Nifti"
                     className="absolute top-0 right-1/2 transform translate-x-1/2 w-8 h-8 opacity-20"
                   />
@@ -307,7 +307,7 @@ const AffiliateDashboard = () => {
           {/* Referral Tips Section */}
           <div className="mt-16 bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 p-10 rounded-3xl text-white">
             <div className="text-center mb-12">
-              <img src="/logo.png" alt="Nifti" className="w-12 h-12 mx-auto mb-6 filter brightness-0 invert" />
+              <img src="/logo.jpg" alt="Nifti" className="w-12 h-12 mx-auto mb-6 filter brightness-0 invert" />
               <h3 className="text-3xl font-light mb-4">Maximize Your Referrals</h3>
               <p className="text-white/80 font-light text-lg">Tips to grow your network and earn more rewards</p>
             </div>

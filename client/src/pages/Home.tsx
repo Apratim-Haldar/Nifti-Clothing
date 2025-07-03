@@ -138,7 +138,7 @@ const Home: React.FC = () => {
           <div className="text-center">
             <div className="relative mb-8">
               <div className="w-20 h-20 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto"></div>
-              <img src="/logo.png" alt="Loading" className="absolute inset-0 w-12 h-12 m-auto animate-pulse" />
+              <img src="/logo.jpg" alt="Loading" className="absolute inset-0 w-12 h-12 m-auto animate-pulse" />
             </div>
             <h2 className="text-4xl font-light text-slate-800 mb-4 tracking-wider animate-pulse">NIFTI CLOTHING</h2>
             <p className="text-slate-600 font-light tracking-wide animate-pulse">Curating your perfect style...</p>
@@ -160,7 +160,7 @@ const Home: React.FC = () => {
           {/* Floating Logo Element */}
           <div className="absolute top-8 right-8 z-20">
             <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-4">
-              <img src="/logo.png" alt="Nifti" className="w-8 h-8 opacity-80" />
+              <img src="/logo.jpg" alt="Nifti" className="w-8 h-8 opacity-80" />
             </div>
           </div>
 
@@ -171,7 +171,7 @@ const Home: React.FC = () => {
                 {/* Brand Badge */}
                 <div className="mb-8 animate-fade-in-up">
                   <div className="inline-flex items-center bg-white/15 backdrop-blur-xl border border-white/30 rounded-full px-8 py-3 shadow-2xl">
-                    <img src="/logo.png" alt="Nifti" className="w-6 h-6 mr-3" />
+                    <img src="/logo.jpg" alt="Nifti" className="w-6 h-6 mr-3" />
                     <span className="text-white font-medium tracking-[0.3em] text-sm uppercase">
                       {currentHeroItem.type === "advertisement" ? "Featured Collection" : "Nifti Premium"}
                     </span>
@@ -265,7 +265,7 @@ const Home: React.FC = () => {
         <section className="relative h-screen flex items-center justify-center bg-gradient-to-br from-teal-900 via-slate-800 to-black">
           <div className="text-center text-white px-6 max-w-5xl">
             <div className="mb-8">
-              <img src="/logo.png" alt="Nifti" className="w-24 h-24 mx-auto mb-6 animate-pulse" />
+              <img src="/logo.jpg" alt="Nifti" className="w-24 h-24 mx-auto mb-6 animate-pulse" />
             </div>
             <h1 className="text-7xl md:text-9xl font-extralight mb-10 tracking-tighter animate-fade-in-up">NIFTI</h1>
             <p className="text-2xl md:text-3xl mb-16 font-light tracking-wide opacity-95 animate-fade-in-up animation-delay-200">
@@ -291,7 +291,7 @@ const Home: React.FC = () => {
             <div className="text-center mb-20">
               <div className="flex items-center justify-center mb-8">
                 <div className="w-16 h-px bg-teal-500"></div>
-                <img src="/logo.png" alt="Nifti" className="w-8 h-8 mx-6" />
+                <img src="/logo.jpg" alt="Nifti" className="w-8 h-8 mx-6" />
                 <div className="w-16 h-px bg-teal-500"></div>
               </div>
               <h2 className="text-5xl md:text-6xl font-extralight mb-8 text-slate-900 tracking-tight">
@@ -320,7 +320,7 @@ const Home: React.FC = () => {
 
                     {/* Floating Logo */}
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-500">
-                      <img src="/logo.png" alt="Nifti" className="w-4 h-4" />
+                      <img src="/logo.jpg" alt="Nifti" className="w-4 h-4" />
                     </div>
                   </div>
 
@@ -365,7 +365,7 @@ const Home: React.FC = () => {
           <div className="text-center mb-20">
             <div className="flex items-center justify-center mb-8">
               <div className="w-16 h-px bg-teal-400"></div>
-              <img src="logo.png" alt="Nifti" className="w-8 h-8 mx-6 filter" />
+              <img src="logo.jpg" alt="Nifti" className="w-8 h-8 mx-6 filter" />
               <div className="w-16 h-px bg-teal-400"></div>
             </div>
             <h2 className="text-5xl md:text-6xl font-extralight mb-8 text-white tracking-tight">The Nifti Promise</h2>
@@ -427,7 +427,7 @@ const Home: React.FC = () => {
                   <div className="text-white group-hover:text-white transition-colors duration-700">{item.icon}</div>
                   {/* Logo overlay */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-20 transition-opacity duration-700">
-                    <img src="/logo.png" alt="Nifti" className="w-12 h-12 filter brightness-0 invert" />
+                    <img src="/logo.jpg" alt="Nifti" className="w-12 h-12 filter brightness-0 invert" />
                   </div>
                 </div>
                 <h3 className="text-2xl font-light mb-6 tracking-wide text-white">{item.title}</h3>
@@ -444,7 +444,7 @@ const Home: React.FC = () => {
           <div className="text-center mb-20">
             <div className="flex items-center justify-center mb-8">
               <div className="w-16 h-px bg-teal-500"></div>
-              <img src="/logo.png" alt="Nifti" className="w-8 h-8 mx-6" />
+              <img src="/logo.jpg" alt="Nifti" className="w-8 h-8 mx-6" />
               <div className="w-16 h-px bg-teal-500"></div>
             </div>
             <h2 className="text-5xl md:text-6xl font-extralight mb-8 text-slate-900 tracking-tight">
@@ -507,7 +507,7 @@ const Home: React.FC = () => {
                       <div className="text-white">{social.icon}</div>
                       {/* Logo overlay */}
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-20 transition-opacity duration-700">
-                        <img src="/logo.png" alt="Nifti" className="w-12 h-12 filter brightness-0 invert" />
+                        <img src="/logo.jpg" alt="Nifti" className="w-12 h-12 filter brightness-0 invert" />
                       </div>
                     </div>
                   </a>
@@ -526,7 +526,7 @@ const Home: React.FC = () => {
           {/* Newsletter Signup */}
           <div className="max-w-2xl mx-auto text-center bg-white/80 backdrop-blur-xl border border-teal-100 rounded-3xl p-12 shadow-2xl">
             <div className="mb-8">
-              <img src="/logo.png" alt="Nifti" className="w-12 h-12 mx-auto mb-4" />
+              <img src="/logo.jpg" alt="Nifti" className="w-12 h-12 mx-auto mb-4" />
               <h3 className="text-3xl font-light mb-4 tracking-wide text-slate-900">Stay in Style</h3>
               <p className="text-slate-600 mb-8 font-light text-lg">
                 Subscribe for exclusive offers and early access to new collections
@@ -556,7 +556,7 @@ const Home: React.FC = () => {
 
         <div className="relative max-w-5xl mx-auto text-center">
           <div className="mb-8">
-            <img src="logo.png" alt="Nifti" className="w-16 h-16 mx-auto mb-6 filter" />
+            <img src="logo.jpg" alt="Nifti" className="w-16 h-16 mx-auto mb-6 filter" />
           </div>
           <h2 className="text-5xl md:text-6xl font-extralight mb-8 text-white tracking-tight">
             Ready to Redefine Your Style?

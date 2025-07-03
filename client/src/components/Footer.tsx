@@ -26,12 +26,22 @@ const Footer = () => {
               >
                 <Facebook className="w-5 h-5" />
               </a>
-              <div className="w-10 h-10 bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all duration-300 cursor-pointer">
+              <a
+                href="https://www.instagram.com/nifticlothing"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all duration-300"
+              >
                 <Instagram className="w-5 h-5" />
-              </div>
-              <div className="w-10 h-10 bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all duration-300 cursor-pointer">
+              </a>
+              <a
+                href="https://wa.me/message/TTBCDWDUYZXHE1?src=qr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all duration-300"
+              >
                 <MessageCircle className="w-5 h-5" />
-              </div>
+              </a>
             </div>
           </div>
 
@@ -50,10 +60,11 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/affiliate" className="text-white/70 hover:text-white font-light transition-colors">
-                  Referral Program
+                <Link to="/orders" className="text-white/70 hover:text-white font-light transition-colors">
+                  My Orders
                 </Link>
               </li>
+
               <li>
                 <Link to="/register" className="text-white/70 hover:text-white font-light transition-colors">
                   Create Account
@@ -67,24 +78,24 @@ const Footer = () => {
             <h3 className="text-lg font-light tracking-wide uppercase mb-6">Customer Care</h3>
             <ul className="space-y-4">
               <li>
-                <a href="#" className="text-white/70 hover:text-white font-light transition-colors">
-                  Size Guide
-                </a>
+                <Link to="/affiliate" className="text-white/70 hover:text-white font-light transition-colors">
+                  Referral Program
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-white/70 hover:text-white font-light transition-colors">
+                <Link to="/shipping-policy" className="text-white/70 hover:text-white font-light transition-colors">
                   Shipping Info
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-white/70 hover:text-white font-light transition-colors">
+                <Link to="/cancellations" className="text-white/70 hover:text-white font-light transition-colors">
                   Returns & Exchanges
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-white/70 hover:text-white font-light transition-colors">
+                <Link to="/contact" className="text-white/70 hover:text-white font-light transition-colors">
                   Contact Us
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -95,18 +106,28 @@ const Footer = () => {
             <div className="space-y-4">
               <div className="flex items-center space-x-3 text-white/70">
                 <Mail className="w-4 h-4" />
-                <span className="font-light">hello@nifti.in</span>
+                <a
+                  href="mailto:nifti.user.in@gmail.com"
+                  className="font-light hover:text-white transition-colors cursor-pointer"
+                >
+                  nifti.user.in@gmail.com
+                </a>
               </div>
               <div className="flex items-center space-x-3 text-white/70">
                 <Phone className="w-4 h-4" />
-                <span className="font-light">+91 XXX XXX XXXX</span>
+                <a
+                  href="tel:+918100371049"
+                  className="font-light hover:text-white transition-colors cursor-pointer"
+                >
+                  +91 8100371049
+                </a>
               </div>
               <div className="flex items-start space-x-3 text-white/70">
                 <MapPin className="w-4 h-4 mt-1" />
                 <span className="font-light">
-                  Fashion District
+                  Sultan Alam Road, Lake Gardens
                   <br />
-                  Mumbai, India
+                  Kolkata, India
                 </span>
               </div>
             </div>
@@ -119,16 +140,19 @@ const Footer = () => {
             <p className="text-white/60 font-light text-sm">
               &copy; {new Date().getFullYear()} Nifti Clothing. All rights reserved.
             </p>
-            <div className="flex space-x-8 text-sm">
-              <a href="#" className="text-white/60 hover:text-white font-light transition-colors">
+            <div className="flex flex-wrap justify-center md:justify-end space-x-6 text-sm">
+              <Link to="/general-policy" className="text-white/60 hover:text-white font-light transition-colors">
                 Privacy Policy
-              </a>
-              <a href="#" className="text-white/60 hover:text-white font-light transition-colors">
+              </Link>
+              <Link to="/terms" className="text-white/60 hover:text-white font-light transition-colors">
                 Terms of Service
-              </a>
-              <a href="#" className="text-white/60 hover:text-white font-light transition-colors">
-                Cookie Policy
-              </a>
+              </Link>
+              <Link to="/shipping-policy" className="text-white/60 hover:text-white font-light transition-colors">
+                Shipping Policy
+              </Link>
+              <Link to="/cancellations" className="text-white/60 hover:text-white font-light transition-colors">
+                Cancellation & Refunds
+              </Link>
             </div>
           </div>
         </div>

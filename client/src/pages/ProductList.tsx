@@ -144,7 +144,7 @@ const ProductList = () => {
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="flex items-center justify-center mb-8">
             <div className="w-16 h-px bg-teal-500"></div>
-            <img src="/logo.png" alt="Nifti" className="w-12 h-12 mx-6" />
+            <img src="/logo.jpg" alt="Nifti" className="w-12 h-12 mx-6" />
             <div className="w-16 h-px bg-teal-500"></div>
           </div>
           <h1 className="text-6xl md:text-7xl font-extralight mb-8 text-slate-900 tracking-tight">Our Collection</h1>
@@ -302,7 +302,7 @@ const ProductList = () => {
                 <div className="relative mb-8">
                   <div className="w-20 h-20 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto"></div>
                   <img
-                    src="/logo.png"
+                    src="/logo.jpg"
                     alt="Loading"
                     className="absolute inset-0 w-12 h-12 m-auto animate-pulse"
                   />
@@ -327,7 +327,7 @@ const ProductList = () => {
                       d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8l-4 4m0 0l-4-4m4 4V3"
                     />
                   </svg>
-                  <img src="/logo.png" alt="Nifti" className="w-12 h-12 mx-auto mb-6 opacity-50" />
+                  <img src="/logo.jpg" alt="Nifti" className="w-12 h-12 mx-auto mb-6 opacity-50" />
                 </div>
                 <h3 className="text-3xl font-light text-slate-900 mb-6">No products found</h3>
                 <p className="text-slate-600 font-light text-lg mb-8">
@@ -346,7 +346,7 @@ const ProductList = () => {
               {/* Results Header */}
               <div className="mb-8 flex justify-between items-center bg-white/80 backdrop-blur-xl border border-teal-100 rounded-2xl p-6 shadow-lg">
                 <div className="flex items-center space-x-4">
-                  <img src="/logo.png" alt="Nifti" className="w-6 h-6" />
+                  <img src="/logo.jpg" alt="Nifti" className="w-6 h-6" />
                   <p className="text-slate-600 text-lg">
                     Showing <span className="font-medium text-teal-600">{products.length}</span>{" "}
                     {products.length === 1 ? "product" : "products"}

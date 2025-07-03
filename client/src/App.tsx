@@ -14,6 +14,11 @@ import MyOrders from './pages/MyOrders';
 import AffiliateDashboard from './pages/AffiliateDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import "./App.css"; // Import your global styles
+import TermsConditions from './pages/TermsConditions';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import ShippingPolicy from './pages/ShippingPolicy';
+import CancellationRefunds from './pages/CancellationRefunds';
+import ContactUs from './pages/ContactUs';
 
 function App() {
   return (
@@ -44,7 +49,12 @@ function App() {
           {/* Public routes */}
           <Route path="/products" element={<ProductList />} />
           <Route path="/shop" element={<ProductList />} />
+          <Route path="/terms" element={<TermsConditions />} />
+          <Route path="/general-policy" element={<PrivacyPolicy />} />
+          <Route path="/shipping-policy" element={<ShippingPolicy />} />
+          <Route path="/contact" element={<ContactUs />} />
           <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="cancellations" element={<CancellationRefunds />} />
           
           {/* Protected routes (require authentication) */}
           <Route 
