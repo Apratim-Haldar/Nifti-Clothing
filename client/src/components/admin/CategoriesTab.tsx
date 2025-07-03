@@ -46,15 +46,16 @@ const CategoriesTab: React.FC = () => {
     }
 
     try {
-      const response = await axios.post<Category>(
+      const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/categories`,
         { name: newCategory.trim() },
         { withCredentials: true }
       );
       
-      // Validate the response
-      if (response.data && response.data._id && response.data.name) {
-        setCategories(prevCategories => [...prevCategories, response.data]);
+      // Extract category from response.data.category
+      const categoryData = response.data?.category;
+      if (categoryData && categoryData._id && categoryData.name) {
+        setCategories(prevCategories => [...prevCategories, categoryData]);
         setNewCategory('');
         showToast('Category added successfully!', 'success');
       } else {
@@ -73,17 +74,18 @@ const CategoriesTab: React.FC = () => {
     }
 
     try {
-      const response = await axios.put<Category>(
+      const response = await axios.put(
         `${import.meta.env.VITE_API_BASE_URL}/categories/${editingCategory._id}`,
         { name: editingCategory.name.trim() },
         { withCredentials: true }
       );
       
-      // Validate the response
-      if (response.data && response.data._id && response.data.name) {
+      // Extract category from response.data.category
+      const categoryData = response.data?.category;
+      if (categoryData && categoryData._id && categoryData.name) {
         setCategories(prevCategories => 
           prevCategories.map(cat => 
-            cat._id === editingCategory._id ? response.data : cat
+            cat._id === editingCategory._id ? categoryData : cat
           )
         );
         setEditingCategory(null);
