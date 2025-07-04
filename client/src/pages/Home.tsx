@@ -4,6 +4,7 @@ import type React from "react"
 import { Link } from "react-router-dom"
 import { useState, useEffect } from "react"
 import axios from "axios"
+import NewsletterSignup from "../components/NewsletterSignup"
 
 // Define interfaces for type safety
 interface Product {
@@ -532,16 +533,7 @@ const Home: React.FC = () => {
                 Subscribe for exclusive offers and early access to new collections
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                className="flex-1 px-6 py-4 bg-white border-2 border-teal-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-500 transition-all duration-500 rounded-xl text-lg"
-              />
-              <button className="px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-semibold tracking-wider uppercase hover:from-teal-600 hover:to-teal-700 transition-all duration-500 rounded-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 hover:scale-105 text-lg">
-                Subscribe
-              </button>
-            </div>
+            <NewsletterSignup />
           </div>
         </div>
       </section>

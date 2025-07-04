@@ -14,6 +14,7 @@ const paymentRoutes = require('./routes/payment');
 const adminProductRoutes = require('./routes/adminProducts');
 const reviewRoutes = require('./routes/reviews');
 const advertisementRoutes = require('./routes/advertisements');
+const newsletterRoutes = require('./routes/newsletter');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const cartRoutes = require('./routes/cart');
@@ -134,6 +135,7 @@ app.use('/api/admin/products', adminProductRoutes);
 app.use('/api/admin/advertisements', advertisementRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

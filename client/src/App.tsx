@@ -14,6 +14,7 @@ import MyOrders from './pages/MyOrders';
 import AffiliateDashboard from './pages/AffiliateDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Profile from './pages/Profile';
+import Unsubscribe from './pages/Unsubscribe';
 import "./App.css"; // Import your global styles
 import TermsConditions from './pages/TermsConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -65,6 +66,7 @@ function App() {
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="cancellations" element={<CancellationRefunds />} />
+          <Route path="/unsubscribe" element={<Unsubscribe />} />
           
           {/* Protected routes (require authentication) */}
           <Route 

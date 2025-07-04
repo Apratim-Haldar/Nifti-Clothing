@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 const dotenv = require('dotenv');
+const { generateWelcomeNewsletterHTML, generateNewsletterHTML } = require('./emailTemplates');
 dotenv.config();
 
 // OAuth2 setup
@@ -381,20 +382,53 @@ const sendWelcomeEmail = async (user) => {
   }
 };
 
-const sendEmail = async (to, subject, html) => {
-  const transporter = await createTransporter();
-  await transporter.sendMail({ 
-    from: `"NIFTI CLOTHING" <${process.env.EMAIL_USER}>`, 
-    to, 
-    subject, 
-    html 
-  });
+// Newsletter Functions (Updated)
+const sendWelcomeNewsletterEmail = async (email, customization = {}) => {
+  try {
+    const transporter = await createTransporter();
+
+    const mailOptions = {
+      from: `"${customization.companyName || 'NIFTI'} CLOTHING" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: `🎉 Welcome to ${customization.companyName || 'Nifti'} Newsletter - Exclusive Access Awaits!`,
+      html: generateWelcomeNewsletterHTML(email, customization)
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Welcome newsletter email sent successfully:', result.messageId);
+    return result;
+
+  } catch (error) {
+    console.error('Error sending welcome newsletter email:', error);
+    throw error;
+  }
 };
 
-// Export all functions including the new OTP functions
-module.exports = { 
-  sendEmail, 
+const sendNewsletterEmail = async (email, subject, content, unsubscribeLink, customization = {}) => {
+  try {
+    const transporter = await createTransporter();
+
+    const mailOptions = {
+      from: `"${customization.companyName || 'NIFTI'} CLOTHING" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: subject,
+      html: generateNewsletterHTML(subject, content, unsubscribeLink, customization)
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Newsletter email sent successfully to:', email);
+    return result;
+
+  } catch (error) {
+    console.error('Error sending newsletter email to', email, ':', error);
+    throw error;
+  }
+};
+
+module.exports = {
   sendOrderConfirmationEmail,
   sendOTPEmail,
-  sendWelcomeEmail
+  sendWelcomeEmail,
+  sendWelcomeNewsletterEmail,
+  sendNewsletterEmail
 };
