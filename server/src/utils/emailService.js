@@ -186,7 +186,7 @@ const generateOrderEmailHTML = (orderData, isAdmin = false) => {
 
         <div class="footer">
           <p><strong>NIFTI CLOTHING</strong> - Premium Fashion Collection</p>
-          <p>📧 ${process.env.EMAIL_USER} | 📱 Support: +91-XXXXXXXXXX</p>
+          <p>📧 nifti.user.in@gmail.com | 📱 Support: +91-8100371049</p>
           <p>Questions? Reply to this email and we'll help you out!</p>
         </div>
       </div>
@@ -282,7 +282,7 @@ const sendOTPEmail = async (email, name, otp) => {
             <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
               <p style="color: #6b7280; margin: 0 0 15px 0; font-size: 14px;">
                 Need help? Contact us at 
-                <a href="mailto:nifti.user.in@gmail.com" style="color: #1e293b; text-decoration: none;">${process.env.EMAIL_USER}</a>
+                <a href="mailto:nifti.user.in@gmail.com" style="color: #1e293b; text-decoration: none;">nifti.user.in@gmail.com</a>
               </p>
               <p style="color: #9ca3af; margin: 0; font-size: 12px;">
                 © ${new Date().getFullYear()} Nifti Clothing. All rights reserved.
@@ -349,7 +349,7 @@ const sendWelcomeEmail = async (user) => {
               </div>
               
               <div style="text-align: center; margin: 30px 0;">
-                <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/products" 
+                <a href="'https://www.nifti.in'/products" 
                    style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: #ffffff; text-decoration: none; padding: 15px 30px; border-radius: 8px; font-weight: 600; display: inline-block; letter-spacing: 1px;">
                   START SHOPPING
                 </a>
@@ -360,7 +360,7 @@ const sendWelcomeEmail = async (user) => {
             <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
               <p style="color: #6b7280; margin: 0 0 15px 0; font-size: 14px;">
                 Questions? We're here to help! 
-                <a href="mailto:${process.env.EMAIL_USER}" style="color: #1e293b; text-decoration: none;">${process.env.EMAIL_USER}</a>
+                <a href="mailto:nifit.user.in@gmail.com" style="color: #1e293b; text-decoration: none;">nifit.user.in@gmail.com</a>
               </p>
               <p style="color: #9ca3af; margin: 0; font-size: 12px;">
                 © ${new Date().getFullYear()} Nifti Clothing. All rights reserved.

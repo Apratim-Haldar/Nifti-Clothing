@@ -73,7 +73,7 @@ const generateWelcomeNewsletterHTML = (email, customization = {}) => {
         <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
           <p style="color: #6b7280; margin: 0 0 15px 0; font-size: 14px;">
             Questions? Contact us at 
-            <a href="mailto:${process.env.EMAIL_USER}" style="color: ${primaryColor}; text-decoration: none;">${process.env.EMAIL_USER}</a>
+            <a href="mailto:nifti.user.in@gmail.com" style="color: ${primaryColor}; text-decoration: none;">nifti.user.in@gmail.com</a>
           </p>
           <p style="color: #9ca3af; margin: 0 0 15px 0; font-size: 12px;">
             You received this email because you subscribed to our newsletter.
@@ -151,7 +151,7 @@ const generateNewsletterHTML = (subject, content, unsubscribeLink, customization
         <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
           <p style="color: #6b7280; margin: 0 0 15px 0; font-size: 14px;">
             Questions? Contact us at 
-            <a href="mailto:${process.env.EMAIL_USER}" style="color: ${primaryColor}; text-decoration: none;">${process.env.EMAIL_USER}</a>
+            <a href="mailto:nifti.user.in@gmail.com" style="color: ${primaryColor}; text-decoration: none;">nifti.user.in@gmail.com</a>
           </p>
           <p style="color: #9ca3af; margin: 0 0 15px 0; font-size: 12px;">
             You received this email because you subscribed to our newsletter.
