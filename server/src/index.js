@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
+const pingRoutes = require('./routes/ping');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/product');
 const orderRoutes = require('./routes/order');
@@ -136,7 +137,7 @@ app.use('/api/admin/advertisements', advertisementRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/newsletter', newsletterRoutes);
-
+app.use('/api/ping', pingRoutes)
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ 
