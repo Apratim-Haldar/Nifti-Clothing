@@ -89,7 +89,7 @@ const ShippingPolicy: React.FC = () => {
                       </div>
                       <div className="space-y-3 text-sm text-slate-700">
                         <p><strong>Timeline:</strong> 5-7 business days</p>
-                        <p><strong>Cost:</strong> Free on orders above ₹2000</p>
+                        <p><strong>Cost:</strong> Free on orders upto ₹999</p>
                         <p><strong>Coverage:</strong> All major cities and towns in India</p>
                         <p><strong>Tracking:</strong> SMS and email updates included</p>
                       </div>

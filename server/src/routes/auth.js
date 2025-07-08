@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Newsletter = require('../models/Newsletter'); // Add Newsletter model import
 const { v4: uuidv4 } = require('uuid');
 const { verifyToken } = require('../middleware/authMiddleware');
 const { sendOTPEmail, sendWelcomeEmail } = require('../utils/emailService');
@@ -175,6 +176,28 @@ router.post('/verify-otp', async (req, res) => {
 
     // Clean up OTP
     otpStore.delete(email);
+
+    // Automatically add user to newsletter mailing list
+    try {
+      const existingSubscriber = await Newsletter.findOne({ email });
+      if (!existingSubscriber) {
+        const unsubscribeToken = uuidv4();
+        const newSubscriber = new Newsletter({
+          email,
+          unsubscribeToken
+        });
+        await newSubscriber.save();
+      } else if (existingSubscriber.status === 'unsubscribed') {
+        // Resubscribe if they were previously unsubscribed
+        existingSubscriber.status = 'subscribed';
+        existingSubscriber.subscribedAt = new Date();
+        existingSubscriber.unsubscribedAt = undefined;
+        await existingSubscriber.save();
+      }
+    } catch (newsletterError) {
+      console.error('Newsletter subscription failed during registration:', newsletterError);
+      // Don't fail registration if newsletter subscription fails
+    }
 
     // Send welcome email
     try {

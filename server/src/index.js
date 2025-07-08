@@ -45,6 +45,7 @@ const allowedOrigins = [
   process.env.PRODUCTION_CLIENT_URL,
   process.env.TEST_URL,
   'https://www.nifti.in',
+  'https://nifti.in',
   // Add your actual production domains here
   'https://your-production-domain.com',
   'https://your-production-domain.vercel.app',
@@ -137,7 +138,7 @@ app.use('/api/admin/advertisements', advertisementRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/newsletter', newsletterRoutes);
-app.use('/api/ping', pingRoutes)
+app.use('/api/ping', pingRoutes);
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ 
