@@ -42,7 +42,6 @@ const ProductList = () => {
   const [categories, setCategories] = useState<Category[]>([])
   const [availableColors, setAvailableColors] = useState<string[]>([])
   const [availableSizes, setAvailableSizes] = useState<string[]>([])
-  const [availableGenders, setAvailableGenders] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
 
   const [search, setSearch] = useState<string>("")
@@ -103,7 +102,6 @@ const ProductList = () => {
         setCategories(categoriesRes.data)
         setAvailableColors(filtersRes.data.colors || [])
         setAvailableSizes(filtersRes.data.sizes || [])
-        setAvailableGenders(filtersRes.data.genders || [])
       })
       .catch((err) => console.error("Error fetching filter options:", err))
   }, [])
