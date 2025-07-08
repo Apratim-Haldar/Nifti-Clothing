@@ -183,7 +183,7 @@ const ProductList = () => {
               {/* Filter Pills */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {/* Gender Filter */}
-                <div className="relative">
+                {/* <div className="relative">
                   <select
                     value={selectedGender}
                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedGender(e.target.value)}
@@ -201,7 +201,7 @@ const ProductList = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Category Filter */}
                 <div className="relative">

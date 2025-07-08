@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useToast } from "../context/ToastContext"
@@ -26,7 +24,7 @@ const Register: React.FC = () => {
   const [otpTimer, setOtpTimer] = useState(0)
   const [canResend, setCanResend] = useState(false)
   const { showToast } = useToast()
-  const navigate = useNavigate()
+  const navigate = useNavigate() 
 
   // OTP Timer
   useEffect(() => {
@@ -89,7 +87,7 @@ const Register: React.FC = () => {
 
       showToast(response.data.message, "success")
       setStep("verify")
-      setOtpTimer(600) // 10 minutes
+      setOtpTimer(60) // 10 minutes
       setCanResend(false)
     } catch (error: any) {
       showToast(error.response?.data?.message || "Registration failed", "error")
