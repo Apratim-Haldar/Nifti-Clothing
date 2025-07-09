@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchMyOrders, cancelOrder } from '../services/api';
 import { useToast } from '../context/ToastContext';
+import { useModal } from '../context/ModalContext';
 import './MyOrders.css';
 
 interface OrderItem {
@@ -37,6 +38,7 @@ const MyOrders: React.FC = () => {
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all');
   const { showToast } = useToast();
+  const { showConfirm } = useModal();
 
   useEffect(() => {
     loadOrders();
@@ -56,7 +58,14 @@ const MyOrders: React.FC = () => {
   };
 
   const handleCancelOrder = async (orderId: string) => {
-    if (!confirm('Are you sure you want to cancel this order?')) return;
+    const confirmed = await showConfirm(
+      'Cancel Order',
+      'Are you sure you want to cancel this order?',
+      'Cancel Order',
+      'Keep Order'
+    );
+    
+    if (!confirmed) return;
 
     try {
       setCancelling(orderId);

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useModal } from '../../context/ModalContext';
 
 interface Review {
   _id: string;
@@ -28,6 +29,8 @@ interface ReviewsTabProps {
 }
 
 const ReviewsTab: React.FC<ReviewsTabProps> = ({ setMessage, setError }) => {
+  const { showConfirm } = useModal();
+  
   const [reviews, setReviews] = useState<Review[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -107,7 +110,14 @@ const ReviewsTab: React.FC<ReviewsTabProps> = ({ setMessage, setError }) => {
   };
 
   const handleDeleteReview = async (reviewId: string) => {
-    if (!window.confirm('Are you sure you want to delete this review?')) return;
+    const confirmed = await showConfirm(
+      'Delete Review',
+      'Are you sure you want to delete this review?',
+      'Delete',
+      'Cancel'
+    );
+    
+    if (!confirmed) return;
 
     try {
       await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/reviews/${reviewId}`, {

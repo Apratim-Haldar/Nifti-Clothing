@@ -3,7 +3,8 @@ const router = express.Router();
 const Newsletter = require('../models/Newsletter');
 const NewsletterSettings = require('../models/NewsletterSettings');
 const { verifyToken, verifyAdmin } = require('../middleware/authMiddleware');
-const { sendNewsletterEmail, sendWelcomeNewsletterEmail } = require('../utils/emailService');
+const { sendNewsletterEmail, sendWelcomeNewsletterEmail, sendNewsletterEmailHTML } = require('../utils/emailService');
+const { generateCustomNewsletterHTML, generateWelcomeNewsletterHTML } = require('../utils/modernEmailTemplates');
 const { v4: uuidv4 } = require('uuid');
 
 // Helper function to get newsletter settings
@@ -208,6 +209,104 @@ router.post('/send', verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
+// Admin: Send modern newsletter
+router.post('/send-modern', verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const {
+      subject,
+      mainTitle,
+      description,
+      headerImage,
+      buttonText,
+      buttonUrl,
+      footerMessage,
+      primaryColor,
+      accentColor,
+      companyName,
+      logoUrl
+    } = req.body;
+
+    if (!subject || !mainTitle || !description) {
+      return res.status(400).json({ 
+        message: 'Subject, main title, and description are required' 
+      });
+    }
+
+    // Get all active subscribers
+    const subscribers = await Newsletter.find({ status: 'subscribed' });
+    
+    if (subscribers.length === 0) {
+      return res.status(400).json({ 
+        message: 'No active subscribers found' 
+      });
+    }
+
+    const emailsSent = [];
+    const emailsFailed = [];
+
+    // Process subscribers in batches
+    const batchSize = 10;
+    for (let i = 0; i < subscribers.length; i += batchSize) {
+      const batch = subscribers.slice(i, i + batchSize);
+      
+      const batchPromises = batch.map(async (subscriber) => {
+        try {
+          const unsubscribeUrl = `${process.env.CLIENT_URL}/unsubscribe?token=${subscriber.unsubscribeToken}`;
+          
+          const templateData = {
+            subject,
+            mainTitle,
+            description,
+            headerImage,
+            buttonText,
+            buttonUrl: buttonUrl.startsWith('http') ? buttonUrl : `${process.env.CLIENT_URL}${buttonUrl}`,
+            footerMessage,
+            primaryColor,
+            accentColor,
+            companyName,
+            logoUrl,
+            unsubscribeUrl
+          };
+
+          const htmlContent = generateCustomNewsletterHTML(templateData);
+
+          // Send email using your email service
+          await sendNewsletterEmailHTML(subscriber.email, subject, htmlContent);
+          emailsSent.push(subscriber.email);
+        } catch (error) {
+          console.error(`Failed to send newsletter to ${subscriber.email}:`, error);
+          emailsFailed.push(subscriber.email);
+        }
+      });
+
+      await Promise.allSettled(batchPromises);
+      
+      // Add delay between batches to avoid rate limiting
+      if (i + batchSize < subscribers.length) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+
+    console.log(`Newsletter sent successfully to ${emailsSent.length} subscribers`);
+    console.log(`Failed to send to ${emailsFailed.length} subscribers`);
+
+    res.json({
+      message: 'Newsletter sent successfully',
+      results: {
+        successful: emailsSent.length,
+        failed: emailsFailed.length,
+        total: subscribers.length
+      }
+    });
+  } catch (error) {
+    console.error('Error sending modern newsletter:', error);
+    res.status(500).json({ 
+      message: 'Failed to send newsletter', 
+      error: error.message 
+    });
+  }
+});
+
 // Admin: Get newsletter settings
 router.get('/settings', verifyToken, verifyAdmin, async (req, res) => {
   try {
@@ -263,6 +362,53 @@ router.post('/preview', verifyToken, verifyAdmin, async (req, res) => {
   } catch (err) {
     console.error('Error generating newsletter preview:', err);
     res.status(500).json({ message: 'Failed to generate newsletter preview' });
+  }
+});
+
+// Admin: Preview modern newsletter
+router.post('/preview-modern', verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const {
+      subject,
+      mainTitle,
+      description,
+      headerImage,
+      buttonText,
+      buttonUrl,
+      footerMessage,
+      primaryColor,
+      accentColor,
+      companyName,
+      logoUrl
+    } = req.body;
+
+    const templateData = {
+      subject: subject || 'Newsletter Preview',
+      mainTitle: mainTitle || 'Newsletter Preview',
+      description: description || 'This is a preview of your newsletter.',
+      headerImage,
+      buttonText,
+      buttonUrl: buttonUrl?.startsWith('http') ? buttonUrl : `${process.env.CLIENT_URL}${buttonUrl || '/products'}`,
+      footerMessage,
+      primaryColor,
+      accentColor,
+      companyName,
+      logoUrl,
+      unsubscribeUrl: `${process.env.CLIENT_URL}/unsubscribe?token=preview`
+    };
+
+    const htmlContent = generateCustomNewsletterHTML(templateData);
+
+    res.json({
+      success: true,
+      html: htmlContent
+    });
+  } catch (error) {
+    console.error('Error generating newsletter preview:', error);
+    res.status(500).json({ 
+      message: 'Failed to generate preview', 
+      error: error.message 
+    });
   }
 });
 

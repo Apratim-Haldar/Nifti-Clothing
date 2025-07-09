@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useToast } from '../../context/ToastContext';
+import { useModal } from '../../context/ModalContext';
 import type { Category } from '../../types/admin';
 
 const CategoriesTab: React.FC = () => {
   const { showToast } = useToast();
+  const { showConfirm } = useModal();
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState<string>('');
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -100,7 +102,14 @@ const CategoriesTab: React.FC = () => {
   };
 
   const handleDeleteCategory = async (id: string): Promise<void> => {
-    if (!window.confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
+    const confirmed = await showConfirm(
+      'Delete Category',
+      'Are you sure you want to delete this category? This action cannot be undone.',
+      'Delete',
+      'Cancel'
+    );
+    
+    if (!confirmed) {
       return;
     }
 

@@ -1,8 +1,7 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import axios from "axios"
 import { useAuth } from "../context/AuthContext"
+import { useModal } from "../context/ModalContext"
 
 interface ReferredUser {
   name: string
@@ -11,6 +10,8 @@ interface ReferredUser {
 
 const AffiliateDashboard = () => {
   const { user } = useAuth()
+  const { showAlert } = useModal()
+  
   const [stats, setStats] = useState<{
     affiliateCode: string
     count: number
@@ -170,9 +171,9 @@ const AffiliateDashboard = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
               <button
-                onClick={() => {
+                onClick={async () => {
                   navigator.clipboard.writeText(`${window.location.origin}/register?ref=${stats.affiliateCode}`)
-                  alert("Referral link copied to clipboard!")
+                  await showAlert("Link Copied", "Referral link copied to clipboard!", "success")
                 }}
                 className="flex-1 bg-gradient-to-r from-teal-500 to-teal-600 text-white px-8 py-4 text-lg font-medium tracking-wide hover:from-teal-600 hover:to-teal-700 transition-all duration-300 transform hover:scale-105 rounded-xl shadow-lg"
               >
@@ -285,9 +286,9 @@ const AffiliateDashboard = () => {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       navigator.clipboard.writeText(`${window.location.origin}/register?ref=${stats.affiliateCode}`)
-                      alert("Referral link copied!")
+                      await showAlert("Link Copied", "Referral link copied!", "success")
                     }}
                     className="bg-gradient-to-r from-teal-500 to-teal-600 text-white px-8 py-3 rounded-xl font-medium hover:from-teal-600 hover:to-teal-700 transition-all duration-300 transform hover:scale-105"
                   >

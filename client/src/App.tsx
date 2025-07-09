@@ -22,12 +22,14 @@ import ShippingPolicy from './pages/ShippingPolicy';
 import CancellationRefunds from './pages/CancellationRefunds';
 import ContactUs from './pages/ContactUs';
 import ResetPassword from './pages/ResetPassword'; // Import the ResetPassword component
+import { ModalProvider } from './context/ModalContext';
 
 function App() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-grow">
+    <ModalProvider>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
           
@@ -124,6 +126,7 @@ function App() {
       </main>
       <Footer />
     </div>
+    </ModalProvider>
   );
 }
 

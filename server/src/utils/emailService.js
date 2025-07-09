@@ -425,10 +425,45 @@ const sendNewsletterEmail = async (email, subject, content, unsubscribeLink, cus
   }
 };
 
+// Send newsletter email with HTML content
+const sendNewsletterEmailHTML = async (to, subject, htmlContent) => {
+  try {
+    const transporter = await createTransporter();
+    
+    const mailOptions = {
+      from: {
+        name: 'NIFTI CLOTHING',
+        address: process.env.EMAIL_USER
+      },
+      to: to,
+      subject: subject,
+      html: htmlContent,
+      // Add text fallback
+      text: `This email requires HTML support. Please view it in an HTML-compatible email client. 
+      
+Subject: ${subject}
+
+Visit our website at ${process.env.CLIENT_URL} to view this content.
+
+---
+NIFTI CLOTHING
+nifti.user.in@gmail.com
++91-8100371049`
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Newsletter email sent to: ${to}`);
+  } catch (error) {
+    console.error(`❌ Failed to send newsletter email to ${to}:`, error);
+    throw error;
+  }
+};
+
 module.exports = {
   sendOrderConfirmationEmail,
   sendOTPEmail,
   sendWelcomeEmail,
   sendWelcomeNewsletterEmail,
-  sendNewsletterEmail
+  sendNewsletterEmail,
+  sendNewsletterEmailHTML
 };

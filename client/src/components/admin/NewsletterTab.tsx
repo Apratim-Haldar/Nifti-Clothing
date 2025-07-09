@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useToast } from '../../context/ToastContext';
+import { useModal } from '../../context/ModalContext';
+import ModernNewsletterBuilder from './ModernNewsletterBuilder';
 
 interface Subscriber {
   _id: string;
@@ -45,6 +47,7 @@ interface NewsletterSettings {
 
 const NewsletterTab: React.FC = () => {
   const { showToast } = useToast();
+  const { showConfirm } = useModal();
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'compose' | 'settings'>('overview');
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [stats, setStats] = useState<Stats>({ total: 0, subscribed: 0, unsubscribed: 0 });
@@ -61,13 +64,6 @@ const NewsletterTab: React.FC = () => {
     search: '',
     page: 1
   });
-
-  // Newsletter composition
-  const [newsletter, setNewsletter] = useState({
-    subject: '',
-    content: ''
-  });
-  const [sending, setSending] = useState(false);
 
   // Settings
   const [settings, setSettings] = useState<NewsletterSettings>({
@@ -149,26 +145,15 @@ const NewsletterTab: React.FC = () => {
     }
   };
 
-  const handlePreview = async () => {
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/newsletter/preview`,
-        {
-          subject: newsletter.subject || 'Newsletter Preview',
-          content: newsletter.content || '<p>This is a preview of your newsletter content.</p>',
-          customization: settings
-        },
-        { withCredentials: true }
-      );
-      setPreviewHtml(response.data.html);
-    } catch (err: any) {
-      console.error('Error generating preview:', err);
-      showToast('Failed to generate preview', 'error');
-    }
-  };
-
   const handleDeleteSubscriber = async (id: string, email: string) => {
-    if (!window.confirm(`Are you sure you want to delete ${email} from the newsletter?`)) {
+    const confirmed = await showConfirm(
+      'Delete Subscriber',
+      `Are you sure you want to delete ${email} from the newsletter?`,
+      'Delete',
+      'Cancel'
+    );
+    
+    if (!confirmed) {
       return;
     }
 
@@ -182,38 +167,6 @@ const NewsletterTab: React.FC = () => {
     } catch (err: any) {
       console.error('Error deleting subscriber:', err);
       showToast(err.response?.data?.message || 'Failed to delete subscriber', 'error');
-    }
-  };
-
-  const handleSendNewsletter = async () => {
-    if (!newsletter.subject.trim() || !newsletter.content.trim()) {
-      showToast('Subject and content are required', 'error');
-      return;
-    }
-
-    if (!window.confirm(`Are you sure you want to send this newsletter to ${stats.subscribed} subscribers?`)) {
-      return;
-    }
-
-    try {
-      setSending(true);
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/newsletter/send`,
-        {
-          ...newsletter,
-          customization: settings
-        },
-        { withCredentials: true }
-      );
-
-      showToast(`Newsletter sent successfully! ${response.data.results.successful} emails delivered.`, 'success');
-      setNewsletter({ subject: '', content: '' });
-      setActiveSubTab('overview');
-    } catch (err: any) {
-      console.error('Error sending newsletter:', err);
-      showToast(err.response?.data?.message || 'Failed to send newsletter', 'error');
-    } finally {
-      setSending(false);
     }
   };
 
@@ -238,6 +191,48 @@ const NewsletterTab: React.FC = () => {
     } catch (err: any) {
       console.error('Error exporting subscribers:', err);
       showToast('Failed to export subscribers', 'error');
+    }
+  };
+
+  // Modern handlers for EmailTemplateBuilder integration
+  const handleModernPreview = async (template: any) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/newsletter/preview-modern`,
+        template,
+        { withCredentials: true }
+      );
+      setPreviewHtml(response.data.html);
+    } catch (err: any) {
+      console.error('Error generating modern preview:', err);
+      showToast('Failed to generate preview', 'error');
+    }
+  };
+
+  const handleModernSend = async (template: any) => {
+    const confirmed = await showConfirm(
+      'Send Newsletter',
+      `Are you sure you want to send this newsletter to ${stats.subscribed} subscribers?`,
+      'Send Newsletter',
+      'Cancel'
+    );
+    
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/newsletter/send-modern`,
+        template,
+        { withCredentials: true }
+      );
+
+      showToast(`Newsletter sent successfully! ${response.data.results.successful} emails delivered.`, 'success');
+      setActiveSubTab('overview');
+    } catch (err: any) {
+      console.error('Error sending modern newsletter:', err);
+      showToast(err.response?.data?.message || 'Failed to send newsletter', 'error');
     }
   };
 
@@ -458,32 +453,10 @@ const NewsletterTab: React.FC = () => {
         </>
       )}
 
-      {/* Compose Tab */}
+      {/* Compose Tab - Integrated with EmailTemplateBuilder */}
       {activeSubTab === 'compose' && (
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-              <input
-                type="text"
-                value={newsletter.subject}
-                onChange={(e) => setNewsletter({ ...newsletter, subject: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter newsletter subject..."
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
-              <textarea
-                value={newsletter.content}
-                onChange={(e) => setNewsletter({ ...newsletter, content: e.target.value })}
-                rows={12}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter newsletter content (HTML supported)..."
-              />
-            </div>
-            
             <div className="text-sm text-gray-600 bg-blue-50 border border-blue-200 p-3 rounded-md">
               <p className="flex items-center mb-1">
                 <span className="mr-2">📧</span>
@@ -491,29 +464,19 @@ const NewsletterTab: React.FC = () => {
               </p>
               <p className="flex items-center">
                 <span className="mr-2">💡</span>
-                You can use HTML tags for formatting
+                Use the template builder below to create professional newsletters
               </p>
             </div>
 
-            <div className="flex space-x-4">
-              <button
-                onClick={handlePreview}
-                className="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-              >
-                👁️ Preview
-              </button>
-              <button
-                onClick={handleSendNewsletter}
-                disabled={sending || !newsletter.subject.trim() || !newsletter.content.trim()}
-                className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {sending ? 'Sending...' : '📨 Send Newsletter'}
-              </button>
-            </div>
+            {/* Modern Newsletter Builder */}
+            <ModernNewsletterBuilder
+              onPreview={handleModernPreview}
+              onSend={handleModernSend}
+            />
 
-            {/* Preview */}
+            {/* Preview will be handled by the modern builder */}
             {previewHtml && (
-              <div className="border border-gray-300 rounded-md p-4 bg-gray-50">
+              <div className="border border-gray-300 rounded-md p-4 bg-gray-50 mt-6">
                 <h3 className="text-lg font-medium mb-4">Email Preview</h3>
                 <div className="bg-white border rounded max-h-96 overflow-y-auto">
                   <iframe
@@ -645,6 +608,83 @@ const NewsletterTab: React.FC = () => {
                 placeholder="Additional footer content..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+            </div>
+
+            {/* Social Links */}
+            <div>
+              <h4 className="text-md font-medium text-gray-700 mb-3">Social Links</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Instagram URL</label>
+                  <input
+                    type="url"
+                    value={settings.socialLinks.instagram}
+                    onChange={(e) => setSettings({ 
+                      ...settings, 
+                      socialLinks: { ...settings.socialLinks, instagram: e.target.value }
+                    })}
+                    placeholder="https://instagram.com/yourcompany"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Facebook URL</label>
+                  <input
+                    type="url"
+                    value={settings.socialLinks.facebook}
+                    onChange={(e) => setSettings({ 
+                      ...settings, 
+                      socialLinks: { ...settings.socialLinks, facebook: e.target.value }
+                    })}
+                    placeholder="https://facebook.com/yourcompany"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Twitter URL</label>
+                  <input
+                    type="url"
+                    value={settings.socialLinks.twitter}
+                    onChange={(e) => setSettings({ 
+                      ...settings, 
+                      socialLinks: { ...settings.socialLinks, twitter: e.target.value }
+                    })}
+                    placeholder="https://twitter.com/yourcompany"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn URL</label>
+                  <input
+                    type="url"
+                    value={settings.socialLinks.linkedin}
+                    onChange={(e) => setSettings({ 
+                      ...settings, 
+                      socialLinks: { ...settings.socialLinks, linkedin: e.target.value }
+                    })}
+                    placeholder="https://linkedin.com/company/yourcompany"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Custom CSS */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Custom CSS</label>
+              <textarea
+                value={settings.customCSS}
+                onChange={(e) => setSettings({ ...settings, customCSS: e.target.value })}
+                rows={6}
+                placeholder="/* Add custom CSS for email styling */&#10;.custom-header { font-weight: bold; }"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Add custom CSS that will be included in email templates
+              </p>
             </div>
 
             <button

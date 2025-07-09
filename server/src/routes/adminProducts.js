@@ -4,9 +4,135 @@ const router = express.Router();
 const Product = require('../models/Product');
 const Category = require('../models/Category');
 const { verifyToken, verifyAdmin } = require('../middleware/authMiddleware');
-const { uploadProduct, uploadHero, handleS3Error, deleteFromS3 } = require('../middleware/s3Upload');
+const { uploadProduct, uploadHero, handleS3Error, deleteFromS3, uploadProductTemp, uploadHeroTemp } = require('../middleware/s3Upload');
+const { sessionTracker, assetCleanupMiddleware } = require('../middleware/connectionMonitor');
+const s3AssetManager = require('../utils/s3AssetManager');
 
-// S3 IMAGE UPLOAD ROUTES
+// Apply session tracking to all routes
+router.use(sessionTracker);
+router.use(assetCleanupMiddleware);
+
+// S3 TEMPORARY UPLOAD ROUTES
+
+// Upload temporary product image
+router.post('/upload/temp/product-image', verifyToken, verifyAdmin, (req, res) => {
+  uploadProductTemp.single('image')(req, res, (err) => {
+    if (err) {
+      return handleS3Error(err, req, res);
+    }
+    
+    if (!req.file) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'No file uploaded' 
+      });
+    }
+
+    // Register temporary asset
+    s3AssetManager.registerTempAsset(req.sessionId, req.file.key, 'products');
+
+    res.json({
+      success: true,
+      message: 'Product image uploaded temporarily',
+      imageUrl: req.file.location,
+      filename: req.file.key,
+      sessionId: req.sessionId
+    });
+  });
+});
+
+// Upload temporary hero image
+router.post('/upload/temp/hero-image', verifyToken, verifyAdmin, (req, res) => {
+  uploadHeroTemp.single('image')(req, res, (err) => {
+    if (err) {
+      return handleS3Error(err, req, res);
+    }
+    
+    if (!req.file) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'No file uploaded' 
+      });
+    }
+
+    // Register temporary asset
+    s3AssetManager.registerTempAsset(req.sessionId, req.file.key, 'hero');
+
+    res.json({
+      success: true,
+      message: 'Hero image uploaded temporarily',
+      imageUrl: req.file.location,
+      filename: req.file.key,
+      sessionId: req.sessionId
+    });
+  });
+});
+
+// Upload temporary color image
+router.post('/upload/temp/color-image', verifyToken, verifyAdmin, (req, res) => {
+  uploadProductTemp.single('image')(req, res, (err) => {
+    if (err) {
+      return handleS3Error(err, req, res);
+    }
+    
+    if (!req.file) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'No file uploaded' 
+      });
+    }
+
+    const { color } = req.body;
+    if (!color) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Color is required' 
+      });
+    }
+
+    // Register temporary asset
+    s3AssetManager.registerTempAsset(req.sessionId, req.file.key, 'products');
+
+    res.json({
+      success: true,
+      message: 'Color image uploaded temporarily',
+      imageUrl: req.file.location,
+      filename: req.file.key,
+      color: color,
+      sessionId: req.sessionId
+    });
+  });
+});
+
+// Manual session cleanup endpoint
+router.post('/cleanup-session', verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const { sessionId } = req.body;
+    const targetSessionId = sessionId || req.sessionId;
+    
+    if (!targetSessionId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Session ID is required'
+      });
+    }
+
+    await s3AssetManager.cleanupSession(targetSessionId);
+    
+    res.json({
+      success: true,
+      message: 'Session assets cleaned up successfully'
+    });
+  } catch (error) {
+    console.error('Manual cleanup error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to cleanup session assets'
+    });
+  }
+});
+
+// S3 IMAGE UPLOAD ROUTES (Legacy - Direct uploads)
 
 // Upload product image
 router.post('/upload/product-image', verifyToken, verifyAdmin, (req, res) => {
@@ -123,6 +249,11 @@ router.delete('/upload/delete-image', verifyToken, verifyAdmin, async (req, res)
 
 // ADD product
 router.post('/', verifyToken, verifyAdmin, async (req, res) => {
+  console.log('🚀 Product creation route hit');
+  console.log('📋 Request body:', JSON.stringify(req.body, null, 2));
+  console.log('🆔 Session ID from header:', req.headers['x-session-id']);
+  console.log('🆔 Session ID from request:', req.sessionId);
+  
   try {
     const { 
       title, 
@@ -139,7 +270,8 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
       stock,
       gender,
       lowStockThreshold,
-      defaultColor
+      defaultColor,
+      sessionId
     } = req.body;
 
     // Validate required fields
@@ -177,6 +309,76 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
       return res.status(400).json({ message: 'Stock cannot be negative' });
     }
 
+    // Handle temporary assets - move to final location
+    let finalImageUrl = imageUrl;
+    let finalHeroImage = heroImage;
+    let finalColorImages = colorImages || [];
+
+    const targetSessionId = sessionId || req.sessionId;
+
+    // Mark session as active to prevent cleanup during processing
+    if (targetSessionId) {
+      s3AssetManager.markSessionActive(targetSessionId);
+    }
+
+    try {
+      // Move main image if it's temporary
+      if (s3AssetManager.isTempAsset(imageUrl)) {
+        const tempKey = s3AssetManager.extractKeyFromUrl(imageUrl);
+        if (tempKey) {
+          try {
+            finalImageUrl = await s3AssetManager.moveToFinal(tempKey, 'products');
+          } catch (moveError) {
+            console.warn(`⚠️ Could not move main image ${tempKey}, using original URL:`, moveError.message);
+            // Keep the original URL if moving fails
+          }
+        }
+      }
+
+      // Move hero image if it's temporary
+      if (heroImage && s3AssetManager.isTempAsset(heroImage)) {
+        const tempKey = s3AssetManager.extractKeyFromUrl(heroImage);
+        if (tempKey) {
+          try {
+            finalHeroImage = await s3AssetManager.moveToFinal(tempKey, 'advertisements');
+          } catch (moveError) {
+            console.warn(`⚠️ Could not move hero image ${tempKey}, using original URL:`, moveError.message);
+            // Keep the original URL if moving fails
+          }
+        }
+      }
+
+      // Move color images if they're temporary
+      if (finalColorImages && finalColorImages.length > 0) {
+        const movedColorImages = [];
+        for (const colorImg of finalColorImages) {
+          if (s3AssetManager.isTempAsset(colorImg.imageUrl)) {
+            const tempKey = s3AssetManager.extractKeyFromUrl(colorImg.imageUrl);
+            if (tempKey) {
+              try {
+                const finalUrl = await s3AssetManager.moveToFinal(tempKey, 'products');
+                movedColorImages.push({
+                  color: colorImg.color,
+                  imageUrl: finalUrl
+                });
+              } catch (moveError) {
+                console.warn(`⚠️ Could not move color image ${tempKey}, using original URL:`, moveError.message);
+                // Keep the original image if moving fails
+                movedColorImages.push(colorImg);
+              }
+            }
+          } else {
+            movedColorImages.push(colorImg);
+          }
+        }
+        finalColorImages = movedColorImages;
+      }
+    } catch (assetError) {
+      console.error('Error moving temporary assets:', assetError);
+      // Don't fail the entire product creation if asset movement fails
+      console.warn('⚠️ Continuing with product creation despite asset movement issues');
+    }
+
     // Set default color if colors exist
     let finalDefaultColor = defaultColor;
     if (colors && colors.length > 0 && !finalDefaultColor) {
@@ -189,12 +391,12 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
       price,
       sizes,
       colors: colors || [],
-      colorImages: colorImages || [],
+      colorImages: finalColorImages,
       defaultColor: finalDefaultColor,
-      imageUrl,
+      imageUrl: finalImageUrl,
       categories: categories || [],
       isHero: isHero || false,
-      heroImage: heroImage || null,
+      heroImage: finalHeroImage || null,
       heroTagline: heroTagline || null,
       stock: stockValue,
       gender,
@@ -207,12 +409,26 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
     // Populate categories for response
     await product.populate('categories');
     
+    // Clean up any remaining temporary assets for this session
+    if (targetSessionId) {
+      s3AssetManager.markSessionInactive(targetSessionId);
+      await s3AssetManager.cleanupSession(targetSessionId);
+    }
+    
     res.status(201).json({ 
       message: 'Product created successfully', 
       product 
     });
   } catch (error) {
     console.error('Error creating product:', error);
+    
+    // Clean up temporary assets on error
+    const targetSessionId = req.body.sessionId || req.sessionId;
+    if (targetSessionId) {
+      s3AssetManager.markSessionInactive(targetSessionId);
+      await s3AssetManager.cleanupSession(targetSessionId);
+    }
+    
     res.status(500).json({ 
       message: 'Failed to create product', 
       error: error.message 

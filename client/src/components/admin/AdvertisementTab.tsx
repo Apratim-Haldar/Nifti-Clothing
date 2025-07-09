@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useToast } from '../../context/ToastContext';
+import { useModal } from '../../context/ModalContext';
 
 interface Advertisement {
   _id: string;
@@ -51,6 +52,12 @@ interface PageOption {
 }
 
 const AdvertisementTab: React.FC = () => {
+  const { addToast } = useToast();
+  const { showConfirm } = useModal();
+  
+  // Session management for S3 uploads
+  const [sessionId, setSessionId] = useState<string>('');
+  
   const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +65,6 @@ const AdvertisementTab: React.FC = () => {
   const [editingAd, setEditingAd] = useState<Advertisement | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const { addToast } = useToast();
 
   // Predefined page options
   const pageOptions: PageOption[] = [
@@ -156,6 +162,21 @@ const AdvertisementTab: React.FC = () => {
     generateButtonLink();
   }, [formData.targetPage, formData.shopFilters]);
 
+  // Initialize session ID
+  useEffect(() => {
+    const newSessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    setSessionId(newSessionId);
+  }, []);
+
+  // Cleanup session on unmount
+  useEffect(() => {
+    return () => {
+      if (sessionId) {
+        cleanupSession();
+      }
+    };
+  }, [sessionId]);
+
   const fetchAdvertisements = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/advertisements`, {
@@ -243,11 +264,14 @@ const AdvertisementTab: React.FC = () => {
     formData.append('image', file);
 
     const response = await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/admin/advertisements/upload`,
+      `${import.meta.env.VITE_API_BASE_URL}/admin/advertisements/upload/temp`,
       formData,
       { 
         withCredentials: true,
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          'X-Session-ID': sessionId
+        }
       }
     );
 
@@ -292,6 +316,7 @@ const AdvertisementTab: React.FC = () => {
     try {
       const submitData = {
         ...formData,
+        sessionId, // Pass session ID for asset management
         // Only include shopFilters if targetPage is 'shop'
         shopFilters: formData.targetPage === 'shop' ? formData.shopFilters : undefined
       };
@@ -348,7 +373,14 @@ const AdvertisementTab: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this advertisement?')) return;
+    const confirmed = await showConfirm(
+      'Delete Advertisement',
+      'Are you sure you want to delete this advertisement?',
+      'Delete',
+      'Cancel'
+    );
+    
+    if (!confirmed) return;
 
     try {
       await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/admin/advertisements/${id}`, {
@@ -393,6 +425,20 @@ const AdvertisementTab: React.FC = () => {
       priority: 1
     });
     setEditingAd(null);
+  };
+
+  const cleanupSession = async () => {
+    if (!sessionId) return;
+    
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/admin/products/cleanup-session`,
+        { sessionId },
+        { withCredentials: true }
+      );
+    } catch (error) {
+      console.error('Error cleaning up session:', error);
+    }
   };
 
   const getTargetPageDisplay = (ad: Advertisement) => {

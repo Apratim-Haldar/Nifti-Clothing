@@ -20,7 +20,7 @@ const validateS3Config = () => {
     console.error('Missing required S3 environment variables:', missing);
     throw new Error(`Missing S3 configuration: ${missing.join(', ')}`);
   }
-  
+
   console.log('✅ S3 Configuration loaded:');
   console.log('- Region:', process.env.AWS_REGION);
   console.log('- Bucket:', process.env.AWS_S3_BUCKET);
@@ -80,12 +80,14 @@ const generateUniqueFilename = (originalname) => {
 };
 
 // Configure multer for different upload types
-const createS3Upload = (folder) => {
+const createS3Upload = (folder, isTemporary = false) => {
   const bucketName = process.env.AWS_S3_BUCKET;
   
   if (!bucketName) {
     throw new Error('AWS_S3_BUCKET environment variable is not set');
   }
+
+  const folderPath = isTemporary ? `temp-uploads/${folder}` : folder;
 
   return multer({
     storage: multerS3({
@@ -94,7 +96,7 @@ const createS3Upload = (folder) => {
       acl: 'public-read',
       key: function (req, file, cb) {
         const filename = generateUniqueFilename(file.originalname);
-        const key = `${folder}/${filename}`;
+        const key = `${folderPath}/${filename}`;
         console.log(`📤 Uploading file to S3: ${bucketName}/${key}`);
         cb(null, key);
       },
@@ -103,7 +105,9 @@ const createS3Upload = (folder) => {
         cb(null, { 
           fieldName: file.fieldname,
           originalName: file.originalname,
-          uploadDate: new Date().toISOString()
+          uploadDate: new Date().toISOString(),
+          sessionId: req.sessionId || 'unknown',
+          isTemporary: isTemporary.toString()
         });
       }
     }),
@@ -128,11 +132,19 @@ const createS3Upload = (folder) => {
 
 // Upload configurations for different types
 let uploadProduct, uploadCategory, uploadHero;
+let uploadProductTemp, uploadCategoryTemp, uploadHeroTemp;
 
 try {
+  // Permanent uploads
   uploadProduct = createS3Upload('products');
   uploadCategory = createS3Upload('categories');
   uploadHero = createS3Upload('hero');
+  
+  // Temporary uploads
+  uploadProductTemp = createS3Upload('products', true);
+  uploadCategoryTemp = createS3Upload('categories', true);
+  uploadHeroTemp = createS3Upload('hero', true);
+  
   console.log('✅ S3 upload configurations created successfully');
 } catch (error) {
   console.error('❌ Failed to create S3 upload configurations:', error.message);
@@ -286,5 +298,8 @@ module.exports = {
   getFileInfo,
   handleS3Error,
   s3,
-  validateS3Config
+  validateS3Config,
+  uploadProductTemp,
+  uploadCategoryTemp,
+  uploadHeroTemp
 };

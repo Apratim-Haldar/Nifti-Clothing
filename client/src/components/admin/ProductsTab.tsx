@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useToast } from '../../context/ToastContext';
+import { useModal } from '../../context/ModalContext';
 
 interface Product {
   _id: string;
@@ -66,7 +67,12 @@ const ProductsTab: React.FC = () => {
   const [filterStock, setFilterStock] = useState('');
   const [uploading, setUploading] = useState(false);
   const [colorImages, setColorImages] = useState<ColorImageState>({});
+  
+  // Session management for S3 uploads
+  const [sessionId, setSessionId] = useState<string>('');
+  
   const { addToast } = useToast();
+  const { showConfirm, showPrompt } = useModal();
 
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -89,6 +95,21 @@ const ProductsTab: React.FC = () => {
     fetchProducts();
     fetchCategories();
   }, []);
+
+  // Initialize session ID
+  useEffect(() => {
+    const newSessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    setSessionId(newSessionId);
+  }, []);
+
+  // Cleanup session on unmount or modal close
+  useEffect(() => {
+    return () => {
+      if (sessionId) {
+        cleanupSession();
+      }
+    };
+  }, [sessionId]);
 
   const fetchProducts = async () => {
     try {
@@ -113,17 +134,34 @@ const ProductsTab: React.FC = () => {
     }
   };
 
-  // Upload main product image to S3
+  const cleanupSession = async () => {
+    if (!sessionId) return;
+    
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/admin/products/cleanup-session`,
+        { sessionId },
+        { withCredentials: true }
+      );
+    } catch (error) {
+      console.error('Error cleaning up session:', error);
+    }
+  };
+
+  // Upload main product image to S3 (temporary)
   const uploadProductImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('image', file);
 
     const response = await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/admin/products/upload/product-image`,
+      `${import.meta.env.VITE_API_BASE_URL}/admin/products/upload/temp/product-image`,
       formData,
       { 
         withCredentials: true,
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          'X-Session-ID': sessionId
+        }
       }
     );
 
@@ -134,17 +172,20 @@ const ProductsTab: React.FC = () => {
     }
   };
 
-  // Upload hero image to S3
+  // Upload hero image to S3 (temporary)
   const uploadHeroImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('image', file);
 
     const response = await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/admin/products/upload/hero-image`,
+      `${import.meta.env.VITE_API_BASE_URL}/admin/products/upload/temp/hero-image`,
       formData,
       { 
         withCredentials: true,
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          'X-Session-ID': sessionId
+        }
       }
     );
 
@@ -155,18 +196,21 @@ const ProductsTab: React.FC = () => {
     }
   };
 
-  // Upload single color image to S3
+  // Upload single color image to S3 (temporary)
   const uploadColorImage = async (file: File, color: string): Promise<string> => {
     const formData = new FormData();
     formData.append('image', file);
     formData.append('color', color);
 
     const response = await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/admin/products/upload/color-image`,
+      `${import.meta.env.VITE_API_BASE_URL}/admin/products/upload/temp/color-image`,
       formData,
       { 
         withCredentials: true,
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          'X-Session-ID': sessionId
+        }
       }
     );
 
@@ -268,18 +312,34 @@ const ProductsTab: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('🔄 Form submission started');
+    console.log('📝 Form data:', formData);
+    console.log('🆔 Session ID:', sessionId);
+    console.log('🔍 Validation check:');
+    console.log('  - Title:', formData.title);
+    console.log('  - Price:', formData.price);
+    console.log('  - Stock:', formData.stock);
+    console.log('  - Gender:', formData.gender);
+    console.log('  - ImageUrl:', formData.imageUrl);
+    console.log('  - Sizes:', formData.sizes, 'Length:', formData.sizes.length);
+    
     if (!formData.title || !formData.price || !formData.stock || !formData.gender) {
+      console.log('❌ Missing required fields');
       addToast('Please fill in all required fields', 'error');
       return;
     }
 
     if (!formData.imageUrl) {
+      console.log('❌ Missing image URL');
       addToast('Please upload a product image', 'error');
       return;
     }
 
     if (formData.sizes.length === 0) {
+      console.log('❌ No sizes provided');
+      console.log('🧪 Testing addToast function...');
       addToast('Please add at least one size', 'error');
+      console.log('✅ addToast called');
       return;
     }
 
@@ -290,6 +350,7 @@ const ProductsTab: React.FC = () => {
     }
 
     setSaving(true);
+    console.log('💾 Starting save process...');
     try {
       // Prepare color images data
       const colorImagesData = Object.entries(colorImages)
@@ -312,6 +373,7 @@ const ProductsTab: React.FC = () => {
         lowStockThreshold: parseInt(formData.lowStockThreshold),
         colorImages: colorImagesData,
         defaultColor,
+        sessionId, // Pass session ID for asset management
         // Send old data for cleanup
         ...(editingProduct && {
           oldImageUrl: editingProduct.imageUrl,
@@ -322,18 +384,35 @@ const ProductsTab: React.FC = () => {
 
       let response;
       if (editingProduct) {
+        console.log('📝 Updating existing product:', editingProduct._id);
         response = await axios.put(
           `${import.meta.env.VITE_API_BASE_URL}/admin/products/${editingProduct._id}`,
           productData,
-          { withCredentials: true }
+          { 
+            withCredentials: true,
+            headers: {
+              'x-session-id': sessionId
+            }
+          }
         );
       } else {
+        console.log('➕ Creating new product');
+        console.log('🌐 API URL:', `${import.meta.env.VITE_API_BASE_URL}/admin/products`);
+        console.log('📦 Product data:', productData);
+        
         response = await axios.post(
           `${import.meta.env.VITE_API_BASE_URL}/admin/products`,
           productData,
-          { withCredentials: true }
+          { 
+            withCredentials: true,
+            headers: {
+              'x-session-id': sessionId
+            }
+          }
         );
       }
+
+      console.log('✅ Response received:', response.data);
 
       // Use the response to show more specific success message
       addToast(
@@ -341,11 +420,11 @@ const ProductsTab: React.FC = () => {
         'success'
       );
       
-      setShowModal(false);
-      resetForm();
+      await handleModalClose();
       fetchProducts();
     } catch (error: any) {
-      console.error('Error saving product:', error);
+      console.error('❌ Error saving product:', error);
+      console.error('📋 Error details:', error.response?.data);
       addToast(error.response?.data?.message || 'Error saving product', 'error');
     } finally {
       setSaving(false);
@@ -385,7 +464,14 @@ const ProductsTab: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this product? This will also delete all associated images.')) return;
+    const confirmed = await showConfirm(
+      'Delete Product',
+      'Are you sure you want to delete this product? This will also delete all associated images.',
+      'Delete',
+      'Cancel'
+    );
+    
+    if (!confirmed) return;
 
     try {
       await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/admin/products/${id}`, {
@@ -433,8 +519,24 @@ const ProductsTab: React.FC = () => {
     setColorImages({});
   };
 
-  const addSize = () => {
-    const size = prompt('Enter size (e.g., S, M, L, XL, 32, 34):');
+  const handleModalClose = async () => {
+    // Cleanup temporary assets before closing
+    await cleanupSession();
+    setShowModal(false);
+    resetForm();
+    
+    // Generate new session ID for next use
+    const newSessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    setSessionId(newSessionId);
+  };
+
+  const addSize = async () => {
+    const size = await showPrompt(
+      'Add Size',
+      'Enter size (e.g., S, M, L, XL, 32, 34):',
+      'Enter size...'
+    );
+    
     if (size && !formData.sizes.includes(size.trim())) {
       setFormData(prev => ({
         ...prev,
@@ -450,8 +552,13 @@ const ProductsTab: React.FC = () => {
     }));
   };
 
-  const addColor = () => {
-    const color = prompt('Enter color (e.g., Red, Blue, Black):');
+  const addColor = async () => {
+    const color = await showPrompt(
+      'Add Color',
+      'Enter color (e.g., Red, Blue, Black):',
+      'Enter color...'
+    );
+    
     if (color && !formData.colors.includes(color.trim())) {
       const colorName = color.trim();
       setFormData(prev => ({
@@ -656,8 +763,13 @@ const ProductsTab: React.FC = () => {
                     +1
                   </button>
                   <button
-                    onClick={() => {
-                      const amount = prompt('Enter stock amount:');
+                    onClick={async () => {
+                      const amount = await showPrompt(
+                        'Set Stock Amount',
+                        'Enter the new stock amount:',
+                        'Amount...'
+                      );
+                      
                       if (amount && !isNaN(Number(amount))) {
                         updateStock(product._id, 'set', Number(amount));
                       }
@@ -683,10 +795,7 @@ const ProductsTab: React.FC = () => {
                   {editingProduct ? 'Edit Product' : 'Add New Product'}
                 </h3>
                 <button
-                  onClick={() => {
-                    setShowModal(false);
-                    resetForm();
-                  }}
+                  onClick={handleModalClose}
                   className="text-gray-500 hover:text-gray-700 text-2xl"
                 >
                   ×
@@ -997,10 +1106,7 @@ const ProductsTab: React.FC = () => {
                 <div className="flex gap-4 pt-4 border-t">
                   <button
                     type="button"
-                    onClick={() => {
-                      setShowModal(false);
-                      resetForm();
-                    }}
+                    onClick={handleModalClose}
                     className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 font-medium"
                   >
                     Cancel
@@ -1009,6 +1115,7 @@ const ProductsTab: React.FC = () => {
                     type="submit"
                     disabled={saving || uploading}
                     className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
+                    onClick={() => console.log('🔴 Submit button clicked', { saving, uploading })}
                   >
                     {saving ? 'Saving...' : (editingProduct ? 'Update Product' : 'Add Product')}
                   </button>
