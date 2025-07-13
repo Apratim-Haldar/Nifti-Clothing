@@ -253,7 +253,7 @@ const TermsConditions: React.FC = () => {
                         </div>
                         <div>
                           <p className="font-medium">Email</p>
-                          <p className="text-teal-600">nifti.user.in@gmail.com</p>
+                          <p className="text-teal-600">nifti07@gmail.com</p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">

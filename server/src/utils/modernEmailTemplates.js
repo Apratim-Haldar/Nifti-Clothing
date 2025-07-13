@@ -207,7 +207,7 @@ const generateModernNewsletterHTML = (templateData) => {
                 <td style="background-color: ${primaryColor}; color: #ffffff; padding: 30px; text-align: center;">
                   <p style="margin: 0 0 15px 0; font-size: 14px; opacity: 0.9;">
                     Contact us: 
-                    <a href="mailto:nifti.user.in@gmail.com" style="color: #ffffff; text-decoration: underline;">nifti.user.in@gmail.com</a>
+                    <a href="mailto:nifti07@gmail.com" style="color: #ffffff; text-decoration: underline;">nifti07@gmail.com</a>
                     | Phone: +91-8100371049
                   </p>
                   <p style="margin: 0 0 15px 0; font-size: 12px; opacity: 0.8;">

@@ -54,7 +54,7 @@ const ContactUs: React.FC = () => {
           <div className="text-center mb-16">
             <div className="flex items-center justify-center mb-8">
               <div className="w-16 h-px bg-teal-500"></div>
-              <img src="/images/logo.png" alt="Nifti" className="w-12 h-12 mx-6" />
+              <img src="logo.jpg" alt="Nifti" className="w-12 h-12 mx-6" />
               <div className="w-16 h-px bg-teal-500"></div>
             </div>
             <h1 className="text-5xl md:text-6xl font-extralight mb-8 text-slate-900 tracking-tight">Contact Us</h1>
@@ -67,7 +67,7 @@ const ContactUs: React.FC = () => {
             {/* Contact Form */}
             <div className="bg-white/80 backdrop-blur-xl border border-teal-100 rounded-3xl shadow-2xl p-10">
               <div className="flex items-center mb-8">
-                <img src="/images/logo.png" alt="Nifti" className="w-8 h-8 mr-4" />
+                <img src="logo.jpg" alt="Nifti" className="w-8 h-8 mr-4" />
                 <h2 className="text-3xl font-light text-slate-900">Send us a Message</h2>
               </div>
 
@@ -226,7 +226,7 @@ const ContactUs: React.FC = () => {
               {/* Direct Contact */}
               <div className="bg-white/80 backdrop-blur-xl border border-teal-100 rounded-3xl shadow-2xl p-10">
                 <div className="flex items-center mb-8">
-                  <img src="/images/logo.png" alt="Nifti" className="w-8 h-8 mr-4" />
+                  <img src="logo.jpg" alt="Nifti" className="w-8 h-8 mr-4" />
                   <h3 className="text-3xl font-light text-slate-900">Get in Touch</h3>
                 </div>
 
@@ -246,10 +246,10 @@ const ContactUs: React.FC = () => {
                       <h4 className="text-xl font-medium text-slate-900 mb-2">Email Us</h4>
                       <p className="text-slate-600 mb-3">For general inquiries and support</p>
                       <a
-                        href="mailto:nifti.user.in@gmail.com"
+                        href="mailto:nifti07@gmail.com"
                         className="text-teal-600 hover:text-teal-700 font-medium transition-colors"
                       >
-                        nifti.user.in@gmail.com
+                        nifti07@gmail.com
                       </a>
                     </div>
                   </div>
@@ -327,7 +327,7 @@ const ContactUs: React.FC = () => {
               {/* Business Hours */}
               <div className="bg-gradient-to-r from-slate-900 to-teal-900 rounded-3xl p-8 text-white">
                 <div className="flex items-center mb-6">
-                  <img src="/images/logo.png" alt="Nifti" className="w-8 h-8 mr-4 filter brightness-0 invert" />
+                  <img src="logo.jpg" alt="Nifti" className="w-8 h-8 mr-4" />
                   <h3 className="text-2xl font-light">Business Hours</h3>
                 </div>
                 <div className="space-y-3">

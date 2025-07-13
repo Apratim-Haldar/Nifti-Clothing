@@ -105,7 +105,7 @@ const CancellationRefunds: React.FC = () => {
                         </ul>
                         <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                           <p className="text-sm text-green-800">
-                            <strong>How to cancel:</strong> Contact us at nifti.user.in@gmail.com or +91 8100371049 with
+                            <strong>How to cancel:</strong> Contact us at nifti07@gmail.com or +91 8100371049 with
                             your order number.
                           </p>
                         </div>
@@ -604,7 +604,7 @@ const CancellationRefunds: React.FC = () => {
                           d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                         />
                       </svg>
-                      <span>nifti.user.in@gmail.com</span>
+                      <span>nifti07@gmail.com</span>
                     </div>
                     <div className="flex items-center">
                       <svg className="w-5 h-5 mr-3 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

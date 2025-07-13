@@ -90,7 +90,7 @@ const ShippingPolicy: React.FC = () => {
                       <div className="space-y-3 text-sm text-slate-700">
                         <p><strong>Timeline:</strong> 5-7 business days</p>
                         <p><strong>Cost:</strong> Free on orders upto ₹999</p>
-                        <p><strong>Coverage:</strong> All major cities and towns in India</p>
+                        <p><strong>Coverage:</strong> Free through out the city of Kolkata. Standard charges apply for cities other than Kolkata.</p>
                         <p><strong>Tracking:</strong> SMS and email updates included</p>
                       </div>
                     </div>
@@ -239,7 +239,7 @@ const ShippingPolicy: React.FC = () => {
                       <svg className="w-5 h-5 mr-3 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      <span>nifti.user.in@gmail.com</span>
+                      <span>nifti07@gmail.com</span>
                     </div>
                     <div className="flex items-center">
                       <svg className="w-5 h-5 mr-3 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
