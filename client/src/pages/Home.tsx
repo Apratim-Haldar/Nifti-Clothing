@@ -268,7 +268,7 @@ const Home: React.FC = () => {
             </div>
             <h1 className="text-7xl md:text-9xl font-extralight mb-10 tracking-tighter animate-fade-in-up">NIFTI</h1>
             <p className="text-2xl md:text-3xl mb-16 font-light tracking-wide opacity-95 animate-fade-in-up animation-delay-200">
-              Where Elegance Meets Innovation
+              The Fit That Fits You
             </p>
             <Link
               to="/products"
