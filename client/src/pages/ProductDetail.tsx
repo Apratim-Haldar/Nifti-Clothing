@@ -475,7 +475,7 @@ const ProductDetail: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="font-medium tracking-wider uppercase text-slate-900 mb-3">Returns</h4>
-                  <p className="text-slate-600 font-light">30-day return policy</p>
+                  <p className="text-slate-600 font-light">7-day return policy</p>
                 </div>
               </div>
             </div>
