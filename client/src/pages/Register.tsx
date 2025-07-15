@@ -177,13 +177,13 @@ const Register: React.FC = () => {
           <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-amber-100/20 to-stone-200/20 rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-10 w-72 h-72 bg-gradient-to-br from-stone-200/20 to-amber-100/20 rounded-full blur-3xl"></div>
         </div>
-        
+
         <div className="max-w-md w-full relative z-10">
           {/* Brand Logo & Header */}
           <div className="text-center mb-6">
             <div className="flex items-center justify-center mb-3">
-              <img 
-                src="/logo.jpg" 
+              <img
+                src="/logo.jpg"
                 alt="Nifti Clothing"
                 className="w-12 h-12 object-contain rounded-lg shadow-lg"
               />
@@ -254,7 +254,7 @@ const Register: React.FC = () => {
               >
                 {canResend ? "Resend Code" : "Resend Available Soon"}
               </button>
-              
+
               <div>
                 <button
                   type="button"
@@ -298,13 +298,13 @@ const Register: React.FC = () => {
         <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-amber-100/20 to-stone-200/20 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 right-10 w-72 h-72 bg-gradient-to-br from-stone-200/20 to-amber-100/20 rounded-full blur-3xl"></div>
       </div>
-      
-      <div className="max-w-md w-full relative z-10">
+
+      <div className="max-w-md relative z-10">
         {/* Brand Logo & Header */}
         <div className="text-center mb-6">
-          <div className="flex items-center justify-center mb-3">
-            <img 
-              src="/logo.jpg" 
+          <div className="mt-12 flex items-center justify-center mb-3">
+            <img
+              src="/logo.jpg"
               alt="Nifti Clothing"
               className="w-12 h-12 object-contain rounded-lg shadow-lg"
             />
@@ -345,35 +345,37 @@ const Register: React.FC = () => {
                 required
               />
             </div>
+            <div className="flex flex-col gap-2 md:flex-row">
+              <div>
+                <label className="block text-sm font-cormorant font-medium text-stone-900 mb-2 tracking-wide">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full border-2 border-stone-200 px-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-lg bg-white/50 backdrop-blur-sm font-inter"
+                  required
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-cormorant font-medium text-stone-900 mb-2 tracking-wide">
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full border-2 border-stone-200 px-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-lg bg-white/50 backdrop-blur-sm font-inter"
-                required
-              />
+              <div>
+                <label className="block text-sm font-cormorant font-medium text-stone-900 mb-2 tracking-wide">
+                  Phone Number <span className="text-stone-500 font-inter text-xs">(Optional)</span>
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Enter your phone number"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                  className="w-full border-2 border-stone-200 px-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-lg bg-white/50 backdrop-blur-sm font-inter"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-cormorant font-medium text-stone-900 mb-2 tracking-wide">
-                Phone Number <span className="text-stone-500 font-inter text-xs">(Optional)</span>
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Enter your phone number"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
-                className="w-full border-2 border-stone-200 px-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-lg bg-white/50 backdrop-blur-sm font-inter"
-              />
-            </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
