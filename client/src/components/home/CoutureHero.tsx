@@ -89,7 +89,7 @@ export function CoutureHero() {
                 ))}
               </div>
               <span className="text-sm font-cormorant font-medium text-amber-700 tracking-wider uppercase">
-                Nifti Clothing - Premium Fashion Since 2024
+                Nifti Clothing - Premium Fashion Since 2025
               </span>
             </div>
 
