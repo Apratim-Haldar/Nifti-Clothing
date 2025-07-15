@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useToast } from "../context/ToastContext"
-import { Eye, EyeOff,Timer } from "lucide-react"
+import { Eye, EyeOff, Timer } from "lucide-react"
 import axios from "axios"
 
 const Register: React.FC = () => {
@@ -24,7 +24,7 @@ const Register: React.FC = () => {
   const [otpTimer, setOtpTimer] = useState(0)
   const [canResend, setCanResend] = useState(false)
   const { showToast } = useToast()
-  const navigate = useNavigate() 
+  const navigate = useNavigate()
 
   // OTP Timer
   useEffect(() => {
@@ -87,7 +87,7 @@ const Register: React.FC = () => {
 
       showToast(response.data.message, "success")
       setStep("verify")
-      setOtpTimer(60) // 10 minutes
+      setOtpTimer(600) // 10 minutes
       setCanResend(false)
     } catch (error: any) {
       showToast(error.response?.data?.message || "Registration failed", "error")
@@ -115,11 +115,6 @@ const Register: React.FC = () => {
       )
 
       showToast(response.data.message, "success")
-      
-      // Set auth context
-   
-      
-      // Navigate to products
       navigate("/products")
     } catch (error: any) {
       showToast(error.response?.data?.message || "OTP verification failed", "error")
@@ -156,39 +151,77 @@ const Register: React.FC = () => {
 
   if (step === "verify") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-stone-50 to-amber-100 flex items-center justify-center px-6 relative overflow-hidden">
-        {/* Premium background elements */}
-        <div className="absolute inset-0 fabric-texture opacity-10"></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-stone-50/50 to-rose-50/50"></div>
+      <div className="min-h-screen mt-5 bg-stone-50 flex items-center justify-center px-4 pt-20 pb-8 relative overflow-hidden">
+        {/* Fabric Pattern Overlay */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="w-full h-full" style={{
+            backgroundImage: `repeating-linear-gradient(
+              0deg,
+              transparent,
+              transparent 2px,
+              rgba(139, 69, 19, 0.03) 2px,
+              rgba(139, 69, 19, 0.03) 4px
+            ),
+            repeating-linear-gradient(
+              90deg,
+              transparent,
+              transparent 2px,
+              rgba(139, 69, 19, 0.03) 2px,
+              rgba(139, 69, 19, 0.03) 4px
+            )`
+          }}></div>
+        </div>
+
+        {/* Elegant Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-amber-100/20 to-stone-200/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-72 h-72 bg-gradient-to-br from-stone-200/20 to-amber-100/20 rounded-full blur-3xl"></div>
+        </div>
         
-        <div className="max-w-lg w-full relative z-10">
-          {/* Brand Logo */}
-          <div className="text-center mb-8">
-            <img 
-              src="/logo.jpg" 
-              alt="Nifti Clothing"
-              className="w-16 h-16 object-contain mx-auto mb-6 rounded-lg shadow-lg"
-            />
-            <h1 className="text-4xl font-playfair font-light text-stone-900 mb-4 tracking-tight">Verify Your Email</h1>
-            <div className="w-16 h-0.5 bg-gradient-to-r from-amber-600 to-amber-700 mx-auto mb-6"></div>
-            <p className="text-stone-600 font-inter text-lg">
+        <div className="max-w-md w-full relative z-10">
+          {/* Brand Logo & Header */}
+          <div className="text-center mb-6">
+            <div className="flex items-center justify-center mb-3">
+              <img 
+                src="/logo.jpg" 
+                alt="Nifti Clothing"
+                className="w-12 h-12 object-contain rounded-lg shadow-lg"
+              />
+            </div>
+            <div className="flex items-center justify-center space-x-2 mb-3">
+              <div className="flex space-x-1">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-1.5 h-1.5 bg-amber-600 rounded-full animate-pulse"
+                    style={{ animationDelay: `${i * 200}ms` }}
+                  />
+                ))}
+              </div>
+              <span className="text-xs font-cormorant font-medium text-amber-700 tracking-wider uppercase">
+                Handcrafted Excellence
+              </span>
+            </div>
+            <h1 className="text-2xl font-playfair font-light text-stone-900 mb-2 tracking-tight">Verify Your Email</h1>
+            <div className="w-12 h-0.5 bg-gradient-to-r from-amber-600 to-amber-700 mx-auto mb-3"></div>
+            <p className="text-stone-600 font-cormorant text-sm">
               We've sent a verification code to{" "}
               <span className="font-medium text-stone-900">{formData.email}</span>
             </p>
           </div>
 
           {/* Verification Form */}
-          <div className="boutique-card rounded-2xl p-8 velvet-shadow">
-            <form onSubmit={handleVerifyOTP} className="space-y-6">
+          <div className="bg-white/80 backdrop-blur-lg border border-stone-200/50 rounded-xl p-6 shadow-xl">
+            <form onSubmit={handleVerifyOTP} className="space-y-5">
               <div>
-                <label className="block text-sm font-cormorant font-medium text-stone-900 mb-3 tracking-wide">
+                <label className="block text-sm font-cormorant font-medium text-stone-900 mb-2 tracking-wide">
                   Verification Code
                 </label>
                 <input
                   type="text"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                  className="w-full border-2 border-stone-200 px-5 py-4 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-xl text-lg text-center tracking-widest font-mono bg-white/80 backdrop-blur-sm"
+                  className="w-full border-2 border-stone-200 px-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-lg text-center tracking-widest font-mono bg-white/50 backdrop-blur-sm"
                   placeholder="000000"
                   maxLength={6}
                   required
@@ -196,7 +229,7 @@ const Register: React.FC = () => {
               </div>
 
               {otpTimer > 0 && (
-                <div className="flex items-center justify-center text-stone-600 text-sm font-inter">
+                <div className="flex items-center justify-center text-stone-600 text-sm font-cormorant">
                   <Timer className="w-4 h-4 mr-2 text-amber-600" />
                   Code expires in {formatTime(otpTimer)}
                 </div>
@@ -205,19 +238,19 @@ const Register: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white py-4 text-lg font-cormorant font-medium tracking-wide hover:from-amber-700 hover:to-amber-800 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 couture-shimmer"
+                className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white py-3 font-cormorant font-medium tracking-wide hover:from-amber-700 hover:to-amber-800 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 {loading ? "Verifying..." : "Verify Email"}
               </button>
             </form>
 
             {/* Resend and Back buttons */}
-            <div className="mt-8 pt-6 border-t border-stone-200 text-center space-y-4">
+            <div className="mt-6 pt-4 border-t border-stone-200 text-center space-y-3">
               <button
                 type="button"
                 onClick={handleResendOTP}
                 disabled={!canResend || loading}
-                className="text-amber-700 font-cormorant font-medium tracking-wide hover:text-amber-800 transition-colors text-lg disabled:text-stone-400 disabled:cursor-not-allowed"
+                className="text-amber-700 font-cormorant font-medium tracking-wide hover:text-amber-800 transition-colors disabled:text-stone-400 disabled:cursor-not-allowed"
               >
                 {canResend ? "Resend Code" : "Resend Available Soon"}
               </button>
@@ -226,7 +259,7 @@ const Register: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setStep("register")}
-                  className="text-stone-600 font-inter hover:text-stone-700 transition-colors"
+                  className="text-stone-600 font-cormorant hover:text-stone-700 transition-colors text-sm"
                 >
                   ← Back to Registration
                 </button>
@@ -239,29 +272,67 @@ const Register: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-stone-50 to-amber-100 flex items-center justify-center px-6 py-12 relative overflow-hidden">
-      {/* Premium background elements */}
-      <div className="absolute inset-0 fabric-texture opacity-10"></div>
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-stone-50/50 to-rose-50/50"></div>
+    <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4 pt-16 pb-8 relative overflow-hidden">
+      {/* Fabric Pattern Overlay */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="w-full h-full" style={{
+          backgroundImage: `repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(139, 69, 19, 0.03) 2px,
+            rgba(139, 69, 19, 0.03) 4px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(139, 69, 19, 0.03) 2px,
+            rgba(139, 69, 19, 0.03) 4px
+          )`
+        }}></div>
+      </div>
+
+      {/* Elegant Background Elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-amber-100/20 to-stone-200/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-72 h-72 bg-gradient-to-br from-stone-200/20 to-amber-100/20 rounded-full blur-3xl"></div>
+      </div>
       
-      <div className="max-w-lg w-full relative z-10">
+      <div className="max-w-md w-full relative z-10">
         {/* Brand Logo & Header */}
-        <div className="text-center mb-8">
-          <img 
-            src="/logo.jpg" 
-            alt="Nifti Clothing"
-            className="w-16 h-16 object-contain mx-auto mb-6 rounded-lg shadow-lg"
-          />
-          <h1 className="text-4xl font-playfair font-light text-stone-900 mb-4 tracking-tight">Join Nifti</h1>
-          <div className="w-16 h-0.5 bg-gradient-to-r from-amber-600 to-amber-700 mx-auto mb-6"></div>
-          <p className="text-stone-600 font-inter text-lg">Create your account and discover premium fashion</p>
+        <div className="text-center mb-6">
+          <div className="flex items-center justify-center mb-3">
+            <img 
+              src="/logo.jpg" 
+              alt="Nifti Clothing"
+              className="w-12 h-12 object-contain rounded-lg shadow-lg"
+            />
+          </div>
+          <div className="flex items-center justify-center space-x-2 mb-3">
+            <div className="flex space-x-1">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="w-1.5 h-1.5 bg-amber-600 rounded-full animate-pulse"
+                  style={{ animationDelay: `${i * 200}ms` }}
+                />
+              ))}
+            </div>
+            <span className="text-xs font-cormorant font-medium text-amber-700 tracking-wider uppercase">
+              Handcrafted Excellence
+            </span>
+          </div>
+          <h1 className="text-2xl font-playfair font-light text-stone-900 mb-2 tracking-tight">Join Nifti</h1>
+          <div className="w-12 h-0.5 bg-gradient-to-r from-amber-600 to-amber-700 mx-auto mb-3"></div>
+          <p className="text-stone-600 font-cormorant text-sm">Create your account and discover premium fashion</p>
         </div>
 
         {/* Registration Form */}
-        <div className="boutique-card rounded-2xl p-8 velvet-shadow">
-          <form onSubmit={handleRegister} className="space-y-6">
+        <div className="bg-white/80 backdrop-blur-lg border border-stone-200/50 rounded-xl p-6 shadow-xl">
+          <form onSubmit={handleRegister} className="space-y-4">
             <div>
-              <label className="block text-sm font-cormorant font-medium text-stone-900 mb-3 tracking-wide">
+              <label className="block text-sm font-cormorant font-medium text-stone-900 mb-2 tracking-wide">
                 Full Name
               </label>
               <input
@@ -270,13 +341,13 @@ const Register: React.FC = () => {
                 placeholder="Enter your full name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full border-2 border-stone-200 px-5 py-4 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-xl text-lg bg-white/80 backdrop-blur-sm font-inter"
+                className="w-full border-2 border-stone-200 px-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-lg bg-white/50 backdrop-blur-sm font-inter"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-cormorant font-medium text-stone-900 mb-3 tracking-wide">
+              <label className="block text-sm font-cormorant font-medium text-stone-900 mb-2 tracking-wide">
                 Email Address
               </label>
               <input
@@ -285,13 +356,13 @@ const Register: React.FC = () => {
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full border-2 border-stone-200 px-5 py-4 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-xl text-lg bg-white/80 backdrop-blur-sm font-inter"
+                className="w-full border-2 border-stone-200 px-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-lg bg-white/50 backdrop-blur-sm font-inter"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-cormorant font-medium text-stone-900 mb-3 tracking-wide">
+              <label className="block text-sm font-cormorant font-medium text-stone-900 mb-2 tracking-wide">
                 Phone Number <span className="text-stone-500 font-inter text-xs">(Optional)</span>
               </label>
               <input
@@ -300,59 +371,61 @@ const Register: React.FC = () => {
                 placeholder="Enter your phone number"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
-                className="w-full border-2 border-stone-200 px-5 py-4 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-xl text-lg bg-white/80 backdrop-blur-sm font-inter"
+                className="w-full border-2 border-stone-200 px-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-lg bg-white/50 backdrop-blur-sm font-inter"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-cormorant font-medium text-stone-900 mb-3 tracking-wide">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="Create a password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full border-2 border-stone-200 px-5 py-4 pr-12 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-xl text-lg bg-white/80 backdrop-blur-sm font-inter"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-amber-600 transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-cormorant font-medium text-stone-900 mb-2 tracking-wide">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="Create password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="w-full border-2 border-stone-200 px-4 py-3 pr-10 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-lg bg-white/50 backdrop-blur-sm font-inter"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-amber-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-cormorant font-medium text-stone-900 mb-2 tracking-wide">
+                  Confirm
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    placeholder="Confirm password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    className="w-full border-2 border-stone-200 px-4 py-3 pr-10 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-lg bg-white/50 backdrop-blur-sm font-inter"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-amber-600 transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-cormorant font-medium text-stone-900 mb-3 tracking-wide">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  placeholder="Confirm your password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="w-full border-2 border-stone-200 px-5 py-4 pr-12 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-xl text-lg bg-white/80 backdrop-blur-sm font-inter"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-amber-600 transition-colors"
-                >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-cormorant font-medium text-stone-900 mb-3 tracking-wide">
-                Referral Code (Optional)
+              <label className="block text-sm font-cormorant font-medium text-stone-900 mb-2 tracking-wide">
+                Referral Code <span className="text-stone-500 font-inter text-xs">(Optional)</span>
               </label>
               <input
                 type="text"
@@ -360,25 +433,25 @@ const Register: React.FC = () => {
                 placeholder="Enter referral code"
                 value={formData.referredBy}
                 onChange={(e) => setFormData({ ...formData, referredBy: e.target.value })}
-                className="w-full border-2 border-stone-200 px-5 py-4 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-xl text-lg bg-white/80 backdrop-blur-sm font-inter"
+                className="w-full border-2 border-stone-200 px-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-lg bg-white/50 backdrop-blur-sm font-inter"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white py-4 text-lg font-cormorant font-medium tracking-wide hover:from-amber-700 hover:to-amber-800 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 couture-shimmer"
+              className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white py-3 font-cormorant font-medium tracking-wide hover:from-amber-700 hover:to-amber-800 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
               {loading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 
           {/* Links */}
-          <div className="mt-8 pt-6 border-t border-stone-200 text-center">
-            <p className="text-stone-600 font-inter text-lg mb-4">Already have an account?</p>
+          <div className="mt-5 pt-4 border-t border-stone-200 text-center">
+            <p className="text-stone-600 font-cormorant text-sm mb-2">Already have an account?</p>
             <Link
               to="/login"
-              className="text-amber-700 font-cormorant font-medium tracking-wide hover:text-amber-800 transition-colors text-lg"
+              className="text-amber-700 font-cormorant font-medium tracking-wide hover:text-amber-800 transition-colors"
             >
               Sign In
             </Link>
@@ -386,8 +459,8 @@ const Register: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-sm text-stone-500 font-inter">
+        <div className="text-center mt-4">
+          <p className="text-xs text-stone-500 font-cormorant">
             By creating an account, you agree to our Terms of Service and Privacy Policy
           </p>
         </div>

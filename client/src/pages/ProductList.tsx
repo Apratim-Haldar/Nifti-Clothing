@@ -204,7 +204,7 @@ const FilterSidebar: FC<FilterSidebarProps> = memo(
               Gender
             </label>
             <div className="space-y-2">
-              {["Men", "Women", "Unisex"].map((g) => (
+              {["Unisex"].map((g) => (
                 <label key={g} className="flex items-center cursor-pointer">
                   <input
                     type="radio"
