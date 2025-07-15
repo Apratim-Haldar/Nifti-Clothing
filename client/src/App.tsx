@@ -64,10 +64,10 @@ function App() {
           <Route path="/shop" element={<ProductList />} />
           <Route path="/terms" element={<TermsConditions />} />
           <Route path="/general-policy" element={<PrivacyPolicy />} />
-          <Route path="/shipping-policy" element={<ShippingPolicy />} />
+          <Route path="/shipping" element={<ShippingPolicy />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/products/:id" element={<ProductDetail />} />
-          <Route path="cancellations" element={<CancellationRefunds />} />
+          <Route path="/cancellations" element={<CancellationRefunds />} />
           <Route path="/unsubscribe" element={<Unsubscribe />} />
           
           {/* Protected routes (require authentication) */}

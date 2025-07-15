@@ -5,6 +5,8 @@ import { useCart } from "../context/CartContext"
 import { useAuth } from "../context/AuthContext"
 import { useToast } from "../context/ToastContext"
 import { useState } from "react"
+import { Link } from "react-router-dom"
+import { User, Mail, Phone, MapPin, ShoppingBag, CheckCircle, X, Package, CreditCard, Truck, Shield } from "lucide-react"
 import axios from "axios"
 
 interface OrderConfirmationModalProps {
@@ -30,51 +32,71 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="p-8 border-b border-gray-200">
-          <h2 className="text-3xl font-light text-gray-900">Confirm Your Order</h2>
-          <p className="text-gray-600 mt-3 text-lg">Please review your order details before confirming</p>
+      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        {/* Header */}
+        <div className="p-8 border-b border-stone-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-3xl font-playfair font-bold text-stone-800">Confirm Your Order</h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-stone-100 rounded-full transition-colors"
+            >
+              <X className="h-6 w-6 text-stone-600" />
+            </button>
+          </div>
+          <p className="text-stone-600 mt-2 font-cormorant text-lg">Please review your order details before confirming</p>
         </div>
 
         <div className="p-8 space-y-8">
           {/* Customer Information */}
           <div>
-            <h3 className="text-xl font-medium text-gray-900 mb-4">Customer Information</h3>
-            <div className="bg-gray-50 p-6 rounded-xl space-y-3">
-              <p className="text-lg">
-                <span className="font-medium">Name:</span> {orderDetails.customerInfo.name}
-              </p>
-              <p className="text-lg">
-                <span className="font-medium">Email:</span> {orderDetails.customerInfo.email}
-              </p>
-              <p className="text-lg">
-                <span className="font-medium">Phone:</span> {orderDetails.customerInfo.phone}
-              </p>
-              <p className="text-lg">
-                <span className="font-medium">Address:</span> {orderDetails.customerInfo.address}
-              </p>
+            <h3 className="text-xl font-playfair font-bold text-stone-800 mb-4">Customer Information</h3>
+            <div className="bg-stone-50 p-6 rounded-xl space-y-3">
+              <div className="flex items-center space-x-3">
+                <User className="h-5 w-5 text-stone-500" />
+                <span className="font-cormorant"><strong>Name:</strong> {orderDetails.customerInfo.name}</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Mail className="h-5 w-5 text-stone-500" />
+                <span className="font-cormorant"><strong>Email:</strong> {orderDetails.customerInfo.email}</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Phone className="h-5 w-5 text-stone-500" />
+                <span className="font-cormorant"><strong>Phone:</strong> {orderDetails.customerInfo.phone}</span>
+              </div>
+              <div className="flex items-start space-x-3">
+                <MapPin className="h-5 w-5 text-stone-500 mt-1" />
+                <span className="font-cormorant"><strong>Address:</strong> {orderDetails.customerInfo.address}</span>
+              </div>
             </div>
           </div>
 
           {/* Order Items */}
           <div>
-            <h3 className="text-xl font-medium text-gray-900 mb-4">Order Items</h3>
+            <h3 className="text-xl font-playfair font-bold text-stone-800 mb-4">Order Items</h3>
             <div className="space-y-4">
               {orderDetails.items.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-6 p-4 bg-gray-50 rounded-xl">
-                  <img
-                    src={item.imageUrl || "/placeholder.svg"}
-                    alt={item.title}
-                    className="w-20 h-20 object-cover rounded-lg"
-                  />
+                <div key={idx} className="flex items-center gap-6 p-4 bg-stone-50 rounded-xl">
+                  <div className="w-16 h-16 bg-stone-200 rounded-lg overflow-hidden flex-shrink-0">
+                    <img
+                      src={item.imageUrl || "/placeholder.jpg"}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement
+                        target.src = "/placeholder.jpg"
+                      }}
+                    />
+                  </div>
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 text-lg">{item.title}</h4>
-                    <p className="text-gray-600">
+                    <h4 className="font-playfair font-semibold text-stone-800">{item.title}</h4>
+                    <p className="text-stone-600 font-cormorant">
                       Size: {item.size} | Qty: {item.quantity}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-gray-900 text-lg">₹{item.price * item.quantity}</p>
+                    <p className="font-playfair font-bold text-stone-800">₹{(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="text-stone-600 font-cormorant text-sm">₹{item.price.toFixed(2)} each</p>
                   </div>
                 </div>
               ))}
@@ -82,28 +104,20 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
           </div>
 
           {/* Order Total */}
-          <div className="border-t border-gray-200 pt-6">
-            <div className="flex justify-between text-2xl font-semibold text-gray-900">
+          <div className="border-t border-stone-200 pt-6">
+            <div className="flex justify-between text-2xl font-playfair font-bold text-stone-800">
               <span>Total Amount:</span>
-              <span>₹{orderDetails.total}</span>
+              <span>₹{orderDetails.total.toFixed(2)}</span>
             </div>
           </div>
 
           {/* Payment Notice */}
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <svg className="h-6 w-6 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fillRule="evenodd"
-                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <h3 className="font-medium text-blue-800">Payment Information</h3>
-                <p className="mt-2 text-blue-700">
+            <div className="flex items-start space-x-4">
+              <CreditCard className="h-6 w-6 text-blue-500 mt-1" />
+              <div>
+                <h3 className="font-playfair font-bold text-blue-800">Payment Information</h3>
+                <p className="mt-2 text-blue-700 font-cormorant">
                   Your order will be confirmed via email. Our team will contact you for payment arrangements and
                   delivery details.
                 </p>
@@ -112,18 +126,19 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
           </div>
         </div>
 
-        <div className="p-8 border-t border-gray-200 flex gap-4 justify-end">
+        {/* Footer */}
+        <div className="p-8 border-t border-stone-200 flex gap-4 justify-end">
           <button
             onClick={onClose}
             disabled={loading}
-            className="px-8 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 disabled:opacity-50 font-medium"
+            className="px-8 py-3 border-2 border-stone-300 text-stone-700 rounded-xl hover:border-stone-500 disabled:opacity-50 font-cormorant transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className="px-8 py-3 bg-black text-white rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="px-8 py-3 bg-stone-800 text-white rounded-xl hover:bg-stone-700 disabled:opacity-50 disabled:cursor-not-allowed font-cormorant transition-colors"
           >
             {loading ? "Confirming..." : "Confirm Order"}
           </button>
@@ -136,18 +151,20 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
 const Checkout = () => {
   const { cart, clearCart } = useCart()
   const { user } = useAuth()
-  const { showToast } = useToast()
+  const { addToast } = useToast()
   const [form, setForm] = useState({
     name: user?.name || "",
     email: user?.email || "",
-    phone: "",
+    phone: user?.phone || "",
     address: "",
   })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [showModal, setShowModal] = useState(false)
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const tax = subtotal * 0.1
+  const total = subtotal + tax
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -158,12 +175,12 @@ const Checkout = () => {
 
     // Validate form
     if (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !form.address.trim()) {
-      showToast("Please fill in all required fields", "error")
+      addToast("Please fill in all required fields", "error")
       return
     }
 
     if (cart.length === 0) {
-      showToast("Your cart is empty", "error")
+      addToast("Your cart is empty", "error")
       return
     }
 
@@ -189,203 +206,325 @@ const Checkout = () => {
       setSuccess(true)
       setShowModal(false)
       clearCart()
-      showToast("Order confirmed! Check your email for details.", "success")
+      addToast("Order confirmed! Check your email for details.", "success")
     } catch (err: any) {
       console.error(err)
-      showToast(err.response?.data?.message || "Failed to place order. Please try again.", "error")
+      addToast(err.response?.data?.message || "Failed to place order. Please try again.", "error")
     } finally {
       setLoading(false)
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
-      <section className="py-20">
-        <div className="max-w-5xl mx-auto px-6">
-          {/* Enhanced Header */}
-          <div className="text-center mb-20">
-            <h1 className="text-5xl md:text-6xl font-extralight mb-8 text-slate-900 tracking-tight">Checkout</h1>
-            <div className="w-20 h-1 bg-slate-900 mx-auto"></div>
-          </div>
-
-          {success ? (
-            <div className="bg-white p-16 text-center shadow-2xl rounded-2xl border border-slate-100">
-              <div className="mb-10">
-                <svg
-                  className="w-24 h-24 text-green-500 mx-auto mb-8"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+  if (cart.length === 0 && !success) {
+    return (
+      <div className="min-h-screen bg-white pt-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-20">
+            <div className="bg-stone-50 rounded-2xl p-16 max-w-2xl mx-auto">
+              <div className="w-24 h-24 bg-stone-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                <ShoppingBag className="h-12 w-12 text-stone-400" />
               </div>
-              <h2 className="text-4xl font-light text-slate-900 mb-6">Order Confirmed!</h2>
-              <p className="text-slate-600 font-light text-xl mb-10">
-                Thank you for your order! You will receive a confirmation email shortly with all the details. Our team
-                will contact you soon for payment and delivery arrangements.
+              <h3 className="text-2xl font-playfair font-bold text-stone-800 mb-4">Your cart is empty</h3>
+              <p className="text-stone-600 font-cormorant text-lg mb-8">
+                Add some items to your cart before proceeding to checkout.
               </p>
-              <button
-                onClick={() => (window.location.href = "/products")}
-                className="bg-slate-900 text-white px-10 py-4 font-medium tracking-wider uppercase hover:bg-slate-800 transition-all duration-500 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              <Link
+                to="/products"
+                className="inline-flex items-center space-x-2 bg-stone-800 text-white px-8 py-4 rounded-lg hover:bg-stone-700 transition-colors font-cormorant text-lg"
               >
-                Continue Shopping
-              </button>
+                <ShoppingBag className="h-5 w-5" />
+                <span>Continue Shopping</span>
+              </Link>
             </div>
-          ) : (
-            <div className="grid lg:grid-cols-2 gap-16">
-              {/* Order Form */}
-              <div className="bg-white p-10 shadow-2xl rounded-2xl border border-slate-100">
-                <h2 className="text-3xl font-light mb-10 text-slate-900">Shipping Information</h2>
-                <form onSubmit={handleFormSubmit} className="space-y-8">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-900 mb-3 tracking-wider uppercase">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Enter your full name"
-                      className="w-full border-2 border-slate-200 px-5 py-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-all duration-300 rounded-xl text-lg"
-                      value={form.name}
-                      onChange={handleChange}
-                      required
-                    />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-white pt-20">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center space-x-3 mb-6">
+            <div className="w-2 h-2 bg-stone-800 rounded-full"></div>
+            <span className="text-sm font-cormorant font-medium text-stone-600 tracking-wider uppercase">
+              Secure Checkout
+            </span>
+            <div className="w-2 h-2 bg-stone-800 rounded-full"></div>
+          </div>
+          <h1 className="text-5xl font-playfair font-bold mb-4 text-stone-800">
+            {success ? "Order Confirmed" : "Checkout"}
+          </h1>
+          <p className="text-stone-600 text-xl max-w-2xl mx-auto font-cormorant">
+            {success 
+              ? "Thank you for your order! We'll be in touch soon."
+              : "Complete your order with secure checkout"
+            }
+          </p>
+        </div>
+
+        {success ? (
+          <div className="text-center py-20">
+            <div className="bg-stone-50 rounded-2xl p-16 max-w-3xl mx-auto">
+              <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8">
+                <CheckCircle className="h-12 w-12 text-green-600" />
+              </div>
+              <h2 className="text-3xl font-playfair font-bold text-stone-800 mb-6">Order Confirmed!</h2>
+              <p className="text-stone-600 font-cormorant text-lg mb-8 max-w-2xl mx-auto">
+                Thank you for your order! You will receive a confirmation email shortly with all the details. 
+                Our team will contact you soon for payment and delivery arrangements.
+              </p>
+              
+              {/* Order Features */}
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Mail className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h3 className="font-playfair font-semibold text-stone-800 mb-2">Email Confirmation</h3>
+                  <p className="text-stone-600 font-cormorant text-sm">Order details sent to your email</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Phone className="h-8 w-8 text-purple-600" />
+                  </div>
+                  <h3 className="font-playfair font-semibold text-stone-800 mb-2">Personal Contact</h3>
+                  <p className="text-stone-600 font-cormorant text-sm">We'll call you for arrangements</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Truck className="h-8 w-8 text-green-600" />
+                  </div>
+                  <h3 className="font-playfair font-semibold text-stone-800 mb-2">Fast Delivery</h3>
+                  <p className="text-stone-600 font-cormorant text-sm">Quick and secure delivery</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  to="/products"
+                  className="inline-flex items-center space-x-2 bg-stone-800 text-white px-8 py-4 rounded-lg hover:bg-stone-700 transition-colors font-cormorant"
+                >
+                  <ShoppingBag className="h-5 w-5" />
+                  <span>Continue Shopping</span>
+                </Link>
+                <Link
+                  to="/orders"
+                  className="inline-flex items-center space-x-2 border-2 border-stone-300 text-stone-700 px-8 py-4 rounded-lg hover:border-stone-500 transition-colors font-cormorant"
+                >
+                  <Package className="h-5 w-5" />
+                  <span>View Orders</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="grid lg:grid-cols-3 gap-12">
+            {/* Checkout Form */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* Progress Steps */}
+              <div className="bg-stone-50 rounded-2xl p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-stone-800 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                    <span className="font-cormorant font-semibold">Shipping Information</span>
+                  </div>
+                  <div className="flex items-center space-x-3 opacity-50">
+                    <div className="w-8 h-8 bg-stone-300 text-stone-600 rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                    <span className="font-cormorant">Review & Confirm</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Shipping Form */}
+              <div className="bg-white border border-stone-200 rounded-2xl p-8">
+                <h2 className="text-2xl font-playfair font-bold text-stone-800 mb-8">Shipping Information</h2>
+                
+                <form onSubmit={handleFormSubmit} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
+                        Full Name *
+                      </label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-stone-400" />
+                        <input
+                          type="text"
+                          name="name"
+                          placeholder="Enter your full name"
+                          className="w-full pl-12 pr-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
+                          value={form.name}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
+                        Phone Number *
+                      </label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-stone-400" />
+                        <input
+                          type="tel"
+                          name="phone"
+                          placeholder="Enter your phone number"
+                          className="w-full pl-12 pr-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
+                          value={form.phone}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-900 mb-3 tracking-wider uppercase">
+                    <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
                       Email Address *
                     </label>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Enter your email"
-                      className="w-full border-2 border-slate-200 px-5 py-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-all duration-300 rounded-xl text-lg"
-                      value={form.email}
-                      onChange={handleChange}
-                      required
-                    />
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-stone-400" />
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        className="w-full pl-12 pr-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
+                        value={form.email}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-900 mb-3 tracking-wider uppercase">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      placeholder="Enter your phone number"
-                      className="w-full border-2 border-slate-200 px-5 py-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-all duration-300 rounded-xl text-lg"
-                      value={form.phone}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-900 mb-3 tracking-wider uppercase">
+                    <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
                       Shipping Address *
                     </label>
-                    <textarea
-                      name="address"
-                      placeholder="Enter your complete address"
-                      className="w-full border-2 border-slate-200 px-5 py-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-all duration-300 rounded-xl text-lg"
-                      rows={4}
-                      value={form.address}
-                      onChange={handleChange}
-                      required
-                    />
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-4 h-5 w-5 text-stone-400" />
+                      <textarea
+                        name="address"
+                        placeholder="Enter your complete address"
+                        className="w-full pl-12 pr-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
+                        rows={4}
+                        value={form.address}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full bg-slate-900 text-white py-5 text-xl font-medium tracking-wider uppercase hover:bg-slate-800 transition-all duration-500 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                    className="w-full bg-stone-800 text-white py-4 rounded-lg hover:bg-stone-700 transition-colors font-cormorant text-lg"
                   >
                     Review Order
                   </button>
                 </form>
               </div>
+            </div>
 
-              {/* Order Summary */}
-              <div className="bg-white p-10 shadow-2xl h-fit rounded-2xl border border-slate-100">
-                <h2 className="text-3xl font-light mb-10 text-slate-900">Order Summary</h2>
+            {/* Order Summary */}
+            <div className="lg:col-span-1">
+              <div className="bg-stone-50 rounded-2xl p-8 sticky top-24">
+                <h3 className="text-2xl font-playfair font-bold text-stone-800 mb-6">Order Summary</h3>
 
-                <div className="space-y-8 mb-10">
-                  {cart.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-6 pb-8 border-b border-slate-200 last:border-b-0">
-                      <img
-                        src={item.imageUrl || "/placeholder.svg"}
-                        alt={item.title}
-                        className="w-20 h-20 object-cover rounded-xl"
-                      />
+                {/* Items */}
+                <div className="space-y-4 mb-6">
+                  {cart.map((item) => (
+                    <div key={`${item.productId}-${item.size}`} className="flex items-center gap-4">
+                      <div className="w-16 h-16 bg-stone-200 rounded-lg overflow-hidden flex-shrink-0">
+                        <img
+                          src={item.imageUrl || "/placeholder.jpg"}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement
+                            target.src = "/placeholder.jpg"
+                          }}
+                        />
+                      </div>
                       <div className="flex-1">
-                        <h4 className="font-medium text-slate-900 mb-2 text-lg">{item.title}</h4>
-                        <p className="text-slate-600">Size: {item.size}</p>
-                        <p className="text-slate-600">Qty: {item.quantity}</p>
+                        <h4 className="font-playfair font-semibold text-stone-800 text-sm">{item.title}</h4>
+                        <p className="text-stone-600 font-cormorant text-sm">
+                          Size: {item.size} | Qty: {item.quantity}
+                        </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium text-slate-900 text-lg">₹{item.price * item.quantity}</p>
+                        <p className="font-playfair font-bold text-stone-800">₹{(item.price * item.quantity).toFixed(2)}</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="space-y-4 mb-10 pt-8 border-t border-slate-200">
-                  <div className="flex justify-between text-slate-600 text-lg">
-                    <span>Subtotal</span>
-                    <span>₹{total}</span>
+                {/* Totals */}
+                <div className="space-y-3 mb-6 pt-6 border-t border-stone-300">
+                  <div className="flex justify-between font-cormorant">
+                    <span className="text-stone-600">Subtotal</span>
+                    <span className="text-stone-800 font-semibold">₹{subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-slate-600 text-lg">
-                    <span>Shipping</span>
-                    <span>Free</span>
+                  <div className="flex justify-between font-cormorant">
+                    <span className="text-stone-600">Shipping</span>
+                    <span className="text-green-600 font-semibold">Free</span>
                   </div>
-                  <div className="flex justify-between text-2xl font-medium text-slate-900 pt-4 border-t border-slate-200">
-                    <span>Total</span>
-                    <span>₹{total}</span>
+                  <div className="flex justify-between font-cormorant">
+                    <span className="text-stone-600">Tax</span>
+                    <span className="text-stone-800 font-semibold">₹{tax.toFixed(2)}</span>
+                  </div>
+                  <div className="border-t border-stone-300 pt-3">
+                    <div className="flex justify-between text-lg font-playfair font-bold">
+                      <span className="text-stone-800">Total</span>
+                      <span className="text-stone-800">₹{total.toFixed(2)}</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
-                  <div className="flex items-start">
-                    <svg className="h-6 w-6 text-amber-400 mt-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fillRule="evenodd"
-                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <div className="ml-4">
-                      <h3 className="font-medium text-amber-800">Payment Notice</h3>
-                      <p className="mt-2 text-amber-700">
-                        No payment required now. We'll contact you for payment arrangements after order confirmation.
+                {/* Security Info */}
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                  <div className="flex items-start space-x-3">
+                    <Shield className="h-5 w-5 text-green-600 mt-1" />
+                    <div>
+                      <h4 className="font-playfair font-semibold text-green-800 text-sm">Secure Checkout</h4>
+                      <p className="mt-1 text-green-700 font-cormorant text-sm">
+                        Your order is secure and encrypted
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Payment Notice */}
+                <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <div className="flex items-start space-x-3">
+                    <CreditCard className="h-5 w-5 text-blue-600 mt-1" />
+                    <div>
+                      <h4 className="font-playfair font-semibold text-blue-800 text-sm">Payment Info</h4>
+                      <p className="mt-1 text-blue-700 font-cormorant text-sm">
+                        We'll contact you for payment arrangements
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Confirmation Modal */}
-          <OrderConfirmationModal
-            isOpen={showModal}
-            onClose={() => setShowModal(false)}
-            onConfirm={handleConfirmOrder}
-            loading={loading}
-            orderDetails={{
-              items: cart,
-              total: total,
-              customerInfo: form,
-            }}
-          />
-        </div>
-      </section>
+        {/* Confirmation Modal */}
+        <OrderConfirmationModal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          onConfirm={handleConfirmOrder}
+          loading={loading}
+          orderDetails={{
+            items: cart,
+            total: total,
+            customerInfo: form,
+          }}
+        />
+      </div>
     </div>
   )
 }

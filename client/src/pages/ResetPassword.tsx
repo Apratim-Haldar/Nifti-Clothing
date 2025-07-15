@@ -23,7 +23,7 @@ const ResetPassword = () => {
 
   // OTP Timer
   useEffect(() => {
-    let interval: number
+    let interval: any
     if (otpTimer > 0) {
       interval = setInterval(() => {
         setOtpTimer((prev) => prev - 1)

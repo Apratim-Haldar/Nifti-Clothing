@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
+import { Heart, Star, Eye } from "lucide-react"
 import { useCart } from "../context/CartContext"
 
 interface Product {
@@ -10,21 +11,25 @@ interface Product {
   sizes: string[]
   imageUrl: string
   inStock: boolean
+  stockStatus?: string
   categories?: string[]
 }
 
 interface ProductCardProps {
   product: Product
+  viewMode?: "grid" | "list"
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addToCart, loading } = useCart()
-  const [qty, setQty] = useState(1)
-  const [selectedSize, setSelectedSize] = useState("M")
+const ProductCard: React.FC<ProductCardProps> = ({ product, viewMode = "grid" }) => {
+  const { addToCart } = useCart()
+  const [isHovered, setIsHovered] = useState(false)
   const [isAdding, setIsAdding] = useState(false)
-  const [showQuickAdd, setShowQuickAdd] = useState(false)
+  const selectedSize = product.sizes?.[0] || "M"
 
-  const handleQuickAdd = async () => {
+  const handleQuickAdd = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
     setIsAdding(true)
     try {
       await addToCart({
@@ -33,160 +38,191 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         imageUrl: product.imageUrl,
         price: product.price,
         size: selectedSize,
-        quantity: qty,
+        quantity: 1,
       })
     } catch (error) {
       console.error("Error adding to cart:", error)
     } finally {
       setIsAdding(false)
-      setShowQuickAdd(false)
     }
   }
 
-  const incrementQty = () => setQty((prev) => prev + 1)
-  const decrementQty = () => setQty((prev) => (prev > 1 ? prev - 1 : 1))
+  if (viewMode === "list") {
+    return (
+      <Link to={`/products/${product._id}`} className="block">
+        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden hover:shadow-lg transition-all duration-300 group">
+          <div className="flex">
+            {/* Image */}
+            <div className="w-48 h-48 relative overflow-hidden bg-stone-100 flex-shrink-0">
+              <img
+                src={product.imageUrl}
+                alt={product.title}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.src = "/placeholder.jpg"
+                }}
+              />
+              {!product.inStock && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                  <span className="text-white font-cormorant font-semibold">Out of Stock</span>
+                </div>
+              )}
+            </div>
 
-  const sizes = ["XS", "S", "M", "L", "XL", "XXL"]
-  const availableSizes = product.sizes || sizes
+            {/* Content */}
+            <div className="flex-1 p-6 flex flex-col justify-between">
+              <div>
+                <h3 className="text-xl font-playfair font-bold text-stone-800 mb-2 group-hover:text-stone-600 transition-colors">
+                  {product.title}
+                </h3>
+                <p className="text-stone-600 font-cormorant mb-4 line-clamp-2">
+                  {product.description}
+                </p>
+                <div className="flex items-center space-x-4 mb-4">
+                  <span className="text-2xl font-bold text-stone-800">₹{product.price}</span>
+                  <div className="flex items-center">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 text-amber-400 fill-current" />
+                    ))}
+                    <span className="ml-2 text-stone-500 text-sm font-cormorant">4.8 (24)</span>
+                  </div>
+                </div>
+                {product.sizes && product.sizes.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {product.sizes.slice(0, 4).map((size) => (
+                      <span
+                        key={size}
+                        className="px-2 py-1 bg-stone-100 text-stone-600 text-xs font-cormorant rounded"
+                      >
+                        {size}
+                      </span>
+                    ))}
+                    {product.sizes.length > 4 && (
+                      <span className="px-2 py-1 bg-stone-100 text-stone-600 text-xs font-cormorant rounded">
+                        +{product.sizes.length - 4} more
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
 
+              {/* Actions */}
+              <div className="flex items-center space-x-3 mt-4">
+                <button
+                  onClick={handleQuickAdd}
+                  disabled={!product.inStock || isAdding}
+                  className="flex-1 bg-stone-800 text-white py-2 px-4 rounded-lg hover:bg-stone-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-cormorant"
+                >
+                  {isAdding ? "Adding..." : "Add to Cart"}
+                </button>
+                <button className="p-2 border border-stone-300 rounded-lg hover:border-stone-500 transition-colors">
+                  <Heart className="h-5 w-5" />
+                </button>
+                <button className="p-2 border border-stone-300 rounded-lg hover:border-stone-500 transition-colors">
+                  <Eye className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Link>
+    )
+  }
+
+  // Grid view (default)
   return (
-    <div className="group relative bg-white border border-slate-200 overflow-hidden transition-all duration-300 hover:shadow-lg">
-      {/* Product Image */}
-      <div className="relative overflow-hidden aspect-[4/5]">
-        <img
-          src={product.imageUrl}
-          alt={product.title}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-
-        {/* Quick Add Overlay */}
-        <div
-          className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-300 ${
-            showQuickAdd ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
-        >
-          <div className="absolute inset-0 flex flex-col justify-center items-center p-6 text-white">
-            {/* Size Selection */}
-            <div className="mb-4 w-full">
-              <label className="block text-xs font-medium mb-2 text-center uppercase tracking-wide">
-                Select Size
-              </label>
-              <div className="flex justify-center gap-2 flex-wrap">
-                {availableSizes.slice(0, 4).map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`w-8 h-8 text-xs border transition-all duration-200 ${
-                      selectedSize === size
-                        ? "border-white bg-white text-black"
-                        : "border-white/50 text-white hover:border-white"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
+    <Link to={`/products/${product._id}`} className="block group">
+      <div
+        className="bg-white rounded-2xl border border-stone-200 overflow-hidden hover:shadow-lg transition-all duration-300"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* Image Container */}
+        <div className="relative aspect-square overflow-hidden bg-stone-100">
+          <img
+            src={product.imageUrl}
+            alt={product.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement
+              target.src = "/placeholder.jpg"
+            }}
+          />
+          
+          {/* Overlay */}
+          {!product.inStock && (
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <span className="text-white font-cormorant font-semibold">Out of Stock</span>
             </div>
+          )}
 
-            {/* Quantity Controls */}
-            <div className="mb-4 flex items-center gap-3">
-              <span className="text-xs font-medium uppercase tracking-wide">
-                Qty:
-              </span>
-              <div className="flex items-center border border-white/50 rounded">
-                <button
-                  onClick={decrementQty}
-                  disabled={isAdding || loading}
-                  className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/20 disabled:opacity-50 transition-colors"
-                >
-                  −
-                </button>
-                <span className="w-10 h-8 flex items-center justify-center text-sm font-medium bg-white/10">
-                  {qty}
-                </span>
-                <button
-                  onClick={incrementQty}
-                  disabled={isAdding || loading}
-                  className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/20 disabled:opacity-50 transition-colors"
-                >
-                  +
-                </button>
-              </div>
-            </div>
+          {/* Quick Actions */}
+          <div className={`absolute top-4 right-4 flex flex-col space-y-2 transition-all duration-300 ${
+            isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
+          }`}>
+            <button className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors">
+              <Heart className="h-4 w-4 text-stone-600" />
+            </button>
+            <button className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors">
+              <Eye className="h-4 w-4 text-stone-600" />
+            </button>
+          </div>
 
-            {/* Add to Cart Button */}
+          {/* Quick Add Button */}
+          <div className={`absolute bottom-4 left-4 right-4 transition-all duration-300 ${
+            isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+          }`}>
             <button
               onClick={handleQuickAdd}
-              disabled={isAdding || loading}
-              className="w-full py-2 bg-white text-black text-sm font-medium uppercase tracking-wide hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center"
+              disabled={!product.inStock || isAdding}
+              className="w-full bg-stone-800/90 backdrop-blur-sm text-white py-2 px-4 rounded-lg hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-cormorant font-medium"
             >
-              {isAdding ? (
-                <>
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-black"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Adding...
-                </>
-              ) : (
-                "Add to Cart"
-              )}
-            </button>
-
-            {/* Close Button */}
-            <button
-              onClick={() => setShowQuickAdd(false)}
-              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors"
-            >
-              ×
+              {isAdding ? "Adding..." : "Quick Add"}
             </button>
           </div>
         </div>
 
-        {/* Quick Add Trigger */}
-        <button
-          onClick={() => setShowQuickAdd(true)}
-          className="absolute bottom-3 right-3 w-10 h-10 bg-slate-900 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-slate-800"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Product Info */}
-      <div className="p-6">
-        <Link to={`/products/${product._id}`} className="block">
-          <h3 className="text-lg font-light mb-2 text-slate-900 tracking-wide hover:text-slate-600 transition-colors">
+        {/* Product Info */}
+        <div className="p-6">
+          <h3 className="text-lg font-playfair font-bold text-stone-800 mb-2 group-hover:text-stone-600 transition-colors line-clamp-1">
             {product.title}
           </h3>
-          <p className="text-slate-600 text-sm mb-3 line-clamp-2 font-light">
+          
+          <p className="text-stone-600 font-cormorant mb-3 line-clamp-2 text-sm">
             {product.description}
           </p>
-          <div className="flex justify-between items-center">
-            <span className="text-xl font-light text-slate-900">₹{product.price}</span>
-            <span className="text-xs text-slate-500 uppercase tracking-wide font-medium">
-              View Details →
-            </span>
+
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xl font-bold text-stone-800">₹{product.price}</span>
+            <div className="flex items-center">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="h-3 w-3 text-amber-400 fill-current" />
+              ))}
+            </div>
           </div>
-        </Link>
+
+          {/* Sizes */}
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {product.sizes.slice(0, 4).map((size) => (
+                <span
+                  key={size}
+                  className="px-2 py-1 bg-stone-100 text-stone-600 text-xs font-cormorant rounded"
+                >
+                  {size}
+                </span>
+              ))}
+              {product.sizes.length > 4 && (
+                <span className="px-2 py-1 bg-stone-100 text-stone-600 text-xs font-cormorant rounded">
+                  +{product.sizes.length - 4}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </Link>
   )
 }
 
