@@ -97,7 +97,7 @@ const Footer = () => {
                 </li>
                 <li>
                   <Link to="/contact" className="text-stone-300 hover:text-amber-400 transition-colors font-cormorant">
-                    Size Guide
+                    Contact Us
                   </Link>
                 </li>
               </ul>
@@ -125,8 +125,8 @@ const Footer = () => {
                 </div>
                 <div className="flex items-center space-x-3">
                   <Mail className="h-5 w-5 text-amber-400 flex-shrink-0" />
-                  <a href="mailto:atelier@nifti.com" className="text-stone-300 hover:text-amber-400 transition-colors font-cormorant">
-                    atelier@nifti.com
+                  <a href="mailto:nifi07@gmail.com" className="text-stone-300 hover:text-amber-400 transition-colors font-cormorant">
+                    nifi07@gmail.com
                   </a>
                 </div>
               </div>
