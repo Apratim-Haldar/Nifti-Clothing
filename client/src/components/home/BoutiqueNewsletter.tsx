@@ -156,7 +156,7 @@ export function BoutiqueNewsletter() {
             </div>
             <div className="text-center">
               <div className="text-2xl font-playfair font-bold text-stone-800">100+</div>
-              <div className="text-sm text-stone-600 font-cormorant">Years of Heritage</div>
+              <div className="text-sm text-stone-600 font-cormorant">Unique Options </div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-playfair font-bold text-stone-800">24/7</div>

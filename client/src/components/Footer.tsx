@@ -136,7 +136,6 @@ const Footer = () => {
                 <h4 className="font-cormorant font-semibold text-white mb-2">Working Hours</h4>
                 <p className="text-stone-300 text-sm font-cormorant">Mon - Sat: 10:00 AM - 8:00 PM</p>
                 <p className="text-stone-300 text-sm font-cormorant">Sun: 12:00 PM - 6:00 PM</p>
-                <p className="text-amber-400 text-sm font-cormorant mt-1">Private appointments available</p>
               </div>
             </div>
           </div>
