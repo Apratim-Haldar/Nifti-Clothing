@@ -39,10 +39,11 @@ export function BoutiqueNewsletter() {
   }
 
   return (
-    <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Elegant Background */}
-      <div className="absolute inset-0 fabric-texture opacity-10"></div>
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-stone-50/50 to-rose-50/50"></div>
+    <section className="relative overflow-hidden py-32 px-4 sm:px-6 lg:px-8">
+      {/* base fabric dots */}
+      <div className="absolute inset-0 fabric-texture opacity-10" />
+      {/* diagonal stripes for depth */}
+      <div className="absolute inset-0 diagonal-stripes opacity-5" />
 
       <div className="max-w-4xl mx-auto text-center relative z-10">
         <div className="boutique-card rounded-3xl p-12 velvet-shadow">

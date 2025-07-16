@@ -2,6 +2,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop'; // Add this import
 import { GuestOnlyRoute, ProtectedRoute } from './components/RouteGuard';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -27,6 +28,7 @@ import { ModalProvider } from './context/ModalContext';
 function App() {
   return (
     <ModalProvider>
+      <ScrollToTop /> {/* Add this component */}
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-grow">

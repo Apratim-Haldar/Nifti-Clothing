@@ -41,8 +41,8 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
             <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg flex items-center justify-center border border-amber-300/50 group-hover:shadow-lg transition-all duration-300">
-                <Scissors className="h-6 w-6 text-amber-800 group-hover:rotate-12 transition-transform duration-300" />
+              <div className="w-12 h-12 flex items-center justify-center border border-black group-hover:shadow-lg transition-all duration-300">
+                <img src = "/logo.jpg" alt="Nifti Logo" className="object-cover" />
               </div>
               <div className="absolute -inset-1 bg-gradient-to-r from-amber-200 to-amber-300 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300 -z-10"></div>
             </div>

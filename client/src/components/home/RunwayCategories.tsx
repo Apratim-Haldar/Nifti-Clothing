@@ -91,16 +91,14 @@ export function RunwayCategories() {
   }
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 relative bg-white">
-      {/* Clean stitching pattern background */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="stitching-border w-full h-full"></div>
-      </div>
+    <section className="relative py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-stone-50 via-amber-50 to-stone-100">
+      {/* linen texture overlay */}
+      <div className="absolute inset-0 linen-texture opacity-5 pointer-events-none" />
 
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-playfair font-bold mb-4 text-stone-800">
-            Our <span className="text-stone-700">Collections</span>
+          <h2 className="text-5xl font-playfair font-bold mb-4 text-amber-700">
+            Our Collections
           </h2>
           <p className="text-stone-600 text-lg max-w-2xl mx-auto leading-relaxed font-cormorant">
             Discover our curated range of modern fashion pieces, from contemporary streetwear to 

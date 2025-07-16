@@ -5,6 +5,20 @@ import { RunwayCategories } from "../components/home/RunwayCategories"
 import { SocialConnect } from "../components/home/SocialConnect"
 import { BoutiqueNewsletter } from "../components/home/BoutiqueNewsletter"
 
+const WaveDivider: React.FC<{ flip?: boolean }> = ({ flip }) => (
+  <div className="relative w-full ">
+    <svg
+      viewBox="0 0 1140 100"
+      className={`w-full h-auto ${
+        flip ? "rotate-180" : ""
+      } fill-[#f8f5f1] dark:fill-stone-800`}
+      preserveAspectRatio="none"
+    >
+      <path d="M0 60c200 40 400-40 600 0s400 40 600 0v60H0Z" />
+    </svg>
+  </div>
+);
+
 const Home: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -56,9 +70,11 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="pt-20">
+    <div className="pt-20 ">
       <CoutureHero />
+      <WaveDivider />
       <RunwayCategories />
+      <WaveDivider />
       <SocialConnect />
       <BoutiqueNewsletter />
     </div>

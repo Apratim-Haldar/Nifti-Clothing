@@ -59,10 +59,10 @@ export function SocialConnect() {
   }
 
   return (
-    <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gradient-to-br from-stone-50 via-amber-50 to-stone-100">
-      {/* Premium background elements */}
-      <div className="absolute inset-0 fabric-texture opacity-10"></div>
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-stone-50/50 to-rose-50/50"></div>
+    <section className="relative overflow-hidden py-32 px-4 sm:px-6 lg:px-8
+                        bg-gradient-to-br from-stone-50 via-amber-50 to-stone-100">
+      <div className="absolute inset-0 fabric-texture opacity-10" />
+      {/* stripped the extra warm overlay – keeps it cool/neutral */}
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}

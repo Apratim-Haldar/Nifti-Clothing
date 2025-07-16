@@ -1,19 +1,30 @@
-import { Link } from "react-router-dom"
-import { Instagram, Facebook, MessageCircle, Mail, Phone, MapPin, Scissors, Crown, Heart } from "lucide-react"
+// src/components/Footer.tsx
+import { Link } from "react-router-dom";
+import {
+  Instagram,
+  Facebook,
+  MessageCircle,
+  Mail,
+  Phone,
+  MapPin,
+  Scissors,
+  Heart,
+} from "lucide-react";
 
 const Footer = () => {
   return (
     <footer className="relative bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 text-white overflow-hidden">
       {/* Elegant Background Pattern */}
-      <div className="absolute inset-0 fabric-texture opacity-5"></div>
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-rose-500/5 rounded-full blur-3xl"></div>
+      <div className="absolute inset-0 fabric-texture opacity-5" />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-rose-500/5 rounded-full blur-3xl" />
 
       <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-6 py-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          {/* ======= GRID ======= */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
             {/* Brand Section */}
-            <div className="lg:col-span-1">
+            <div>
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg flex items-center justify-center border border-amber-300/50">
                   <Scissors className="h-6 w-6 text-amber-800" />
@@ -23,10 +34,11 @@ const Footer = () => {
                   <div className="text-xs font-cormorant text-stone-300 -mt-1">Clothing</div>
                 </div>
               </div>
+
               <p className="text-stone-300 font-cormorant text-lg leading-relaxed mb-8">
                 Where timeless craftsmanship meets contemporary elegance. Each piece tells a story of artistry and passion.
               </p>
-              
+
               {/* Social Links */}
               <div className="flex space-x-4">
                 <a
@@ -54,41 +66,6 @@ const Footer = () => {
                   <MessageCircle className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
                 </a>
               </div>
-            </div>
-
-            {/* Collections */}
-            <div>
-              <div className="flex items-center space-x-2 mb-6">
-                <Crown className="h-5 w-5 text-amber-400" />
-                <h3 className="font-playfair font-semibold text-lg text-white">Collections</h3>
-              </div>
-              <ul className="space-y-3">
-                <li>
-                  <Link to="/products?category=couture" className="text-stone-300 hover:text-amber-400 transition-colors font-cormorant">
-                    Haute Couture
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/products?category=ready" className="text-stone-300 hover:text-amber-400 transition-colors font-cormorant">
-                    Ready-to-Wear
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/products?category=bridal" className="text-stone-300 hover:text-amber-400 transition-colors font-cormorant">
-                    Bridal Collection
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/products?category=accessories" className="text-stone-300 hover:text-amber-400 transition-colors font-cormorant">
-                    Accessories
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/products?category=limited" className="text-stone-300 hover:text-amber-400 transition-colors font-cormorant">
-                    Limited Edition
-                  </Link>
-                </li>
-              </ul>
             </div>
 
             {/* Client Services */}
@@ -142,7 +119,7 @@ const Footer = () => {
                 </div>
                 <div className="flex items-center space-x-3">
                   <Phone className="h-5 w-5 text-amber-400 flex-shrink-0" />
-                  <a href="tel:+1234567890" className="text-stone-300 hover:text-amber-400 transition-colors font-cormorant">
+                  <a href="tel:+918100371049" className="text-stone-300 hover:text-amber-400 transition-colors font-cormorant">
                     +91 8100371049
                   </a>
                 </div>
@@ -153,7 +130,7 @@ const Footer = () => {
                   </a>
                 </div>
               </div>
-              
+
               {/* Working Hours */}
               <div className="mt-6 p-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl">
                 <h4 className="font-cormorant font-semibold text-white mb-2">Working Hours</h4>
@@ -166,11 +143,11 @@ const Footer = () => {
 
           {/* Decorative Stitching Line */}
           <div className="mt-16 mb-8 flex items-center justify-center space-x-4">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent"></div>
-            <div className="w-2 h-2 bg-amber-400 rounded-full"></div>
-            <div className="w-2 h-2 bg-amber-300 rounded-full"></div>
-            <div className="w-2 h-2 bg-amber-200 rounded-full"></div>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent"></div>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+            <div className="w-2 h-2 bg-amber-400 rounded-full" />
+            <div className="w-2 h-2 bg-amber-300 rounded-full" />
+            <div className="w-2 h-2 bg-amber-200 rounded-full" />
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
           </div>
 
           {/* Bottom Section */}
@@ -194,14 +171,14 @@ const Footer = () => {
                 </Link>
               </div>
               <div className="text-stone-400 text-sm font-cormorant">
-                <p>&copy; 2024 Nifti Clothing. Handcrafted with care.</p>
+                <p>&copy; 5 Nifti Clothing. Handcrafted with care.</p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

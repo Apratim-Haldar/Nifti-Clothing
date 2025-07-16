@@ -67,11 +67,11 @@ export function CoutureHero() {
     <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Fabric Pattern Overlay */}
       <div className="absolute inset-0 fabric-texture opacity-20"></div>
-
+    
       {/* Elegant Background Elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-amber-100/30 to-stone-200/30 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-stone-200/30 to-amber-100/30 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 left-10 w-96 h-96 bg-amber-100/50 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-amber-100/60 rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
