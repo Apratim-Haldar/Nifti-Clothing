@@ -1,7 +1,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
-import {  Share2, Star, Truck, Shield, RotateCcw, Minus, Plus, ArrowLeft } from "lucide-react"
+import { Share2, Star, Truck, Shield, RotateCcw, Minus, Plus, ArrowLeft, Copy, Facebook, Twitter, MessageCircle } from "lucide-react"
 import axios from "axios"
 import { useCart } from "../context/CartContext"
 import { useAuth } from "../context/AuthContext"
@@ -70,6 +70,9 @@ const ProductDetail: React.FC = () => {
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null)
   const [editedReview, setEditedReview] = useState<NewReview>({ rating: 5, comment: "" })
   const [activeTab, setActiveTab] = useState<'details' | 'reviews' | 'shipping'>('details')
+
+  // Share menu state
+  const [showShareMenu, setShowShareMenu] = useState(false)
 
   // Fetch product data
   useEffect(() => {
@@ -232,6 +235,66 @@ const ProductDetail: React.FC = () => {
     } catch (err) {
       addToast("Failed to update review", "error")
     }
+  }
+
+  // Add share functionality
+  const handleShare = async () => {
+    const shareData = {
+      title: product?.title || 'Check out this product',
+      text: product?.description || 'Amazing product from Nifti',
+      url: window.location.href,
+    }
+
+    // Check if native sharing is supported
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData)
+        addToast('Product shared successfully!', 'success')
+      } catch (error) {
+        if ((error as Error).name !== 'AbortError') {
+          console.error('Error sharing:', error)
+          setShowShareMenu(true) // Fallback to custom share menu
+        }
+      }
+    } else {
+      setShowShareMenu(true) // Show custom share menu
+    }
+  }
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      addToast('Link copied to clipboard!', 'success')
+      setShowShareMenu(false)
+    } catch (error) {
+      console.error('Failed to copy:', error)
+      addToast('Failed to copy link', 'error')
+    }
+  }
+
+  const shareToSocial = (platform: string) => {
+    const url = encodeURIComponent(window.location.href)
+    const title = encodeURIComponent(product?.title || 'Check out this product')
+    const description = encodeURIComponent(product?.description || 'Amazing product from Nifti')
+    
+    let shareUrl = ''
+    
+    switch (platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`
+        break
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`
+        break
+      case 'whatsapp':
+        shareUrl = `https://wa.me/?text=${title}%20${url}`
+        break
+      default:
+        return
+    }
+    
+    window.open(shareUrl, '_blank', 'width=600,height=400')
+    setShowShareMenu(false)
   }
 
   if (loading) {
@@ -418,9 +481,62 @@ const ProductDetail: React.FC = () => {
               >
                 {isAdding ? "Adding..." : "Add to Cart"}
               </button>
-              <button className="p-4 border-2 border-stone-300 rounded-xl hover:border-stone-500 transition-colors">
-                <Share2 className="h-6 w-6" />
-              </button>
+              <div className="relative">
+                <button 
+                  onClick={handleShare}
+                  className="p-4 border-2 border-stone-300 rounded-xl hover:border-stone-500 transition-colors"
+                >
+                  <Share2 className="h-6 w-6" />
+                </button>
+
+                {/* Custom Share Menu */}
+                {showShareMenu && (
+                  <div className="absolute top-full right-0 mt-2 bg-white border border-stone-200 rounded-xl shadow-lg p-4 min-w-48 z-50">
+                    <div className="text-sm font-semibold text-stone-800 mb-3">Share this product</div>
+                    
+                    {/* Copy Link */}
+                    <button
+                      onClick={copyToClipboard}
+                      className="w-full flex items-center space-x-3 p-2 hover:bg-stone-50 rounded-lg transition-colors"
+                    >
+                      <Copy className="h-4 w-4 text-stone-600" />
+                      <span className="text-stone-700">Copy Link</span>
+                    </button>
+                    
+                    {/* Social Media Options */}
+                    <button
+                      onClick={() => shareToSocial('facebook')}
+                      className="w-full flex items-center space-x-3 p-2 hover:bg-stone-50 rounded-lg transition-colors"
+                    >
+                      <Facebook className="h-4 w-4 text-blue-600" />
+                      <span className="text-stone-700">Facebook</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => shareToSocial('twitter')}
+                      className="w-full flex items-center space-x-3 p-2 hover:bg-stone-50 rounded-lg transition-colors"
+                    >
+                      <Twitter className="h-4 w-4 text-blue-400" />
+                      <span className="text-stone-700">Twitter</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => shareToSocial('whatsapp')}
+                      className="w-full flex items-center space-x-3 p-2 hover:bg-stone-50 rounded-lg transition-colors"
+                    >
+                      <MessageCircle className="h-4 w-4 text-green-600" />
+                      <span className="text-stone-700">WhatsApp</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => setShowShareMenu(false)}
+                      className="w-full mt-2 pt-2 border-t border-stone-200 text-stone-500 text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Features */}
