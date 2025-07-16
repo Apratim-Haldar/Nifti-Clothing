@@ -275,7 +275,6 @@ const ProductDetail: React.FC = () => {
   const shareToSocial = (platform: string) => {
     const url = encodeURIComponent(window.location.href)
     const title = encodeURIComponent(product?.title || 'Check out this product')
-    const description = encodeURIComponent(product?.description || 'Amazing product from Nifti')
     
     let shareUrl = ''
     
