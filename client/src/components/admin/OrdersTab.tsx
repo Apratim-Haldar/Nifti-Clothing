@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchAllOrders, updateOrderStatus, addOrderNote } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
+import ShippingBill from './ShippingBill';
 import './OrdersTab.css';
 
 interface OrderItem {
@@ -42,6 +43,8 @@ const OrdersTab: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [orderNotes, setOrderNotes] = useState('');
+  const [showShippingBill, setShowShippingBill] = useState(false);
+  const [selectedOrderForBill, setSelectedOrderForBill] = useState<Order | null>(null);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -95,6 +98,16 @@ const OrdersTab: React.FC = () => {
     setSelectedOrder(order);
     setOrderNotes(order.notes || '');
     setShowModal(true);
+  };
+
+  const handleGenerateShippingBill = (order: Order) => {
+    setSelectedOrderForBill(order);
+    setShowShippingBill(true);
+  };
+
+  const closeShippingBill = () => {
+    setShowShippingBill(false);
+    setSelectedOrderForBill(null);
   };
 
   const getStatusColor = (status: string) => {
@@ -313,6 +326,13 @@ const OrdersTab: React.FC = () => {
                 <td className="order-date">{formatDate(order.createdAt)}</td>
                 <td className="order-actions">
                   <button
+                    className="bill-btn"
+                    onClick={() => handleGenerateShippingBill(order)}
+                    title="Generate Shipping Bill"
+                  >
+                    📄
+                  </button>
+                  <button
                     className="notes-btn"
                     onClick={() => openNotesModal(order)}
                     title="Add/Edit Notes"
@@ -345,10 +365,19 @@ const OrdersTab: React.FC = () => {
       {/* Order Details/Notes Modal */}
       {showModal && selectedOrder && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content enhanced-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Order Details - {selectedOrder.orderNumber}</h3>
-              <button className="close-btn" onClick={() => setShowModal(false)}>×</button>
+              <div className="modal-header-actions">
+                <button 
+                  className="bill-modal-btn"
+                  onClick={() => handleGenerateShippingBill(selectedOrder)}
+                  title="Generate Shipping Bill"
+                >
+                  📄 Shipping Bill
+                </button>
+                <button className="close-btn" onClick={() => setShowModal(false)}>×</button>
+              </div>
             </div>
             
             <div className="modal-body">
@@ -389,6 +418,14 @@ const OrdersTab: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Shipping Bill Modal */}
+      {showShippingBill && selectedOrderForBill && (
+        <ShippingBill 
+          order={selectedOrderForBill} 
+          onClose={closeShippingBill}
+        />
       )}
     </div>
   );

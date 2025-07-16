@@ -26,8 +26,12 @@ const Footer = () => {
             {/* Brand Section */}
             <div>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg flex items-center justify-center border border-amber-300/50">
-                  <Scissors className="h-6 w-6 text-amber-800" />
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center border border-black">
+                  <img
+                    src="/logo.jpg"
+                    alt="Nfiti Logo"
+                    className="w-12 h-12 object-cover"
+                  />
                 </div>
                 <div>
                   <span className="font-playfair text-2xl font-bold text-white">Nfiti</span>

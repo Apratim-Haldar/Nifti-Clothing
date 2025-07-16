@@ -394,6 +394,58 @@
   transform: translateY(-1px);
 }
 
+.bill-btn {
+  padding: 0.5rem;
+  background: #059669;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  margin-right: 0.5rem;
+}
+
+.bill-btn:hover {
+  background: #047857;
+  transform: scale(1.1);
+}
+
+.bill-modal-btn {
+  padding: 0.5rem 1rem;
+  background: #059669;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.bill-modal-btn:hover {
+  background: #047857;
+  transform: translateY(-1px);
+}
+
+/* Print specific styles */
+@media print {
+  .print\\:hidden {
+    display: none !important;
+  }
+  
+  /* Force print in portrait mode */
+  @page {
+    size: A4 portrait;
+    margin: 0.5in;
+  }
+  
+  /* Ensure the bill fits on one page */
+  .shipping-bill-container {
+    page-break-inside: avoid;
+  }
+}
+
 @media (max-width: 1024px) {
   .orders-table-container {
     overflow-x: scroll;
