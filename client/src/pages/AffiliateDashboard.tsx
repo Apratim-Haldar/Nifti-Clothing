@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { Copy, Users, Gift, DollarSign, Share2, Mail, MessageCircle } from "lucide-react"
+import { Copy, Users, Gift, Share2, Mail, MessageCircle } from "lucide-react"
 import axios from "axios"
 import { useAuth } from "../context/AuthContext"
 import { useToast } from "../context/ToastContext"
