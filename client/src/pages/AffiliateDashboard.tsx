@@ -148,7 +148,7 @@ const AffiliateDashboard = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
           {/* Referral Code */}
           <div className="bg-stone-50 rounded-2xl p-8 text-center">
             <div className="w-16 h-16 bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -173,17 +173,7 @@ const AffiliateDashboard = () => {
             <p className="text-stone-600 font-cormorant">Friends who joined</p>
           </div>
 
-          {/* Potential Earnings */}
-          <div className="bg-stone-50 rounded-2xl p-8 text-center">
-            <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-              <DollarSign className="h-8 w-8 text-white" />
-            </div>
-            <h3 className="text-xl font-playfair font-bold text-stone-800 mb-2">Potential Rewards</h3>
-            <p className="text-3xl font-bold text-stone-800 mb-4">
-              ₹{(stats.count * 10).toFixed(2)}
-            </p>
-            <p className="text-stone-600 font-cormorant">Based on referrals</p>
-          </div>
+          
         </div>
 
         {/* Referral Link Section */}

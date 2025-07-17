@@ -193,12 +193,12 @@ const MyOrders: React.FC = () => {
                 <Package className="h-12 w-12 text-stone-400" />
               </div>
               <h3 className="text-2xl font-playfair font-bold text-stone-800 mb-4">
-                {filter === 'all' ? 'No orders yet' : `No ${filter} orders`}
+                {filter === 'all' ? 'No orders yet' : `No ₹{filter} orders`}
               </h3>
               <p className="text-stone-600 font-cormorant text-lg mb-8">
                 {filter === 'all' 
                   ? "You haven't placed any orders yet. Start shopping to see your orders here!"
-                  : `You don't have any ${filter} orders at the moment.`
+                  : `You don't have any ₹{filter} orders at the moment.`
                 }
               </p>
               {filter === 'all' && (
@@ -250,7 +250,7 @@ const MyOrders: React.FC = () => {
                     
                     <div className="text-right">
                       <p className="text-2xl font-bold text-stone-800">
-                        ${order.totalAmount.toFixed(2)}
+                        ₹{order.totalAmount.toFixed(2)}
                       </p>
                       <p className="text-stone-600 font-cormorant">
                         {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
@@ -283,13 +283,13 @@ const MyOrders: React.FC = () => {
                           <div className="flex items-center space-x-4 text-stone-600 font-cormorant">
                             <span>Size: {item.size}</span>
                             <span>Qty: {item.quantity}</span>
-                            <span className="font-semibold">${item.price.toFixed(2)}</span>
+                            <span className="font-semibold">₹{item.price.toFixed(2)}</span>
                           </div>
                         </div>
                         
                         <div className="text-right">
                           <p className="font-bold text-stone-800">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            ₹{(item.price * item.quantity).toFixed(2)}
                           </p>
                         </div>
                       </div>
@@ -342,7 +342,7 @@ const MyOrders: React.FC = () => {
               </div>
               <div className="text-center">
                 <p className="text-3xl font-bold text-green-600">
-                  ${filteredOrders.reduce((sum, order) => sum + order.totalAmount, 0).toFixed(2)}
+                  ₹{filteredOrders.reduce((sum, order) => sum + order.totalAmount, 0).toFixed(2)}
                 </p>
                 <p className="text-stone-600 font-cormorant">Total Spent</p>
               </div>
