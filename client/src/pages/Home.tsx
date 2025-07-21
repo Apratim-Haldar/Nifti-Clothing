@@ -63,7 +63,7 @@ const Home: React.FC = () => {
               <div className="w-8 h-8 border-2 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
           </div>
-          <p className="font-cormorant text-stone-600 text-lg">Loading your Nfiti experience...</p>
+          <p className="font-cormorant text-stone-600 text-lg">Loading your Nifti experience...</p>
         </div>
       </div>
     )

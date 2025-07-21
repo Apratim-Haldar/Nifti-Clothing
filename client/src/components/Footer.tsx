@@ -29,12 +29,12 @@ const Footer = () => {
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center border border-black">
                   <img
                     src="/logo.jpg"
-                    alt="Nfiti Logo"
+                    alt="Nifti Logo"
                     className="w-12 h-12 object-cover"
                   />
                 </div>
                 <div>
-                  <span className="font-playfair text-2xl font-bold text-white">Nfiti</span>
+                  <span className="font-playfair text-2xl font-bold text-white">Nifti</span>
                   <div className="text-xs font-cormorant text-stone-300 -mt-1">Clothing</div>
                 </div>
               </div>

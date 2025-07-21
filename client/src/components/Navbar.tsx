@@ -47,7 +47,7 @@ export default function Navbar() {
               <div className="absolute -inset-1 bg-gradient-to-r from-amber-200 to-amber-300 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300 -z-10"></div>
             </div>
             <div>
-              <span className="font-playfair text-2xl font-bold text-stone-800">Nfiti</span>
+              <span className="font-playfair text-2xl font-bold text-stone-800">Nifti</span>
               <div className="text-xs font-cormorant text-stone-600 -mt-1">Clothing</div>
             </div>
           </Link>

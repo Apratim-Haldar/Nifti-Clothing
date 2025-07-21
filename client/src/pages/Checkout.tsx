@@ -1,12 +1,10 @@
-"use client"
-
 import type React from "react"
 import { useCart } from "../context/CartContext"
 import { useAuth } from "../context/AuthContext"
 import { useToast } from "../context/ToastContext"
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { User, Mail, Phone, MapPin, ShoppingBag, CheckCircle, X, Package, CreditCard, Truck, Shield } from "lucide-react"
+import { User, Mail, Phone, MapPin, ShoppingBag, CheckCircle, X, Package, CreditCard, Truck, Shield, Home, Building, Globe } from "lucide-react"
 import axios from "axios"
 
 interface OrderConfirmationModalProps {
@@ -29,6 +27,18 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
   orderDetails,
 }) => {
   if (!isOpen) return null
+
+  // Format address for display
+  const formatAddress = (addressInfo: any) => {
+    const parts = []
+    if (addressInfo.streetAddress) parts.push(addressInfo.streetAddress)
+    if (addressInfo.apartment) parts.push(addressInfo.apartment)
+    if (addressInfo.city) parts.push(addressInfo.city)
+    if (addressInfo.state) parts.push(addressInfo.state)
+    if (addressInfo.pincode) parts.push(addressInfo.pincode)
+    if (addressInfo.country) parts.push(addressInfo.country)
+    return parts.join(', ')
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -66,7 +76,7 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
               </div>
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 text-stone-500 mt-1" />
-                <span className="font-cormorant"><strong>Address:</strong> {orderDetails.customerInfo.address}</span>
+                <span className="font-cormorant"><strong>Address:</strong> {formatAddress(orderDetails.customerInfo)}</span>
               </div>
             </div>
           </div>
@@ -156,7 +166,13 @@ const Checkout = () => {
     name: user?.name || "",
     email: user?.email || "",
     phone: user?.phone || "",
-    address: "",
+    streetAddress: "",
+    apartment: "",
+    city: "",
+    state: "",
+    pincode: "",
+    country: "India",
+    addressType: "home", // home, office, other
   })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -166,16 +182,50 @@ const Checkout = () => {
   const tax = subtotal * 0.1
   const total = subtotal + tax
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Indian states for dropdown
+  const indianStates = [
+    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", 
+    "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", 
+    "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", 
+    "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", 
+    "Uttarakhand", "West Bengal", "Delhi", "Jammu and Kashmir", "Ladakh", "Puducherry", 
+    "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Lakshadweep", "Andaman and Nicobar Islands"
+  ]
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  const validateForm = () => {
+    const requiredFields = ['name', 'email', 'phone', 'streetAddress', 'city', 'state', 'pincode', 'country']
+    const missingFields = requiredFields.filter(field => !form[field as keyof typeof form]?.toString().trim())
+    
+    if (missingFields.length > 0) {
+      addToast("Please fill in all required fields", "error")
+      return false
+    }
+
+    // Validate pincode format (Indian pincode)
+    const pincodeRegex = /^[1-9][0-9]{5}$/
+    if (!pincodeRegex.test(form.pincode)) {
+      addToast("Please enter a valid 6-digit pincode", "error")
+      return false
+    }
+
+    // Validate phone number
+    const phoneRegex = /^[6-9]\d{9}$/
+    if (!phoneRegex.test(form.phone.replace(/\s+/g, ''))) {
+      addToast("Please enter a valid 10-digit Indian mobile number", "error")
+      return false
+    }
+
+    return true
   }
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Validate form
-    if (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !form.address.trim()) {
-      addToast("Please fill in all required fields", "error")
+    if (!validateForm()) {
       return
     }
 
@@ -193,10 +243,22 @@ const Checkout = () => {
 
     try {
       const orderData = {
-        user: form,
-        items: cart,
+        user: {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          address: `${form.streetAddress}, ${form.apartment}, ${form.city}, ${form.state}, ${form.pincode}, ${form.country}`.trim()
+        },
+        items: cart.map(item => ({
+          productId: item.productId,
+          title: item.title,
+          imageUrl: item.imageUrl,
+          price: item.price,
+          size: item.size,
+          quantity: item.quantity
+        })),
         totalAmount: total,
-        status: "pending",
+        status: "pending"
       }
 
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders`, orderData, {
@@ -343,55 +405,54 @@ const Checkout = () => {
                 <h2 className="text-2xl font-playfair font-bold text-stone-800 mb-8">Shipping Information</h2>
                 
                 <form onSubmit={handleFormSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
-                        Full Name *
-                      </label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-stone-400" />
+                  {/* Personal Information */}
+                  <div>
+                    <h3 className="text-lg font-playfair font-semibold text-stone-800 mb-4 flex items-center">
+                      <User className="h-5 w-5 mr-2" />
+                      Personal Details
+                    </h3>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
+                          Full Name *
+                        </label>
                         <input
                           type="text"
                           name="name"
                           placeholder="Enter your full name"
-                          className="w-full pl-12 pr-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
+                          className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
                           value={form.name}
                           onChange={handleChange}
                           required
                         />
                       </div>
-                    </div>
 
-                    <div>
-                      <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
-                        Phone Number *
-                      </label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-stone-400" />
+                      <div>
+                        <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
+                          Phone Number *
+                        </label>
                         <input
                           type="tel"
                           name="phone"
-                          placeholder="Enter your phone number"
-                          className="w-full pl-12 pr-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
+                          placeholder="10-digit mobile number"
+                          className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
                           value={form.phone}
                           onChange={handleChange}
+                          maxLength={10}
                           required
                         />
                       </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
-                      Email Address *
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-stone-400" />
+                    <div className="mt-6">
+                      <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
+                        Email Address *
+                      </label>
                       <input
                         type="email"
                         name="email"
                         placeholder="Enter your email"
-                        className="w-full pl-12 pr-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
+                        className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
                         value={form.email}
                         onChange={handleChange}
                         required
@@ -399,21 +460,181 @@ const Checkout = () => {
                     </div>
                   </div>
 
+                  {/* Address Information */}
                   <div>
-                    <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
-                      Shipping Address *
-                    </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-4 h-5 w-5 text-stone-400" />
-                      <textarea
-                        name="address"
-                        placeholder="Enter your complete address"
-                        className="w-full pl-12 pr-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
-                        rows={4}
-                        value={form.address}
-                        onChange={handleChange}
-                        required
-                      />
+                    <h3 className="text-lg font-playfair font-semibold text-stone-800 mb-4 flex items-center">
+                      <MapPin className="h-5 w-5 mr-2" />
+                      Delivery Address
+                    </h3>
+                    
+                    {/* Address Type */}
+                    <div className="mb-6">
+                      <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-3">
+                        Address Type
+                      </label>
+                      <div className="flex gap-4">
+                        <label className="flex items-center cursor-pointer">
+                          <input
+                            type="radio"
+                            name="addressType"
+                            value="home"
+                            checked={form.addressType === "home"}
+                            onChange={handleChange}
+                            className="sr-only"
+                          />
+                          <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg border-2 transition-colors ${
+                            form.addressType === "home" 
+                              ? "border-stone-800 bg-stone-50" 
+                              : "border-stone-300 hover:border-stone-400"
+                          }`}>
+                            <Home className="h-4 w-4" />
+                            <span className="font-cormorant">Home</span>
+                          </div>
+                        </label>
+                        <label className="flex items-center cursor-pointer">
+                          <input
+                            type="radio"
+                            name="addressType"
+                            value="office"
+                            checked={form.addressType === "office"}
+                            onChange={handleChange}
+                            className="sr-only"
+                          />
+                          <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg border-2 transition-colors ${
+                            form.addressType === "office" 
+                              ? "border-stone-800 bg-stone-50" 
+                              : "border-stone-300 hover:border-stone-400"
+                          }`}>
+                            <Building className="h-4 w-4" />
+                            <span className="font-cormorant">Office</span>
+                          </div>
+                        </label>
+                        <label className="flex items-center cursor-pointer">
+                          <input
+                            type="radio"
+                            name="addressType"
+                            value="other"
+                            checked={form.addressType === "other"}
+                            onChange={handleChange}
+                            className="sr-only"
+                          />
+                          <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg border-2 transition-colors ${
+                            form.addressType === "other" 
+                              ? "border-stone-800 bg-stone-50" 
+                              : "border-stone-300 hover:border-stone-400"
+                          }`}>
+                            <MapPin className="h-4 w-4" />
+                            <span className="font-cormorant">Other</span>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Street Address */}
+                    <div className="grid gap-6 mb-6">
+                      <div>
+                        <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
+                          Street Address *
+                        </label>
+                        <input
+                          type="text"
+                          name="streetAddress"
+                          placeholder="House no., Building name, Street name"
+                          className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
+                          value={form.streetAddress}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
+                          Apartment, suite, etc. (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          name="apartment"
+                          placeholder="Apartment, suite, unit, building, floor, etc."
+                          className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
+                          value={form.apartment}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+
+                    {/* City, State, Pincode */}
+                    <div className="grid md:grid-cols-3 gap-6 mb-6">
+                      <div>
+                        <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
+                          City *
+                        </label>
+                        <input
+                          type="text"
+                          name="city"
+                          placeholder="Enter city"
+                          className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
+                          value={form.city}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
+                          State *
+                        </label>
+                        <select
+                          name="state"
+                          className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
+                          value={form.state}
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="">Select State</option>
+                          {indianStates.map((state) => (
+                            <option key={state} value={state}>
+                              {state}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
+                          Pincode *
+                        </label>
+                        <input
+                          type="text"
+                          name="pincode"
+                          placeholder="6-digit pincode"
+                          className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
+                          value={form.pincode}
+                          onChange={handleChange}
+                          maxLength={6}
+                          pattern="[1-9][0-9]{5}"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Country */}
+                    <div>
+                      <label className="block text-sm font-cormorant font-semibold text-stone-700 mb-2">
+                        Country *
+                      </label>
+                      <div className="relative">
+                        <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-stone-400" />
+                        <select
+                          name="country"
+                          className="w-full pl-12 pr-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-stone-500 transition-colors font-cormorant"
+                          value={form.country}
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="India">India</option>
+                          {/* Add more countries if needed */}
+                        </select>
+                      </div>
                     </div>
                   </div>
 
@@ -483,7 +704,7 @@ const Checkout = () => {
                 </div>
 
                 {/* Security Info */}
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
                   <div className="flex items-start space-x-3">
                     <Shield className="h-5 w-5 text-green-600 mt-1" />
                     <div>
@@ -496,7 +717,7 @@ const Checkout = () => {
                 </div>
 
                 {/* Payment Notice */}
-                <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                   <div className="flex items-start space-x-3">
                     <CreditCard className="h-5 w-5 text-blue-600 mt-1" />
                     <div>
