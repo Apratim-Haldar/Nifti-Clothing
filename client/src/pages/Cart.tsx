@@ -2,7 +2,7 @@
 
 import { useCart } from "../context/CartContext"
 import { Link } from "react-router-dom"
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, ShoppingCart } from "lucide-react"
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, ShoppingCart, Truck } from "lucide-react"
 
 const Cart = () => {
   const { cart, increaseQty, decreaseQty, removeFromCart, clearCart } = useCart()
@@ -149,18 +149,21 @@ const Cart = () => {
                     <span className="text-stone-600">Subtotal ({itemCount} items)</span>
                     <span className="text-stone-800 font-semibold">₹{total.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between font-cormorant">
-                    <span className="text-stone-600">Shipping</span>
-                    <span className="text-green-600 font-semibold">Free</span>
-                  </div>
-                  <div className="flex justify-between font-cormorant">
-                    <span className="text-stone-600">Tax</span>
-                    <span className="text-stone-800 font-semibold">₹{(total * 0.1).toFixed(2)}</span>
-                  </div>
+                  {total > 999 && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-start space-x-3">
+                      <Truck className="h-5 w-5 text-yellow-600 mt-1" />
+                      <div>
+                        <h4 className="font-playfair font-semibold text-yellow-800 text-sm">Shipping Charges</h4>
+                        <p className="mt-1 text-yellow-700 font-cormorant text-sm">
+                          For orders above ₹999, our team will contact you after order placement to inform you about shipping charges. No shipping amount is added at checkout.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   <div className="border-t border-stone-300 pt-4">
                     <div className="flex justify-between text-lg font-playfair font-bold">
                       <span className="text-stone-800">Total</span>
-                      <span className="text-stone-800">₹{(total * 1.1).toFixed(2)}</span>
+                      <span className="text-stone-800">₹{total.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
