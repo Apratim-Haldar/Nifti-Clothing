@@ -303,6 +303,20 @@ const MyOrders: React.FC = () => {
                       <p><strong>Delivery Address:</strong> {order.user.address}</p>
                       {order.notes && <p><strong>Notes:</strong> {order.notes}</p>}
                     </div>
+                    
+                    <div className="flex space-x-4">
+                      
+                      
+                      {canCancelOrder(order) && (
+                        <button
+                          onClick={() => handleCancelOrder(order._id)}
+                          disabled={cancelling === order._id}
+                          className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors font-cormorant"
+                        >
+                          {cancelling === order._id ? 'Cancelling...' : 'Cancel Order'}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
