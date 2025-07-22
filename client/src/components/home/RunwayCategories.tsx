@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { Crown, Scissors, Sparkles, Heart, Star, Award } from "lucide-react"
+import { Crown, ShoppingBag, Sparkles, Heart, Star, Award } from "lucide-react"
 import { Button } from "../ui/button"
 import axios from "axios"
 
@@ -19,7 +19,7 @@ interface Product {
 }
 
 // Icon array to cycle through for products
-const productIcons = [Crown, Scissors, Heart, Sparkles, Star, Award]
+const productIcons = [Crown, ShoppingBag, Heart, Sparkles, Star, Award]
 
 // Updated color schemes - more vibrant and premium looking
 const colorSchemes = [

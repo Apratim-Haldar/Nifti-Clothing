@@ -2,7 +2,7 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Mail, Scissors, Crown, Heart } from "lucide-react"
+import { Mail, ShoppingBag, Crown, Heart } from "lucide-react"
 import axios from "axios"
 
 export function BoutiqueNewsletter() {
@@ -74,11 +74,11 @@ export function BoutiqueNewsletter() {
 
           <div className="mb-8 mt-4">
             <div className="flex items-center justify-center space-x-3 mb-6">
-              <Scissors className="h-5 w-5 text-amber-600" />
+              <ShoppingBag className="h-5 w-5 text-amber-600" />
               <span className="text-sm font-cormorant font-medium text-amber-700 tracking-wider uppercase">
                 Join The Nifti Community
               </span>
-              <Scissors className="h-5 w-5 text-amber-600 scale-x-[-1]" />
+              <ShoppingBag className="h-5 w-5 text-amber-600 scale-x-[-1]" />
             </div>
 
             <h2 className="text-4xl font-playfair font-bold mb-6 text-stone-800">

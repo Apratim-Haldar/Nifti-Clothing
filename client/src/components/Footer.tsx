@@ -7,7 +7,7 @@ import {
   Mail,
   Phone,
   MapPin,
-  Scissors,
+  ShoppingBag,
   Heart,
 } from "lucide-react";
 
@@ -110,7 +110,7 @@ const Footer = () => {
             {/* Contact Information */}
             <div>
               <div className="flex items-center space-x-2 mb-6">
-                <Scissors className="h-5 w-5 text-amber-400" />
+          <ShoppingBag className="h-5 w-5 text-amber-400" />
                 <h3 className="font-playfair font-semibold text-lg text-white">Nifti Contact</h3>
               </div>
               <div className="space-y-4">

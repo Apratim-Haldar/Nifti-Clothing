@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { Heart, ShoppingBag, Star, Award, Scissors, Crown, Sparkles } from "lucide-react"
+import { Heart, ShoppingBag, Star, Award, Crown, Sparkles } from "lucide-react"
 
 const featuredPieces = [
   {
@@ -56,11 +56,11 @@ export function AtelierShowcase() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
           <div className="flex items-center justify-center space-x-3 mb-6">
-            <Scissors className="h-6 w-6 text-amber-600" />
+            <ShoppingBag className="h-6 w-6 text-amber-600" />
             <span className="text-sm font-cormorant font-medium text-amber-700 tracking-wider uppercase">
               Handpicked by our Master Craftsmen
             </span>
-            <Scissors className="h-6 w-6 text-amber-600 scale-x-[-1]" />
+            <ShoppingBag className="h-6 w-6 text-amber-600 scale-x-[-1]" />
           </div>
           <h2 className="text-5xl font-playfair font-bold mb-6 text-stone-800">
             Nifti <span className="text-amber-700">Masterpieces</span>
