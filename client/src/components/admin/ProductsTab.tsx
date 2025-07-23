@@ -405,28 +405,7 @@ const ProductsTab: React.FC = () => {
     }
   };
 
-  const handleAddAdditionalImage = async (file: File) => {
-    setUploading(true);
-    try {
-      // Upload new image to S3
-      const imageUrl = await uploadAdditionalImage(file);
-      // Only add to formData if upload succeeded
-      if (imageUrl) {
-        setFormData(prev => ({
-          ...prev,
-          additionalImages: [...prev.additionalImages, imageUrl]
-        }));
-        addToast('Additional image uploaded successfully!', 'success');
-      } else {
-        addToast('Failed to upload additional image. Please try again.', 'error');
-      }
-    } catch (error) {
-      console.error('Error uploading additional image:', error);
-      addToast('Failed to upload additional image. Please try again.', 'error');
-    } finally {
-      setUploading(false);
-    }
-  };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
