@@ -83,6 +83,9 @@ const ProductDetail: React.FC = () => {
         setLoading(true)
         const response = await axios.get<Product>(`${import.meta.env.VITE_API_BASE_URL}/products/${id}`)
         const productData = response.data
+        console.log('🔍 Product data received:', productData)
+        console.log('🖼️ Additional images:', productData.additionalImages)
+        console.log('🎨 Color images:', productData.colorImages)
         setProduct(productData)
         setCurrentImage(productData.imageUrl)
 
@@ -328,6 +331,11 @@ const ProductDetail: React.FC = () => {
     ...(product.additionalImages || []),
     ...(product.colorImages?.map(img => img.imageUrl) || [])
   ].filter((url, index, arr) => arr.indexOf(url) === index) // Remove duplicates
+
+  console.log('🖼️ Combined product images:', productImages)
+  console.log('📸 Main image:', product.imageUrl)
+  console.log('➕ Additional images:', product.additionalImages)
+  console.log('🎨 Color image URLs:', product.colorImages?.map(img => img.imageUrl))
 
   return (
     <div className="min-h-screen bg-white pt-20">

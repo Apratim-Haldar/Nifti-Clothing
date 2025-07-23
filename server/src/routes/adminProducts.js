@@ -14,129 +14,105 @@ router.use(assetCleanupMiddleware);
 
 // S3 TEMPORARY UPLOAD ROUTES
 
-// Upload temporary product image
-router.post('/upload/temp/product-image', verifyToken, verifyAdmin, (req, res) => {
-  uploadProductTemp.single('image')(req, res, (err) => {
-    if (err) {
-      return handleS3Error(err, req, res);
-    }
-    
-    if (!req.file) {
-      return res.status(400).json({ 
-        success: false,
-        message: 'No file uploaded' 
+router.post(
+  '/upload/temp/product-image',
+  verifyToken,
+  verifyAdmin,
+  (req, res) => {
+    uploadProductTemp.single('image')(req, res, err => {
+      if (err) return handleS3Error(err, req, res);
+      if (!req.file)
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+
+      s3AssetManager.registerTempAsset(req.sessionId, req.file.key, 'products');
+      res.json({
+        success: true,
+        message: 'Product image uploaded temporarily',
+        imageUrl: req.file.location,
+        filename: req.file.key,
+        sessionId: req.sessionId
       });
-    }
-
-    // Register temporary asset
-    s3AssetManager.registerTempAsset(req.sessionId, req.file.key, 'products');
-
-    res.json({
-      success: true,
-      message: 'Product image uploaded temporarily',
-      imageUrl: req.file.location,
-      filename: req.file.key,
-      sessionId: req.sessionId
     });
-  });
-});
+  }
+);
 
-// Upload temporary hero image
-router.post('/upload/temp/hero-image', verifyToken, verifyAdmin, (req, res) => {
-  uploadHeroTemp.single('image')(req, res, (err) => {
-    if (err) {
-      return handleS3Error(err, req, res);
-    }
-    
-    if (!req.file) {
-      return res.status(400).json({ 
-        success: false,
-        message: 'No file uploaded' 
+router.post(
+  '/upload/temp/hero-image',
+  verifyToken,
+  verifyAdmin,
+  (req, res) => {
+    uploadHeroTemp.single('image')(req, res, err => {
+      if (err) return handleS3Error(err, req, res);
+      if (!req.file)
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+
+      s3AssetManager.registerTempAsset(req.sessionId, req.file.key, 'hero');
+      res.json({
+        success: true,
+        message: 'Hero image uploaded temporarily',
+        imageUrl: req.file.location,
+        filename: req.file.key,
+        sessionId: req.sessionId
       });
-    }
-
-    // Register temporary asset
-    s3AssetManager.registerTempAsset(req.sessionId, req.file.key, 'hero');
-
-    res.json({
-      success: true,
-      message: 'Hero image uploaded temporarily',
-      imageUrl: req.file.location,
-      filename: req.file.key,
-      sessionId: req.sessionId
     });
-  });
-});
+  }
+);
 
-// Upload temporary color image
-router.post('/upload/temp/color-image', verifyToken, verifyAdmin, (req, res) => {
-  uploadProductTemp.single('image')(req, res, (err) => {
-    if (err) {
-      return handleS3Error(err, req, res);
-    }
-    
-    if (!req.file) {
-      return res.status(400).json({ 
-        success: false,
-        message: 'No file uploaded' 
+router.post(
+  '/upload/temp/color-image',
+  verifyToken,
+  verifyAdmin,
+  (req, res) => {
+    uploadProductTemp.single('image')(req, res, err => {
+      if (err) return handleS3Error(err, req, res);
+      if (!req.file)
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+
+      const { color } = req.body;
+      if (!color)
+        return res.status(400).json({ success: false, message: 'Color is required' });
+
+      s3AssetManager.registerTempAsset(req.sessionId, req.file.key, 'products');
+      res.json({
+        success: true,
+        message: 'Color image uploaded temporarily',
+        imageUrl: req.file.location,
+        filename: req.file.key,
+        color,
+        sessionId: req.sessionId
       });
-    }
-
-    const { color } = req.body;
-    if (!color) {
-      return res.status(400).json({ 
-        success: false,
-        message: 'Color is required' 
-      });
-    }
-
-    // Register temporary asset
-    s3AssetManager.registerTempAsset(req.sessionId, req.file.key, 'products');
-
-    res.json({
-      success: true,
-      message: 'Color image uploaded temporarily',
-      imageUrl: req.file.location,
-      filename: req.file.key,
-      color: color,
-      sessionId: req.sessionId
     });
-  });
-});
+  }
+);
 
-// Upload temporary additional image
-router.post('/upload/temp/additional-image', verifyToken, verifyAdmin, (req, res) => {
-  uploadProductTemp.single('image')(req, res, (err) => {
-    if (err) {
-      return handleS3Error(err, req, res);
-    }
-    
-    if (!req.file) {
-      return res.status(400).json({ 
-        success: false,
-        message: 'No file uploaded' 
+router.post(
+  '/upload/temp/additional-image',
+  verifyToken,
+  verifyAdmin,
+  (req, res) => {
+    uploadProductTemp.single('image')(req, res, err => {
+      if (err) return handleS3Error(err, req, res);
+      if (!req.file)
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+
+      s3AssetManager.registerTempAsset(req.sessionId, req.file.key, 'products');
+      res.json({
+        success: true,
+        message: 'Additional image uploaded temporarily',
+        imageUrl: req.file.location,
+        filename: req.file.key,
+        sessionId: req.sessionId
       });
-    }
-
-    // Register temporary asset
-    s3AssetManager.registerTempAsset(req.sessionId, req.file.key, 'products');
-
-    res.json({
-      success: true,
-      message: 'Additional image uploaded temporarily',
-      imageUrl: req.file.location,
-      filename: req.file.key,
-      sessionId: req.sessionId
     });
-  });
-});
+  }
+);
 
 // Manual session cleanup endpoint
 router.post('/cleanup-session', verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { sessionId } = req.body;
     const targetSessionId = sessionId || req.sessionId;
-    
+
     if (!targetSessionId) {
       return res.status(400).json({
         success: false,
@@ -145,7 +121,7 @@ router.post('/cleanup-session', verifyToken, verifyAdmin, async (req, res) => {
     }
 
     await s3AssetManager.cleanupSession(targetSessionId);
-    
+
     res.json({
       success: true,
       message: 'Session assets cleaned up successfully'
@@ -167,11 +143,11 @@ router.post('/upload/product-image', verifyToken, verifyAdmin, (req, res) => {
     if (err) {
       return handleS3Error(err, req, res);
     }
-    
+
     if (!req.file) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'No file uploaded' 
+        message: 'No file uploaded'
       });
     }
 
@@ -190,11 +166,11 @@ router.post('/upload/hero-image', verifyToken, verifyAdmin, (req, res) => {
     if (err) {
       return handleS3Error(err, req, res);
     }
-    
+
     if (!req.file) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'No file uploaded' 
+        message: 'No file uploaded'
       });
     }
 
@@ -213,19 +189,19 @@ router.post('/upload/color-image', verifyToken, verifyAdmin, (req, res) => {
     if (err) {
       return handleS3Error(err, req, res);
     }
-    
+
     if (!req.file) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'No file uploaded' 
+        message: 'No file uploaded'
       });
     }
 
     const { color } = req.body;
     if (!color) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Color is required' 
+        message: 'Color is required'
       });
     }
 
@@ -243,16 +219,16 @@ router.post('/upload/color-image', verifyToken, verifyAdmin, (req, res) => {
 router.delete('/upload/delete-image', verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { imageUrl } = req.body;
-    
+
     if (!imageUrl) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Image URL is required' 
+        message: 'Image URL is required'
       });
     }
 
     const deleted = await deleteFromS3(imageUrl);
-    
+
     if (deleted) {
       res.json({
         success: true,
@@ -280,45 +256,49 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
   console.log('📋 Request body:', JSON.stringify(req.body, null, 2));
   console.log('🆔 Session ID from header:', req.headers['x-session-id']);
   console.log('🆔 Session ID from request:', req.sessionId);
-  
+
   try {
-    const { 
-      title, 
-      description, 
-      price, 
-      sizes, 
-      colors, 
+    const {
+      title,
+      description,
+      price,
+      sizes,
+      colors,
       colorImages,
-      imageUrl, 
-      categories, 
-      isHero, 
-      heroImage, 
+      imageUrl,
+      categories,
+      isHero,
+      heroImage,
       heroTagline,
       stock,
       gender,
       lowStockThreshold,
       defaultColor,
-      sessionId
+      sessionId,
+      additionalImages
     } = req.body;
+
+    console.log('🖼️ Additional images from request:', additionalImages);
+    console.log('🎨 Color images from request:', colorImages);
 
     // Validate required fields
     if (!title || !description || !price || !imageUrl || !gender) {
-      return res.status(400).json({ 
-        message: 'Missing required fields: title, description, price, imageUrl, and gender are required' 
+      return res.status(400).json({
+        message: 'Missing required fields: title, description, price, imageUrl, and gender are required'
       });
     }
 
     // Validate gender enum
     if (!['Men', 'Women', 'Unisex'].includes(gender)) {
-      return res.status(400).json({ 
-        message: 'Gender must be one of: Men, Women, Unisex' 
+      return res.status(400).json({
+        message: 'Gender must be one of: Men, Women, Unisex'
       });
     }
 
     // Validate sizes - at least one required
     if (!sizes || sizes.length === 0) {
-      return res.status(400).json({ 
-        message: 'At least one size is required' 
+      return res.status(400).json({
+        message: 'At least one size is required'
       });
     }
 
@@ -340,6 +320,7 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
     let finalImageUrl = imageUrl;
     let finalHeroImage = heroImage;
     let finalColorImages = colorImages || [];
+    let finalAdditionalImages = additionalImages || [];
 
     const targetSessionId = sessionId || req.sessionId;
 
@@ -400,6 +381,35 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
         }
         finalColorImages = movedColorImages;
       }
+
+      // Move additional images if they're temporary
+      if (finalAdditionalImages && finalAdditionalImages.length > 0) {
+        console.log('🖼️ Processing additional images:', finalAdditionalImages);
+        const movedAdditionalImages = [];
+        for (const imageUrl of finalAdditionalImages) {
+          console.log(`🔍 Checking if ${imageUrl} is temp asset:`, s3AssetManager.isTempAsset(imageUrl));
+          if (s3AssetManager.isTempAsset(imageUrl)) {
+            const tempKey = s3AssetManager.extractKeyFromUrl(imageUrl);
+            console.log(`🔑 Extracted temp key: ${tempKey}`);
+            if (tempKey) {
+              try {
+                const finalUrl = await s3AssetManager.moveToFinal(tempKey, 'products');
+                console.log(`✅ Moved additional image from ${imageUrl} to ${finalUrl}`);
+                movedAdditionalImages.push(finalUrl);
+              } catch (moveError) {
+                console.warn(`⚠️ Could not move additional image ${tempKey}, using original URL:`, moveError.message);
+                // Keep the original image if moving fails
+                movedAdditionalImages.push(imageUrl);
+              }
+            }
+          } else {
+            console.log(`📋 Keeping non-temp additional image: ${imageUrl}`);
+            movedAdditionalImages.push(imageUrl);
+          }
+        }
+        finalAdditionalImages = movedAdditionalImages;
+        console.log('🏁 Final additional images:', finalAdditionalImages);
+      }
     } catch (assetError) {
       console.error('Error moving temporary assets:', assetError);
       // Don't fail the entire product creation if asset movement fails
@@ -421,7 +431,7 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
       colorImages: finalColorImages,
       defaultColor: finalDefaultColor,
       imageUrl: finalImageUrl,
-      additionalImages: additionalImages || [],
+      additionalImages: finalAdditionalImages || [],
       categories: categories || [],
       isHero: isHero || false,
       heroImage: finalHeroImage || null,
@@ -433,33 +443,33 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
     });
 
     await product.save();
-    
+
     // Populate categories for response
     await product.populate('categories');
-    
+
     // Clean up any remaining temporary assets for this session
     if (targetSessionId) {
       s3AssetManager.markSessionInactive(targetSessionId);
       await s3AssetManager.cleanupSession(targetSessionId);
     }
-    
-    res.status(201).json({ 
-      message: 'Product created successfully', 
-      product 
+
+    res.status(201).json({
+      message: 'Product created successfully',
+      product
     });
   } catch (error) {
     console.error('Error creating product:', error);
-    
+
     // Clean up temporary assets on error
     const targetSessionId = req.body.sessionId || req.sessionId;
     if (targetSessionId) {
       s3AssetManager.markSessionInactive(targetSessionId);
       await s3AssetManager.cleanupSession(targetSessionId);
     }
-    
-    res.status(500).json({ 
-      message: 'Failed to create product', 
-      error: error.message 
+
+    res.status(500).json({
+      message: 'Failed to create product',
+      error: error.message
     });
   }
 });
@@ -467,118 +477,170 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
 // UPDATE product
 router.put('/:id', verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const { 
-      title, 
-      description, 
-      price, 
-      sizes, 
-      colors, 
+    // -----------------------------------------------------------------------
+    // 1️⃣  Destructure payload
+    // -----------------------------------------------------------------------
+    const {
+      title,
+      description,
+      price,
+      sizes,
+      colors,
       colorImages,
-      imageUrl, 
+      imageUrl,
       additionalImages,
-      categories, 
-      isHero, 
-      heroImage, 
+      categories,
+      isHero,
+      heroImage,
       heroTagline,
       stock,
       gender,
       lowStockThreshold,
       defaultColor,
+
+      // housekeeping helpers coming from the admin UI
       oldImageUrl,
-      oldColorImages
+      oldColorImages,
+      oldAdditionalImages,
+      oldHeroImage,
+      sessionId
     } = req.body;
 
+    // -----------------------------------------------------------------------
+    // 2️⃣  Fetch product & sanity check
+    // -----------------------------------------------------------------------
     const product = await Product.findById(req.params.id);
-    if (!product) {
+    if (!product)
       return res.status(404).json({ message: 'Product not found' });
+
+    // -----------------------------------------------------------------------
+    // 3️⃣  🔀  MOVE TEMP ASSETS → FINAL FOLDERS
+    // -----------------------------------------------------------------------
+    // Helper that conditionally moves a temp asset
+    const moveIfTemp = async url => {
+      if (url && s3AssetManager.isTempAsset(url)) {
+        const final = await s3AssetManager.moveToFinal(url, 'products');
+        return final;
+      }
+      return url;
+    };
+
+    // Main image
+    let finalImageUrl = await moveIfTemp(imageUrl || product.imageUrl);
+
+    // Hero image
+    let finalHeroImage = await moveIfTemp(heroImage || product.heroImage);
+
+    // Color images
+    let finalColorImages = [];
+    if (colorImages && Array.isArray(colorImages)) {
+      for (const img of colorImages) {
+        finalColorImages.push({
+          color: img.color,
+          imageUrl: await moveIfTemp(img.imageUrl)
+        });
+      }
+    } else {
+      finalColorImages = product.colorImages;
     }
 
-    // Delete old main image if a new one is provided
-    if (imageUrl && oldImageUrl && imageUrl !== oldImageUrl) {
+    // Additional images
+    let finalAdditionalImages = [];
+    if (additionalImages && Array.isArray(additionalImages)) {
+      for (const imgUrl of additionalImages) {
+        finalAdditionalImages.push(await moveIfTemp(imgUrl));
+      }
+    } else {
+      finalAdditionalImages = product.additionalImages;
+    }
+
+    // -----------------------------------------------------------------------
+    // 4️⃣  🚮  DELETE ASSETS NO LONGER USED
+    // -----------------------------------------------------------------------
+    // Main image
+    if (oldImageUrl && oldImageUrl !== finalImageUrl)
       await deleteFromS3(oldImageUrl);
-    }
 
-    // Delete old color images that are no longer used
+    // Hero image
+    if (oldHeroImage && oldHeroImage !== finalHeroImage)
+      await deleteFromS3(oldHeroImage);
+
+    // Color images
     if (oldColorImages && Array.isArray(oldColorImages)) {
-      const newColorImageUrls = (colorImages || []).map(img => img.imageUrl);
-      for (const oldImg of oldColorImages) {
-        if (!newColorImageUrls.includes(oldImg.imageUrl)) {
-          await deleteFromS3(oldImg.imageUrl);
-        }
+      const newColorUrls = finalColorImages.map(ci => ci.imageUrl);
+      for (const old of oldColorImages) {
+        if (!newColorUrls.includes(old.imageUrl))
+          await deleteFromS3(old.imageUrl);
       }
     }
 
-    // Validate required fields
-    if (title !== undefined && !title) {
-      return res.status(400).json({ message: 'Title cannot be empty' });
+    // Additional images
+    if (oldAdditionalImages && Array.isArray(oldAdditionalImages)) {
+      for (const old of oldAdditionalImages) {
+        if (!finalAdditionalImages.includes(old))
+          await deleteFromS3(old);
+      }
     }
 
-    if (gender && !['Men', 'Women', 'Unisex'].includes(gender)) {
-      return res.status(400).json({ 
-        message: 'Gender must be one of: Men, Women, Unisex' 
-      });
-    }
+    // -----------------------------------------------------------------------
+    // 5️⃣  BUILD UPDATE OBJECT
+    // -----------------------------------------------------------------------
+    const finalDefaultColor =
+      defaultColor ||
+      (colors && colors.length ? defaultColor : product.defaultColor);
 
-    // Validate sizes
-    if (sizes && sizes.length === 0) {
-      return res.status(400).json({ 
-        message: 'At least one size is required' 
-      });
-    }
-
-    // Validate stock
-    if (stock !== undefined && stock < 0) {
-      return res.status(400).json({ message: 'Stock cannot be negative' });
-    }
-
-    // Set default color if colors exist
-    let finalDefaultColor = defaultColor;
-    if (colors && colors.length > 0 && !finalDefaultColor) {
-      finalDefaultColor = colors[0];
-    }
-
-    // Update fields
     const updateData = {
-      ...(title !== undefined && { title }),
-      ...(description !== undefined && { description }),
-      ...(price !== undefined && { price }),
-      ...(sizes !== undefined && { sizes }),
-      ...(colors !== undefined && { colors }),
-      ...(colorImages !== undefined && { colorImages }),
-      ...(finalDefaultColor !== undefined && { defaultColor: finalDefaultColor }),
-      ...(imageUrl !== undefined && { imageUrl }),
-      ...(additionalImages !== undefined && { additionalImages }),
-      ...(categories !== undefined && { categories }),
-      ...(isHero !== undefined && { isHero }),
-      ...(heroImage !== undefined && { heroImage }),
-      ...(heroTagline !== undefined && { heroTagline }),
-      ...(stock !== undefined && { 
-        stock, 
-        inStock: stock > 0 
+      ...(title           !== undefined && { title }),
+      ...(description     !== undefined && { description }),
+      ...(price           !== undefined && { price }),
+      ...(sizes           !== undefined && { sizes }),
+      ...(colors          !== undefined && { colors }),
+      ...(categories      !== undefined && { categories }),
+      ...(isHero          !== undefined && { isHero }),
+      ...(heroTagline     !== undefined && { heroTagline }),
+      ...(gender          !== undefined && { gender }),
+      ...(lowStockThreshold !== undefined && { lowStockThreshold }),
+      ...(stock !== undefined && {
+        stock,
+        inStock: stock > 0
       }),
-      ...(gender !== undefined && { gender }),
-      ...(lowStockThreshold !== undefined && { lowStockThreshold })
+      ...(finalDefaultColor !== undefined && { defaultColor: finalDefaultColor }),
+      imageUrl:        finalImageUrl,
+      heroImage:       finalHeroImage,
+      colorImages:     finalColorImages,
+      additionalImages: finalAdditionalImages
     };
 
+    // -----------------------------------------------------------------------
+    // 6️⃣  PERSIST & RETURN
+    // -----------------------------------------------------------------------
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       updateData,
       { new: true, runValidators: true }
     ).populate('categories');
 
-    res.json({ 
-      message: 'Product updated successfully', 
-      product: updatedProduct 
+    // -----------------------------------------------------------------------
+    // 7️⃣  CLEANUP SESSION ASSETS
+    // -----------------------------------------------------------------------
+    const targetSessionId = sessionId || req.sessionId;
+    if (targetSessionId) {
+      s3AssetManager.markSessionInactive(targetSessionId);
+      await s3AssetManager.cleanupSession(targetSessionId);
+    }
+
+    res.json({
+      message: 'Product updated successfully',
+      product: updatedProduct
     });
-  } catch (error) {
-    console.error('Error updating product:', error);
-    res.status(500).json({ 
-      message: 'Failed to update product', 
-      error: error.message 
+  } catch (err) {
+    console.error('Error updating product:', err);
+    res.status(500).json({
+      message: 'Failed to update product',
+      error: err.message
     });
   }
 });
-
 // DELETE product
 router.delete('/:id', verifyToken, verifyAdmin, async (req, res) => {
   try {
@@ -605,13 +667,13 @@ router.delete('/:id', verifyToken, verifyAdmin, async (req, res) => {
     }
 
     await Product.findByIdAndDelete(req.params.id);
-    
+
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     console.error('Error deleting product:', error);
-    res.status(500).json({ 
-      message: 'Failed to delete product', 
-      error: error.message 
+    res.status(500).json({
+      message: 'Failed to delete product',
+      error: error.message
     });
   }
 });
@@ -625,9 +687,9 @@ router.get('/', async (req, res) => {
     res.json(products);
   } catch (error) {
     console.error('Error fetching products:', error);
-    res.status(500).json({ 
-      message: 'Failed to fetch products', 
-      error: error.message 
+    res.status(500).json({
+      message: 'Failed to fetch products',
+      error: error.message
     });
   }
 });
@@ -642,9 +704,9 @@ router.get('/:id', async (req, res) => {
     res.json(product);
   } catch (error) {
     console.error('Error fetching product:', error);
-    res.status(500).json({ 
-      message: 'Failed to fetch product', 
-      error: error.message 
+    res.status(500).json({
+      message: 'Failed to fetch product',
+      error: error.message
     });
   }
 });
@@ -654,7 +716,7 @@ router.patch('/:id/stock', verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { stock, operation } = req.body;
     const product = await Product.findById(req.params.id);
-    
+
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
@@ -682,15 +744,15 @@ router.patch('/:id/stock', verifyToken, verifyAdmin, async (req, res) => {
     product.inStock = newStock > 0;
     await product.save();
 
-    res.json({ 
-      message: 'Stock updated successfully', 
+    res.json({
+      message: 'Stock updated successfully',
       product: await product.populate('categories', 'name')
     });
   } catch (error) {
     console.error('Error updating stock:', error);
-    res.status(500).json({ 
-      message: 'Failed to update stock', 
-      error: error.message 
+    res.status(500).json({
+      message: 'Failed to update stock',
+      error: error.message
     });
   }
 });
@@ -699,7 +761,7 @@ router.patch('/:id/stock', verifyToken, verifyAdmin, async (req, res) => {
 router.put('/bulk/stock', verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { updates } = req.body;
-    
+
     if (!updates || !Array.isArray(updates)) {
       return res.status(400).json({ message: 'Updates array is required' });
     }
@@ -708,10 +770,10 @@ router.put('/bulk/stock', verifyToken, verifyAdmin, async (req, res) => {
       if (stock < 0) {
         throw new Error(`Stock cannot be negative for product ${productId}`);
       }
-      
+
       return Product.findByIdAndUpdate(
         productId,
-        { 
+        {
           stock,
           inStock: stock > 0
         },
@@ -723,9 +785,9 @@ router.put('/bulk/stock', verifyToken, verifyAdmin, async (req, res) => {
     res.json({ message: 'Stock updated successfully for all products' });
   } catch (error) {
     console.error('Error updating stock:', error);
-    res.status(500).json({ 
-      message: 'Failed to update stock', 
-      error: error.message 
+    res.status(500).json({
+      message: 'Failed to update stock',
+      error: error.message
     });
   }
 });
@@ -741,13 +803,13 @@ router.get('/alerts/low-stock', verifyToken, verifyAdmin, async (req, res) => {
         ]
       }
     }).populate('categories', 'name').sort({ stock: 1 });
-    
+
     res.json(products);
   } catch (error) {
     console.error('Error fetching low stock products:', error);
-    res.status(500).json({ 
-      message: 'Failed to fetch low stock products', 
-      error: error.message 
+    res.status(500).json({
+      message: 'Failed to fetch low stock products',
+      error: error.message
     });
   }
 });

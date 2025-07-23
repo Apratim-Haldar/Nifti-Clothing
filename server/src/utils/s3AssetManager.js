@@ -27,6 +27,8 @@ class S3AssetManager {
     try {
       const bucketName = process.env.AWS_S3_BUCKET;
       
+      console.log(`🔄 Moving asset from temp to final: ${tempKey} -> ${type}`);
+      
       // First check if the temp file exists
       const headCommand = new HeadObjectCommand({
         Bucket: bucketName,
@@ -35,6 +37,7 @@ class S3AssetManager {
 
       try {
         await s3.send(headCommand);
+        console.log(`✅ Temp asset exists: ${tempKey}`);
       } catch (headError) {
         if (headError.name === 'NoSuchKey' || headError.name === 'NotFound') {
           console.warn(`⚠️ Temp asset not found (may have been cleaned up): ${tempKey}`);
@@ -52,6 +55,8 @@ class S3AssetManager {
       const finalFilename = newFilename || originalFilename;
       const finalKey = `${this.finalPrefix[type]}${finalFilename}`;
 
+      console.log(`📁 Final key will be: ${finalKey}`);
+
       // Copy object to final location
       const copyCommand = new CopyObjectCommand({
         Bucket: bucketName,
@@ -61,11 +66,14 @@ class S3AssetManager {
       });
 
       await s3.send(copyCommand);
+      console.log(`✅ Asset copied to final location: ${finalKey}`);
 
       // Delete temporary file
       await this.deleteTemp(tempKey);
 
-      return getS3Url(finalKey);
+      const finalUrl = getS3Url(finalKey);
+      console.log(`🌐 Final URL: ${finalUrl}`);
+      return finalUrl;
     } catch (error) {
       console.error('Error moving asset to final location:', error);
       throw new Error('Failed to finalize asset upload');
@@ -174,7 +182,9 @@ class S3AssetManager {
    * @returns {boolean}
    */
   isTempAsset(url) {
-    return url.includes(this.tempPrefix);
+    const isTemp = url.includes(this.tempPrefix);
+    console.log(`🔍 isTempAsset check: ${url} includes "${this.tempPrefix}" = ${isTemp}`);
+    return isTemp;
   }
 
   /**
