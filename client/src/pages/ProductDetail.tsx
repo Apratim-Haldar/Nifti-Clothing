@@ -17,6 +17,7 @@ interface Product {
   colors?: string[]
   colorImages?: Array<{ color: string; imageUrl: string }>
   imageUrl: string
+  additionalImages?: string[]
   stock: number
   stockStatus: "In Stock" | "Low Stock" | "Out of Stock"
   gender: "Men" | "Women" | "Unisex"
@@ -322,9 +323,11 @@ const ProductDetail: React.FC = () => {
     )
   }
 
-  const productImages = product.colorImages.length > 0 
-    ? product.colorImages.map(img => img.imageUrl)
-    : [product.imageUrl]
+  const productImages = [
+    product.imageUrl,
+    ...(product.additionalImages || []),
+    ...(product.colorImages?.map(img => img.imageUrl) || [])
+  ].filter((url, index, arr) => arr.indexOf(url) === index) // Remove duplicates
 
   return (
     <div className="min-h-screen bg-white pt-20">
@@ -586,21 +589,21 @@ const ProductDetail: React.FC = () => {
                     <div>
                       <h4 className="font-playfair font-semibold text-lg mb-4">Specifications</h4>
                       <ul className="space-y-2 font-cormorant">
-                        <li className="flex justify-between">
+                        <li className="flex gap-2">
                           <span>Gender:</span>
                           <span>{product.gender}</span>
                         </li>
-                        <li className="flex justify-between">
+                        <li className="flex gap-2">
                           <span>Available Sizes:</span>
                           <span>{product.sizes.join(", ")}</span>
                         </li>
                         {product.colors && (
-                          <li className="flex justify-between">
+                          <li className="flex gap-2">
                             <span>Colors:</span>
                             <span>{product.colors.join(", ")}</span>
                           </li>
                         )}
-                        <li className="flex justify-between">
+                        <li className="flex gap-2">
                           <span>Stock:</span>
                           <span>{product.stock} units</span>
                         </li>

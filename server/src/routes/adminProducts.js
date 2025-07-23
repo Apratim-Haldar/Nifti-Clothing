@@ -104,6 +104,33 @@ router.post('/upload/temp/color-image', verifyToken, verifyAdmin, (req, res) => 
   });
 });
 
+// Upload temporary additional image
+router.post('/upload/temp/additional-image', verifyToken, verifyAdmin, (req, res) => {
+  uploadProductTemp.single('image')(req, res, (err) => {
+    if (err) {
+      return handleS3Error(err, req, res);
+    }
+    
+    if (!req.file) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'No file uploaded' 
+      });
+    }
+
+    // Register temporary asset
+    s3AssetManager.registerTempAsset(req.sessionId, req.file.key, 'products');
+
+    res.json({
+      success: true,
+      message: 'Additional image uploaded temporarily',
+      imageUrl: req.file.location,
+      filename: req.file.key,
+      sessionId: req.sessionId
+    });
+  });
+});
+
 // Manual session cleanup endpoint
 router.post('/cleanup-session', verifyToken, verifyAdmin, async (req, res) => {
   try {
@@ -394,6 +421,7 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
       colorImages: finalColorImages,
       defaultColor: finalDefaultColor,
       imageUrl: finalImageUrl,
+      additionalImages: additionalImages || [],
       categories: categories || [],
       isHero: isHero || false,
       heroImage: finalHeroImage || null,
@@ -447,6 +475,7 @@ router.put('/:id', verifyToken, verifyAdmin, async (req, res) => {
       colors, 
       colorImages,
       imageUrl, 
+      additionalImages,
       categories, 
       isHero, 
       heroImage, 
@@ -518,6 +547,7 @@ router.put('/:id', verifyToken, verifyAdmin, async (req, res) => {
       ...(colorImages !== undefined && { colorImages }),
       ...(finalDefaultColor !== undefined && { defaultColor: finalDefaultColor }),
       ...(imageUrl !== undefined && { imageUrl }),
+      ...(additionalImages !== undefined && { additionalImages }),
       ...(categories !== undefined && { categories }),
       ...(isHero !== undefined && { isHero }),
       ...(heroImage !== undefined && { heroImage }),

@@ -14,6 +14,7 @@ const ProductSchema = new mongoose.Schema({
   colorImages: [ColorImageSchema],
   defaultColor: { type: String },
   imageUrl: { type: String, required: true },
+  additionalImages: [{ type: String }],
   inStock: { type: Boolean, default: true },
   stock: { type: Number, required: true, default: 0, min: 0 },
   lowStockThreshold: { type: Number, default: 10 },

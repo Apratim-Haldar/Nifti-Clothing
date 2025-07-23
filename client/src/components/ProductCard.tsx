@@ -10,6 +10,7 @@ interface Product {
   price: number
   sizes: string[]
   imageUrl: string
+  additionalImages?: string[]
   inStock: boolean
   stockStatus?: string
   categories?: string[]

@@ -13,6 +13,7 @@ interface Product {
   colorImages: { color: string; imageUrl: string }[];
   defaultColor?: string;
   imageUrl: string;
+  additionalImages?: string[];
   stock: number;
   lowStockThreshold: number;
   gender: 'Men' | 'Women' | 'Unisex';
@@ -41,6 +42,7 @@ interface FormData {
   gender: 'Men' | 'Women' | 'Unisex';
   categories: string[];
   imageUrl: string;
+  additionalImages: string[];
   defaultColor: string;
   isHero: boolean;
   heroImage: string;
@@ -85,6 +87,7 @@ const ProductsTab: React.FC = () => {
     gender: 'Unisex',
     categories: [],
     imageUrl: '',
+    additionalImages: [],
     defaultColor: '',
     isHero: false,
     heroImage: '',
@@ -309,6 +312,61 @@ const ProductsTab: React.FC = () => {
     }
   };
 
+  // Upload additional product image to S3 (temporary)
+  const uploadAdditionalImage = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/admin/products/upload/temp/additional-image`,
+      formData,
+      { 
+        withCredentials: true,
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          'X-Session-ID': sessionId
+        }
+      }
+    );
+
+    if (response.data.success) {
+      return response.data.imageUrl;
+    } else {
+      throw new Error(response.data.message || 'Upload failed');
+    }
+  };
+
+  // Handle additional image upload
+  const handleAdditionalImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const imageUrl = await uploadAdditionalImage(file);
+      setFormData(prev => ({ 
+        ...prev, 
+        additionalImages: [...prev.additionalImages, imageUrl] 
+      }));
+      addToast('Additional image uploaded successfully!', 'success');
+      // Clear the input
+      e.target.value = '';
+    } catch (error: any) {
+      console.error('Error uploading additional image:', error);
+      addToast(error.response?.data?.message || 'Error uploading additional image', 'error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Remove additional image
+  const removeAdditionalImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      additionalImages: prev.additionalImages.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -444,6 +502,7 @@ const ProductsTab: React.FC = () => {
       gender: product.gender,
       categories: product.categories,
       imageUrl: product.imageUrl,
+      additionalImages: product.additionalImages || [],
       defaultColor: product.defaultColor || '',
       isHero: product.isHero || false,
       heroImage: product.heroImage || '',
@@ -510,6 +569,7 @@ const ProductsTab: React.FC = () => {
       gender: 'Unisex',
       categories: [],
       imageUrl: '',
+      additionalImages: [],
       defaultColor: '',
       isHero: false,
       heroImage: '',
@@ -901,6 +961,39 @@ const ProductsTab: React.FC = () => {
                   )}
                 </div>
 
+                {/* Additional Images Upload */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Additional Product Images</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAdditionalImageUpload}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                  />
+                  <p className="text-xs text-gray-500 mb-3">Add more images to showcase different angles or details of your product</p>
+                  
+                  {formData.additionalImages.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {formData.additionalImages.map((imageUrl, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={imageUrl}
+                            alt={`Additional ${index + 1}`}
+                            className="w-full h-24 object-cover rounded-lg border"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeAdditionalImage(index)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 {/* Hero Section */}
                 <div className="border border-yellow-200 bg-yellow-50 p-4 rounded-lg">
                   <div className="flex items-center mb-3">
@@ -1082,24 +1175,45 @@ const ProductsTab: React.FC = () => {
 
                 {/* Categories */}
                 <div>
-                  <label className="block text-sm font-medium mb-1">Categories</label>
-                  <select
-                    multiple
-                    value={formData.categories}
-                    onChange={(e) => {
-                      const values = Array.from(e.target.selectedOptions, option => option.value);
-                      setFormData(prev => ({ ...prev, categories: values }));
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    size={4}
-                  >
-                    {categories.map((category) => (
-                      <option key={category._id} value={category._id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                  <label className="block text-sm font-medium mb-3">Categories</label>
+                  <div className="border border-gray-300 rounded-lg p-4 max-h-48 overflow-y-auto">
+                    {categories.length === 0 ? (
+                      <p className="text-gray-500 text-sm">No categories available</p>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {categories.map((category) => {
+                          const isSelected = formData.categories.includes(category._id);
+                          return (
+                            <label 
+                              key={category._id} 
+                              className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={(e) => {
+                                  const categoryId = category._id;
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    categories: e.target.checked
+                                      ? [...prev.categories, categoryId]
+                                      : prev.categories.filter(id => id !== categoryId)
+                                  }));
+                                }}
+                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                              />
+                              <span className="text-sm text-gray-700">{category.name}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                  {formData.categories.length > 0 && (
+                    <p className="text-xs text-gray-600 mt-2">
+                      Selected: {formData.categories.length} categor{formData.categories.length === 1 ? 'y' : 'ies'}
+                    </p>
+                  )}
                 </div>
 
                 {/* Form Actions */}
