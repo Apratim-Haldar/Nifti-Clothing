@@ -477,168 +477,98 @@ router.post('/', verifyToken, verifyAdmin, async (req, res) => {
 // UPDATE product
 router.put('/:id', verifyToken, verifyAdmin, async (req, res) => {
   try {
-    // -----------------------------------------------------------------------
-    // 1️⃣  Destructure payload
-    // -----------------------------------------------------------------------
+    /* 1. payload */
     const {
-      title,
-      description,
-      price,
-      sizes,
-      colors,
-      colorImages,
-      imageUrl,
-      additionalImages,
-      categories,
-      isHero,
-      heroImage,
-      heroTagline,
-      stock,
-      gender,
-      lowStockThreshold,
-      defaultColor,
-
-      // housekeeping helpers coming from the admin UI
-      oldImageUrl,
-      oldColorImages,
-      oldAdditionalImages,
-      oldHeroImage,
+      title, description, price, sizes, colors, colorImages,
+      imageUrl, additionalImages, categories, isHero,
+      heroImage, heroTagline, stock, gender,
+      lowStockThreshold, defaultColor,
+      oldImageUrl, oldHeroImage, oldColorImages, oldAdditionalImages,
       sessionId
     } = req.body;
 
-    // -----------------------------------------------------------------------
-    // 2️⃣  Fetch product & sanity check
-    // -----------------------------------------------------------------------
+    /* 2. fetch doc */
     const product = await Product.findById(req.params.id);
-    if (!product)
-      return res.status(404).json({ message: 'Product not found' });
+    if (!product) return res.status(404).json({ message: 'Product not found' });
 
-    // -----------------------------------------------------------------------
-    // 3️⃣  🔀  MOVE TEMP ASSETS → FINAL FOLDERS
-    // -----------------------------------------------------------------------
-    // Helper that conditionally moves a temp asset
-    const moveIfTemp = async url => {
+    /* 3. helper to *promote* a temp asset */
+    const promote = async (url, folder = 'products') => {
       if (url && s3AssetManager.isTempAsset(url)) {
-        const final = await s3AssetManager.moveToFinal(url, 'products');
-        return final;
+        const key = s3AssetManager.extractKeyFromUrl(url);
+        if (key) {
+          try {
+            return await s3AssetManager.moveToFinal(key, folder);
+          } catch (err) {
+            console.error(`⚠️  Failed to move ${key}:`, err.message);
+          }
+        }
       }
       return url;
     };
 
-    // Main image
-    let finalImageUrl = await moveIfTemp(imageUrl || product.imageUrl);
+    /* 4. promote every incoming URL */
+    const finalImageUrl = await promote(imageUrl || product.imageUrl, 'products');
+    const finalHeroImage = await promote(heroImage || product.heroImage, 'advertisements');
 
-    // Hero image
-    let finalHeroImage = await moveIfTemp(heroImage || product.heroImage);
+    const finalColorImages = (colorImages ?? product.colorImages).map(ci => ({
+      color: ci.color,
+      imageUrl: ci.imageUrl === product.imageUrl ? product.imageUrl : ci.imageUrl
+    })).map(async ci => ({ ...ci, imageUrl: await promote(ci.imageUrl, 'products') }));
+    const resolvedColorImages = await Promise.all(finalColorImages);
 
-    // Color images
-    let finalColorImages = [];
-    if (colorImages && Array.isArray(colorImages)) {
-      for (const img of colorImages) {
-        finalColorImages.push({
-          color: img.color,
-          imageUrl: await moveIfTemp(img.imageUrl)
-        });
-      }
-    } else {
-      finalColorImages = product.colorImages;
-    }
+    const finalAdditionalImages = await Promise.all(
+      (additionalImages ?? product.additionalImages).map(u => promote(u, 'products'))
+    );
 
-    // Additional images
-    let finalAdditionalImages = [];
-    if (additionalImages && Array.isArray(additionalImages)) {
-      for (const imgUrl of additionalImages) {
-        finalAdditionalImages.push(await moveIfTemp(imgUrl));
-      }
-    } else {
-      finalAdditionalImages = product.additionalImages;
-    }
+    /* 5. delete orphaned assets */
+    const uniq = arr => [...new Set(arr)];
+    const removed = uniq([
+      ...(oldImageUrl && oldImageUrl !== finalImageUrl ? [oldImageUrl] : []),
+      ...(oldHeroImage && oldHeroImage !== finalHeroImage ? [oldHeroImage] : []),
+      ...(oldColorImages || []).filter(o => !resolvedColorImages.some(n => n.imageUrl === o.imageUrl)).map(o => o.imageUrl),
+      ...(oldAdditionalImages || []).filter(u => !finalAdditionalImages.includes(u))
+    ]);
 
-    // -----------------------------------------------------------------------
-    // 4️⃣  🚮  DELETE ASSETS NO LONGER USED
-    // -----------------------------------------------------------------------
-    // Main image
-    if (oldImageUrl && oldImageUrl !== finalImageUrl)
-      await deleteFromS3(oldImageUrl);
+    await Promise.all(removed.map(deleteFromS3));
 
-    // Hero image
-    if (oldHeroImage && oldHeroImage !== finalHeroImage)
-      await deleteFromS3(oldHeroImage);
-
-    // Color images
-    if (oldColorImages && Array.isArray(oldColorImages)) {
-      const newColorUrls = finalColorImages.map(ci => ci.imageUrl);
-      for (const old of oldColorImages) {
-        if (!newColorUrls.includes(old.imageUrl))
-          await deleteFromS3(old.imageUrl);
-      }
-    }
-
-    // Additional images
-    if (oldAdditionalImages && Array.isArray(oldAdditionalImages)) {
-      for (const old of oldAdditionalImages) {
-        if (!finalAdditionalImages.includes(old))
-          await deleteFromS3(old);
-      }
-    }
-
-    // -----------------------------------------------------------------------
-    // 5️⃣  BUILD UPDATE OBJECT
-    // -----------------------------------------------------------------------
-    const finalDefaultColor =
-      defaultColor ||
-      (colors && colors.length ? defaultColor : product.defaultColor);
-
-    const updateData = {
-      ...(title           !== undefined && { title }),
-      ...(description     !== undefined && { description }),
-      ...(price           !== undefined && { price }),
-      ...(sizes           !== undefined && { sizes }),
-      ...(colors          !== undefined && { colors }),
-      ...(categories      !== undefined && { categories }),
-      ...(isHero          !== undefined && { isHero }),
-      ...(heroTagline     !== undefined && { heroTagline }),
-      ...(gender          !== undefined && { gender }),
+    /* 6. build update */
+    const upd = {
+      ...(title !== undefined && { title }),
+      ...(description !== undefined && { description }),
+      ...(price !== undefined && { price }),
+      ...(sizes !== undefined && { sizes }),
+      ...(colors !== undefined && { colors }),
+      ...(categories !== undefined && { categories }),
+      ...(isHero !== undefined && { isHero }),
+      ...(heroTagline !== undefined && { heroTagline }),
+      ...(gender !== undefined && { gender }),
       ...(lowStockThreshold !== undefined && { lowStockThreshold }),
-      ...(stock !== undefined && {
-        stock,
-        inStock: stock > 0
-      }),
-      ...(finalDefaultColor !== undefined && { defaultColor: finalDefaultColor }),
-      imageUrl:        finalImageUrl,
-      heroImage:       finalHeroImage,
-      colorImages:     finalColorImages,
+      ...(stock !== undefined && { stock, inStock: stock > 0 }),
+      defaultColor: defaultColor || product.defaultColor,
+      imageUrl: finalImageUrl,
+      heroImage: finalHeroImage,
+      colorImages: resolvedColorImages,
       additionalImages: finalAdditionalImages
     };
 
-    // -----------------------------------------------------------------------
-    // 6️⃣  PERSIST & RETURN
-    // -----------------------------------------------------------------------
-    const updatedProduct = await Product.findByIdAndUpdate(
+    /* 7. save */
+    const updated = await Product.findByIdAndUpdate(
       req.params.id,
-      updateData,
+      upd,
       { new: true, runValidators: true }
     ).populate('categories');
 
-    // -----------------------------------------------------------------------
-    // 7️⃣  CLEANUP SESSION ASSETS
-    // -----------------------------------------------------------------------
-    const targetSessionId = sessionId || req.sessionId;
-    if (targetSessionId) {
-      s3AssetManager.markSessionInactive(targetSessionId);
-      await s3AssetManager.cleanupSession(targetSessionId);
+    /* 8. tidy session */
+    const sid = sessionId || req.sessionId;
+    if (sid) {
+      s3AssetManager.markSessionInactive(sid);
+      await s3AssetManager.cleanupSession(sid);
     }
 
-    res.json({
-      message: 'Product updated successfully',
-      product: updatedProduct
-    });
+    return res.json({ message: 'Product updated successfully', product: updated });
   } catch (err) {
-    console.error('Error updating product:', err);
-    res.status(500).json({
-      message: 'Failed to update product',
-      error: err.message
-    });
+    console.error('💥 update error:', err);
+    res.status(500).json({ message: 'Failed to update product', error: err.message });
   }
 });
 // DELETE product

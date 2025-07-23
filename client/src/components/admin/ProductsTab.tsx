@@ -359,12 +359,73 @@ const ProductsTab: React.FC = () => {
     }
   };
 
-  // Remove additional image
-  const removeAdditionalImage = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      additionalImages: prev.additionalImages.filter((_, i) => i !== index)
-    }));
+  // Remove unused removeAdditionalImage function
+  // const removeAdditionalImage = (index: number) => { ... } // REMOVE THIS LINE
+
+  // Add missing image handling functions
+  const handleImageDelete = async (imageUrl: string) => {
+    setUploading(true);
+    try {
+      await deleteImage(imageUrl);
+      setFormData(prev => ({
+        ...prev,
+        additionalImages: prev.additionalImages.filter(img => img !== imageUrl)
+      }));
+      addToast('Image deleted successfully!', 'success');
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      addToast('Failed to delete image. Please try again.', 'error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleImageReplace = async (file: File, index: number) => {
+    setUploading(true);
+    try {
+      // Upload new image first
+      const newImageUrl = await uploadAdditionalImage(file);
+      // Only delete old image if new upload succeeded
+      const oldImageUrl = formData.additionalImages[index];
+      setFormData(prev => {
+        const updatedImages = [...prev.additionalImages];
+        updatedImages[index] = newImageUrl;
+        return { ...prev, additionalImages: updatedImages };
+      });
+      // Delete old image from S3 after updating formData
+      if (oldImageUrl && newImageUrl) {
+        await deleteImage(oldImageUrl);
+      }
+      addToast('Image replaced successfully!', 'success');
+    } catch (error) {
+      console.error('Error replacing image:', error);
+      addToast('Failed to replace image. Please try again.', 'error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleAddAdditionalImage = async (file: File) => {
+    setUploading(true);
+    try {
+      // Upload new image to S3
+      const imageUrl = await uploadAdditionalImage(file);
+      // Only add to formData if upload succeeded
+      if (imageUrl) {
+        setFormData(prev => ({
+          ...prev,
+          additionalImages: [...prev.additionalImages, imageUrl]
+        }));
+        addToast('Additional image uploaded successfully!', 'success');
+      } else {
+        addToast('Failed to upload additional image. Please try again.', 'error');
+      }
+    } catch (error) {
+      console.error('Error uploading additional image:', error);
+      addToast('Failed to upload additional image. Please try again.', 'error');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -436,7 +497,8 @@ const ProductsTab: React.FC = () => {
         ...(editingProduct && {
           oldImageUrl: editingProduct.imageUrl,
           oldHeroImage: editingProduct.heroImage,
-          oldColorImages: editingProduct.colorImages
+          oldColorImages: editingProduct.colorImages,
+          oldAdditionalImages: editingProduct.additionalImages
         })
       };
 
@@ -981,13 +1043,33 @@ const ProductsTab: React.FC = () => {
                             alt={`Additional ${index + 1}`}
                             className="w-full h-24 object-cover rounded-lg border"
                           />
-                          <button
-                            type="button"
-                            onClick={() => removeAdditionalImage(index)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            ×
-                          </button>
+                          <div className="absolute top-2 right-2 flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleImageDelete(imageUrl)}
+                              className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                            >
+                              ×
+                            </button>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  handleImageReplace(file, index);
+                                }
+                              }}
+                              className="hidden"
+                              id={`replace-image-${index}`}
+                            />
+                            <label
+                              htmlFor={`replace-image-${index}`}
+                              className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-blue-600 cursor-pointer"
+                            >
+                              ↻
+                            </label>
+                          </div>
                         </div>
                       ))}
                     </div>
