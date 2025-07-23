@@ -154,7 +154,9 @@ const ProductsTab: React.FC = () => {
   // Upload main product image to S3 (temporary)
   const uploadProductImage = async (file: File): Promise<string> => {
     const formData = new FormData();
-    formData.append('image', file);
+    // Remove spaces from filename
+    const cleanFile = new File([file], file.name.replace(/\s+/g, '_'), { type: file.type });
+    formData.append('image', cleanFile);
 
     const response = await axios.post(
       `${import.meta.env.VITE_API_BASE_URL}/admin/products/upload/temp/product-image`,
@@ -178,7 +180,8 @@ const ProductsTab: React.FC = () => {
   // Upload hero image to S3 (temporary)
   const uploadHeroImage = async (file: File): Promise<string> => {
     const formData = new FormData();
-    formData.append('image', file);
+    const cleanFile = new File([file], file.name.replace(/\s+/g, '_'), { type: file.type });
+    formData.append('image', cleanFile);
 
     const response = await axios.post(
       `${import.meta.env.VITE_API_BASE_URL}/admin/products/upload/temp/hero-image`,
@@ -202,7 +205,8 @@ const ProductsTab: React.FC = () => {
   // Upload single color image to S3 (temporary)
   const uploadColorImage = async (file: File, color: string): Promise<string> => {
     const formData = new FormData();
-    formData.append('image', file);
+    const cleanFile = new File([file], file.name.replace(/\s+/g, '_'), { type: file.type });
+    formData.append('image', cleanFile);
     formData.append('color', color);
 
     const response = await axios.post(
@@ -315,7 +319,8 @@ const ProductsTab: React.FC = () => {
   // Upload additional product image to S3 (temporary)
   const uploadAdditionalImage = async (file: File): Promise<string> => {
     const formData = new FormData();
-    formData.append('image', file);
+    const cleanFile = new File([file], file.name.replace(/\s+/g, '_'), { type: file.type });
+    formData.append('image', cleanFile);
 
     const response = await axios.post(
       `${import.meta.env.VITE_API_BASE_URL}/admin/products/upload/temp/additional-image`,
