@@ -8,6 +8,7 @@ import { useCart } from "../context/CartContext"
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const location = useLocation()
   const { user, logout } = useAuth()
   const { cart } = useCart()
@@ -101,48 +102,55 @@ export default function Navbar() {
 
             {/* User Menu */}
             {user ? (
-              <div className="relative group">
+              <div className="relative">
                 <Button
                   variant="ghost"
                   size="icon"
                   className="hover:bg-stone-100 rounded-full"
+                  onClick={() => setProfileMenuOpen((open) => !open)}
+                  aria-label="Open profile menu"
                 >
                   <User className="h-5 w-5 text-stone-600" />
                 </Button>
-                <div className="absolute right-0 top-full mt-6 bg-white rounded-xl shadow-lg border border-stone-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <div className="p-4 border-b border-stone-100">
-                    <p className="font-cormorant font-semibold text-stone-800">{user.name}</p>
-                    <p className="text-sm text-stone-600">{user.email}</p>
-                  </div>
-                  <div className="py-2">
-                    <Link
-                      to="/profile"
-                      className="block px-4 py-2 text-stone-700 hover:bg-stone-50 font-cormorant"
-                    >
-                      Profile
-                    </Link>
-                    <Link
-                      to="/orders"
-                      className="block px-4 py-2 text-stone-700 hover:bg-stone-50 font-cormorant"
-                    >
-                      Orders
-                    </Link>
-                    {user.isAdmin && (
+                {(profileMenuOpen) && (
+                  <div className="absolute right-0 top-full mt-6 bg-white rounded-xl shadow-lg border border-stone-200 z-50">
+                    <div className="p-4 border-b border-stone-100">
+                      <p className="font-cormorant font-semibold text-stone-800">{user.name}</p>
+                      <p className="text-sm text-stone-600">{user.email}</p>
+                    </div>
+                    <div className="py-2">
                       <Link
-                        to="/admin"
+                        to="/profile"
                         className="block px-4 py-2 text-stone-700 hover:bg-stone-50 font-cormorant"
+                        onClick={() => setProfileMenuOpen(false)}
                       >
-                        Admin Dashboard
+                        Profile
                       </Link>
-                    )}
-                    <button
-                      onClick={logout}
-                      className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 font-cormorant"
-                    >
-                      Logout
-                    </button>
+                      <Link
+                        to="/orders"
+                        className="block px-4 py-2 text-stone-700 hover:bg-stone-50 font-cormorant"
+                        onClick={() => setProfileMenuOpen(false)}
+                      >
+                        Orders
+                      </Link>
+                      {user.isAdmin && (
+                        <Link
+                          to="/admin"
+                          className="block px-4 py-2 text-stone-700 hover:bg-stone-50 font-cormorant"
+                          onClick={() => setProfileMenuOpen(false)}
+                        >
+                          Admin Dashboard
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => { logout(); setProfileMenuOpen(false); }}
+                        className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 font-cormorant"
+                      >
+                        Logout
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             ) : (
               <div className="hidden md:flex items-center space-x-3">
