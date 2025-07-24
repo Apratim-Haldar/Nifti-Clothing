@@ -365,7 +365,7 @@ const ProductDetail: React.FC = () => {
             </div>
             {productImages.length > 1 && (
               <div className="grid grid-cols-4 gap-4">
-                {productImages.slice(0, 4).map((image, index) => (
+                {productImages.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
