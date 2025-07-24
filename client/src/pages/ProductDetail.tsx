@@ -1,7 +1,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
-import { Share2, Star, Truck, Shield, RotateCcw, Minus, Plus, ArrowLeft, Copy, Facebook, Twitter, MessageCircle } from "lucide-react"
+import { Share2, ArrowRight, Star, Truck, Shield, RotateCcw, Minus, Plus, ArrowLeft, Copy, Facebook, Twitter, MessageCircle } from "lucide-react"
 import axios from "axios"
 import { useCart } from "../context/CartContext"
 import { useAuth } from "../context/AuthContext"
@@ -351,38 +351,67 @@ const ProductDetail: React.FC = () => {
 
         <div className="grid lg:grid-cols-2 gap-16">
           {/* Product Images */}
-          <div className="space-y-4">
-            <div className="aspect-square overflow-hidden rounded-2xl bg-stone-100">
-              <img
-                src={productImages[selectedImageIndex] || product.imageUrl}
-                alt={product.title}
-                className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement
-                  target.src = "/placeholder.jpg"
-                }}
-              />
-            </div>
-            {productImages.length > 1 && (
-              <div className="grid grid-cols-4 gap-4">
-                {productImages.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImageIndex(index)}
-                    className={`aspect-square overflow-hidden rounded-lg transition-all ${
-                      selectedImageIndex === index ? "ring-2 ring-stone-800" : "hover:opacity-75"
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${product.title} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+           <div className="space-y-4">
+             <div className="relative aspect-square overflow-hidden rounded-2xl bg-stone-100">
+               {/* Main image */}
+               <img
+                 src={productImages[selectedImageIndex]}
+                 alt={`${product.title} ${selectedImageIndex  + 1}`}
+                 className="w-full h-full object-contain transition-transform duration-500"
+                 onError={(e) => {
+                   const target = e.target as HTMLImageElement
+                   target.src = "/placeholder.jpg"
+                 }}
+               />
+ 
+               {/* Prev arrow */}
+               {selectedImageIndex > 0 && (
+                 <button
+                   onClick={() => setSelectedImageIndex(i => i - 1)}
+                   className="absolute left-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-stone-100 transition"
+                 >
+                   <ArrowLeft className="w-5 h-5 text-stone-800" />
+                 </button>
+               )}
+ 
+               {/* Next arrow */}
+               {selectedImageIndex < productImages.length - 1 && (
+                 <button
+                   onClick={() => setSelectedImageIndex(i => i  + 1)}
+                   className="absolute right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-stone-100 transition"
+                 >
+                   <ArrowRight className="w-5 h-5 text-stone-800" />
+                 </button>
+               )}
+             </div>
+ 
+             {/* Thumbnail strip: 4 per view, scrollable */}
+             {productImages.length > 1 && (
+               <div className="flex overflow-x-auto space-x-4 snap-x snap-mandatory">
+                 {productImages.map((image, index) => (
+                   <button
+                     key={index}
+                     onClick={() => setSelectedImageIndex(index)}
+                     className={`
+                       snap-start
+                       flex-shrink-0 w-1/4 aspect-square
+                       rounded-lg overflow-hidden
+                       transition-opacity duration-200
+                       ${selectedImageIndex === index
+                         ? "ring-2 ring-stone-800"
+                         : "opacity-70 hover:opacity-100"}
+                     `}
+                   >
+                     <img
+                       src={image}
+                       alt={`${product.title} thumb ${index +  1}`}
+                       className="w-full h-full object-cover"
+                     />
+                   </button>
+                 ))}
+               </div>
+             )}
+           </div>
 
           {/* Product Info */}
           <div className="space-y-8">

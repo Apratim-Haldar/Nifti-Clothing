@@ -626,7 +626,7 @@ const ProductList: FC = () => {
 
       {/* mobile overlay ------------------------------------------- */}
       {isFilterOpen && (
-        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+        <div className="lg:hidden fixed inset-0 bg-slate-300/80 z-50">
           <div className="fixed inset-y-0 left-0 w-80 bg-white overflow-y-auto">
             <div className="p-6">
               <FilterSidebar

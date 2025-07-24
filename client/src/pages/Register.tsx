@@ -363,13 +363,14 @@ const Register: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-cormorant font-medium text-stone-900 mb-2 tracking-wide">
-                  Phone Number <span className="text-stone-500 font-inter text-xs">(Optional)</span>
+                  Phone Number <span className="text-stone-500 font-inter text-xs"></span>
                 </label>
                 <input
                   type="tel"
                   name="phone"
                   placeholder="Enter your phone number"
                   value={formData.phone}
+                  required
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
                   className="w-full border-2 border-stone-200 px-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300 rounded-lg bg-white/50 backdrop-blur-sm font-inter"
                 />
