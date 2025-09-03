@@ -65,7 +65,6 @@ const PublicBillPage: React.FC = () => {
         // A4 page dimensions in mm: 210mm wide, 297mm tall
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
         
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;

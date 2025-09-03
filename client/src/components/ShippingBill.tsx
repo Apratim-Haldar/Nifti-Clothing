@@ -3,16 +3,16 @@
 import type React from "react"
 import QRCode from "react-qr-code"
 
-interface OrderItem {
+/* interface OrderItem {
   productId: string
   title: string
   imageUrl: string
   price: number
   size: string
   quantity: number
-}
+} */
 
-interface Order {
+/* interface Order {
   _id: string
   orderNumber: string
   userId: string
@@ -30,10 +30,10 @@ interface Order {
   notes?: string
   createdAt: string
   updatedAt: string
-}
+} */
 
 interface ShippingBillProps {
-  order: Order
+  order: any
   onClose: () => void
 }
 
