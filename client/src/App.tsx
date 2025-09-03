@@ -24,6 +24,7 @@ import CancellationRefunds from './pages/CancellationRefunds';
 import ContactUs from './pages/ContactUs';
 import ResetPassword from './pages/ResetPassword'; // Import the ResetPassword component
 import { ModalProvider } from './context/ModalContext';
+import PublicBillPage from './components/PublicBillPage';
 
 function App() {
   return (
@@ -72,6 +73,7 @@ function App() {
           <Route path="/cancellations" element={<CancellationRefunds />} />
           <Route path="/unsubscribe" element={<Unsubscribe />} />
           
+          <Route path="/bill/:orderNumber" element={<PublicBillPage />} />
           {/* Protected routes (require authentication) */}
           <Route 
             path="/cart" 

@@ -23,14 +23,6 @@ const cartRoutes = require('./routes/cart');
 // Configure dotenv to look for .env file in the server root directory
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
-// Log environment loading
-console.log('Loading environment variables from:', path.join(__dirname, '..', '.env'));
-console.log('Environment check:');
-console.log('- NODE_ENV:', process.env.NODE_ENV || 'development');
-console.log('- PORT:', process.env.PORT || 'using default 8080');
-console.log('- MONGODB_URI:', process.env.MONGODB_URI ? 'Set ✅' : 'Not set ❌');
-console.log('- AWS_S3_BUCKET:', process.env.AWS_S3_BUCKET ? 'Set ✅' : 'Not set ❌');
-console.log('- AWS_REGION:', process.env.AWS_REGION ? 'Set ✅' : 'Not set ❌');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -54,25 +46,23 @@ const allowedOrigins = [
   // Remove this in actual production!
 ].filter(Boolean); // Remove undefined values
 
-console.log('Allowed CORS origins:', allowedOrigins);
+
 
 // Configure CORS for production and development
 const corsOptions = {
   origin: function (origin, callback) {
-    console.log('CORS check for origin:', origin);
     
     // Allow requests with no origin (mobile apps, etc.)
     if (!origin) {
-      console.log('Allowing request with no origin');
+
       return callback(null, true);
     }
     
     if (allowedOrigins.indexOf(origin) !== -1) {
-      console.log('Origin allowed:', origin);
+
       callback(null, true);
     } else {
-      console.log('CORS blocked origin:', origin);
-      console.log('Allowed origins:', allowedOrigins);
+
       // For development/testing, you might want to allow all origins temporarily
       // Remove this in production!
       if (isProduction) {
@@ -172,7 +162,5 @@ mongoose.connect(process.env.MONGODB_URI)
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`Allowed CORS origins: ${allowedOrigins.join(', ')}`);
   console.log(`Production mode: ${isProduction}`);
 });

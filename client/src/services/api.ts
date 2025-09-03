@@ -64,6 +64,18 @@ export const fetchAllOrders = async () => {
   return res.data;
 };
 
+export const fetchSingleOrder = async (orderNumber: string) => {
+  try {
+    // This calls the new backend endpoint we will create below
+    const response = await API.get(`/orders/by-number/${orderNumber}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching order ${orderNumber}:`, error);
+    // Re-throw the error so the component can handle it
+    throw error;
+  }
+};
+
 export const updateOrderStatus = async (orderId: string, status: string, paymentStatus?: string) => {
   const res = await API.patch(`/orders/${orderId}/status`, { status, paymentStatus });
   return res.data;

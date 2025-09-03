@@ -415,17 +415,6 @@ const ProductsTab: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('🔄 Form submission started');
-    console.log('📝 Form data:', formData);
-    console.log('🆔 Session ID:', sessionId);
-    console.log('🔍 Validation check:');
-    console.log('  - Title:', formData.title);
-    console.log('  - Price:', formData.price);
-    console.log('  - Stock:', formData.stock);
-    console.log('  - Gender:', formData.gender);
-    console.log('  - ImageUrl:', formData.imageUrl);
-    console.log('  - Sizes:', formData.sizes, 'Length:', formData.sizes.length);
-    
     if (!formData.title || !formData.price || !formData.stock || !formData.gender) {
       console.log('❌ Missing required fields');
       addToast('Please fill in all required fields', 'error');
@@ -433,16 +422,12 @@ const ProductsTab: React.FC = () => {
     }
 
     if (!formData.imageUrl) {
-      console.log('❌ Missing image URL');
       addToast('Please upload a product image', 'error');
       return;
     }
 
     if (formData.sizes.length === 0) {
-      console.log('❌ No sizes provided');
-      console.log('🧪 Testing addToast function...');
       addToast('Please add at least one size', 'error');
-      console.log('✅ addToast called');
       return;
     }
 
@@ -453,7 +438,6 @@ const ProductsTab: React.FC = () => {
     }
 
     setSaving(true);
-    console.log('💾 Starting save process...');
     try {
       // Prepare color images data
       const colorImagesData = Object.entries(colorImages)
@@ -488,7 +472,6 @@ const ProductsTab: React.FC = () => {
 
       let response;
       if (editingProduct) {
-        console.log('📝 Updating existing product:', editingProduct._id);
         response = await axios.put(
           `${import.meta.env.VITE_API_BASE_URL}/admin/products/${editingProduct._id}`,
           productData,
@@ -500,9 +483,6 @@ const ProductsTab: React.FC = () => {
           }
         );
       } else {
-        console.log('➕ Creating new product');
-        console.log('🌐 API URL:', `${import.meta.env.VITE_API_BASE_URL}/admin/products`);
-        console.log('📦 Product data:', productData);
         
         response = await axios.post(
           `${import.meta.env.VITE_API_BASE_URL}/admin/products`,
@@ -515,8 +495,6 @@ const ProductsTab: React.FC = () => {
           }
         );
       }
-
-      console.log('✅ Response received:', response.data);
 
       // Use the response to show more specific success message
       addToast(

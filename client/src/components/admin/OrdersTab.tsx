@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchAllOrders, updateOrderStatus, addOrderNote } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
-import ShippingBill from './ShippingBill';
+import ShippingBill from '../ShippingBill';
 import './OrdersTab.css';
 
 interface OrderItem {

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const puppeteer = require('puppeteer');
 const { verifyToken } = require('../middleware/authMiddleware');
 const { sendOrderConfirmationEmail } = require('../utils/emailService');
 
@@ -99,6 +100,59 @@ router.get('/my-orders', verifyToken, async (req, res) => {
   }
 });
 
+router.get('/bill/:orderNumber', async (req, res) => {
+  try {
+    const { orderNumber } = req.params;
+    const order = await Order.findOne({ orderNumber }).populate('user');
+
+    if (!order) {
+      return res.status(404).send('Order not found');
+    }
+
+    // --- PDF Generation Logic ---
+    const browser = await puppeteer.launch({ args: ['--no-sandbox'] }); // Use --no-sandbox for server environments
+    const page = await browser.newPage();
+
+    // You would create an HTML template for your bill.
+    // For consistency, you can reuse the same React component's structure/CSS.
+    const htmlContent = `
+      <html>
+        <head>
+          <title>Shipping Bill - ${order.orderNumber}</title>
+          <style>
+            /* IMPORTANT: Paste the CSS from your ShippingBill component here */
+            /* For example: body { font-family: sans-serif; } .header { ... } */
+          </style>
+        </head>
+        <body>
+          <div class="bill-content">
+             <h1>Shipping Bill for ${order.orderNumber}</h1>
+             <p>Customer: ${order.user.name}</p>
+             <p>Total: ₹${order.totalAmount}</p>
+             </div>
+        </body>
+      </html>
+    `;
+
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
+
+    await browser.close();
+
+    // --- Send PDF as Response ---
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Length': pdfBuffer.length,
+      'Content-Disposition': `attachment; filename="Nifti-Bill-${order.orderNumber}.pdf"`,
+    });
+    res.send(pdfBuffer);
+
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    res.status(500).send('Could not generate PDF.');
+  }
+});
+
 // Cancel order (customer)
 router.patch('/:orderId/cancel', verifyToken, async (req, res) => {
   try {
@@ -142,6 +196,22 @@ router.get('/admin/all', verifyToken, async (req, res) => {
   } catch (err) {
     console.error('Error fetching orders:', err);
     res.status(500).json({ message: 'Failed to fetch orders' });
+  }
+});
+
+// It finds an order by its 'orderNumber' field instead of its '_id'
+router.get('/by-number/:orderNumber', async (req, res) => {
+  try {
+    const order = await Order.findOne({ orderNumber: req.params.orderNumber });
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.json(order);
+  } catch (error) {
+    console.error('Server error fetching order by number:', error);
+    res.status(500).json({ message: 'Server Error' });
   }
 });
 
